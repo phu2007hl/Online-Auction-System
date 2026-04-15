@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox alignment="CENTER_LEFT" prefWidth="305.0" spacing="12" style="-fx-background-radius: 30; -fx-border-radius: 30; -fx-border-color: black;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.RegisterController">
+<VBox alignment="CENTER_LEFT" prefWidth="305.0" spacing="12" style="-fx-background-radius: 30; -fx-border-radius: 30;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.RegisterController">
 
     <padding><Insets bottom="30" left="30" right="30" top="30" /></padding>
 
@@ -16,10 +16,10 @@
 
     <TextField fx:id="tfUsername" promptText="Nhập username..." style="-fx-background-radius: 15;" />
    <Label text="Email/SĐT:" />
-   <TextField promptText="Nhập email/sđt" />
+   <TextField promptText="Nhập email/sđt" style="-fx-background-radius: 30;" />
 
     <Label text="Mật khẩu:" />
-    <PasswordField fx:id="pfPassword" promptText="Nhập password..." />
+    <PasswordField fx:id="pfPassword" promptText="Nhập password..." style="-fx-background-radius: 30;" />
    <CheckBox mnemonicParsing="false" text="Tôi đồng ý với điều khoản quy định">
       <font>
          <Font size="10.0" />
@@ -28,7 +28,7 @@
     <Canvas fx:id="captchaCanvas" height="50.0" onMouseClicked="#reloadCaptcha" width="150.0" />
    <TextField />
 
-    <Button maxWidth="Infinity" onAction="#handleRegister" text="Đăng ký" />
+    <Button defaultButton="true" maxWidth="Infinity" onAction="#handleRegister" text="Đăng ký" />
     <Label text="Đã có tài khoản?">
         <VBox.margin>
             <Insets top="10.0" />
