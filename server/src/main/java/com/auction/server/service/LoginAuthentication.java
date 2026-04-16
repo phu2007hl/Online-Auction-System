@@ -1,6 +1,7 @@
 package com.auction.server.service;
 import java.util.HashMap;
 
+import com.auction.shared.enums.LoginResponseStatus;
 import com.auction.shared.request.Request;
 import com.auction.shared.request.LoginRequest;
 import com.auction.server.database.UserDatabase;
@@ -9,31 +10,33 @@ import com.auction.shared.response.LoginResponse;
 import com.auction.shared.model.User;
 
 public class LoginAuthentication {
-    private Request request;
+    private LoginRequest request;
+    private HashMap<String, User> userdata = UserDatabase.loadUser();
 
     public LoginAuthentication(Request request) {
-        this.request = request;
+        this.request = (LoginRequest) request;
     }
 
-    public boolean authenticateLogin() {
-        HashMap<String, User> userdata = UserDatabase.loadUser();
+    public boolean containsEmail() {
+        return userdata.containsKey(request.getEmail());
+    }
 
-        if (!userdata.containsKey(((LoginRequest) request).getEmail())) {
-            return false;
-        }
-
-        User user = userdata.get(((LoginRequest) request).getEmail());
-        return user.getPassword().equals(((LoginRequest) request).getPassword());
+    public boolean matchPassword() {
+        String userPassword = userdata.get(request.getEmail()).getPassword();
+        String requestPassword = request.getPassword();
+        return requestPassword.equals(userPassword);
     }
 
     public Response createResponse() {
-        if (authenticateLogin()){
-            LoginResponse response = new LoginResponse(true);
-            return response;
+        if (containsEmail()) { // email ton tai
+
+            if (!matchPassword()) { // mat khau request tren ui khop voi mat khau co trong database
+                return new LoginResponse(false, LoginResponseStatus.INVALID_PASSWORD);
+            }
+            return new LoginResponse(true, LoginResponseStatus.SUCCESS);
         }
         else{
-            LoginResponse response = new LoginResponse(false);
-            return response;
+            return new LoginResponse(false, LoginResponseStatus.EMAIL_NOT_FOUND);
         }
     }
 }

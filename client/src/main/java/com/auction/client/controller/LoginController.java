@@ -1,5 +1,6 @@
 package com.auction.client.controller;
 
+import com.auction.shared.enums.LoginResponseStatus;
 import com.auction.shared.response.LoginResponse;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -62,11 +63,15 @@ public class LoginController {
             LoginResponse response = (LoginResponse) socket.sendRequest(request);
             System.out.println("Client: after sendRequest");
 
-            if (response.getResponse()==true){
+            if (response.getResponse()){
                 switchToMain(event);
             }
             else{
-                messageLabel.setText("Email hoặc mật khẩu không hợp lệ.");
+                if(response.getStatus()==LoginResponseStatus.EMAIL_NOT_FOUND){
+                    messageLabel.setText("Email không tồn tại.");
+                }
+                else if(response.getStatus()==LoginResponseStatus.INVALID_PASSWORD)
+                messageLabel.setText("Mật khẩu không hợp lệ.");
             }
         }
         catch (Exception e){

@@ -79,10 +79,11 @@ public class RegisterController {
             System.out.println("Client: after sendRequest");
 
             if (response.getResponse() == true){
+                messageLabel.setText("Đăng ký thành công. Đang chuyển trang...");
                 switchToMain(event);
             }
             else{
-                messageLabel.setText("Email already exist.");
+                messageLabel.setText("Email đã tồn tại.");
             }
         }
         catch (Exception e){
@@ -99,7 +100,6 @@ public class RegisterController {
         System.out.println("Email: " + email);
         System.out.println("Password: " + password);
 
-        messageLabel.setText("Register button clicked.");
     }
 
     @FXML
