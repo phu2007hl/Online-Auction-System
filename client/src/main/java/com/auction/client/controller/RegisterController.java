@@ -1,133 +1,176 @@
 package com.auction.client.controller;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-
-import java.net.URL;
-import java.util.Random;
-import java.util.ResourceBundle;
-
-import com.auction.client.MainApp;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 import java.io.IOException;
 
-public class RegisterController implements Initializable {
+import com.auction.client.network.SocketClient;
+import com.auction.shared.request.Request;
+import com.auction.client.service.RegisterAuthenticationService;
+import com.auction.shared.response.RegisterResponse;
 
-    @FXML private TextField usernameField;
-    @FXML private TextField emailField;
-    @FXML private PasswordField passwordField;
-    @FXML private CheckBox agreeCheckBox;
-    @FXML private Label errorLabel;
+public class RegisterController {
+    private SocketClient socket;
 
-    @FXML private Canvas captchaCanvas;
-    @FXML private TextField captchaInputField;
-
-    private String currentCaptchaText;
-
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        // Tự động tạo mã CAPTCHA khi màn hình đăng ký hiện lên
-        generateCaptcha();
-    }
-
-    /**
-     * Xử lý khi người dùng nhấn nút Đăng ký
-     */
     @FXML
-    private void handleRegister() {
-        String username = usernameField.getText();
-        String email = emailField.getText();
+    private TextField fullNameField;
+
+    @FXML
+    private TextField usernameField;
+
+    @FXML
+    private TextField emailField;
+
+    @FXML
+    private PasswordField passwordField;
+
+    @FXML
+    private PasswordField confirmPasswordField;
+
+    @FXML
+    private Label messageLabel;
+
+    @FXML
+    public void setSocketClient(SocketClient socket){
+        this.socket = socket;
+
+    }
+    @FXML
+    private void handleRegister(ActionEvent event) {
+        String fullName = fullNameField.getText().trim();
+        String username = usernameField.getText().trim();
+        String email = emailField.getText().trim();
         String password = passwordField.getText();
-        String captchaInput = captchaInputField.getText();
+        String confirmPassword = confirmPasswordField.getText();
 
-        // 1. Kiểm tra các trường trống
-        if (username.isEmpty() || email.isEmpty() || password.isEmpty() || captchaInput.isEmpty()) {
-            showError("Vui lòng điền đầy đủ thông tin!");
+        if (fullName.isEmpty() || username.isEmpty() || email.isEmpty()
+                || password.isEmpty() || confirmPassword.isEmpty()) {
+            messageLabel.setText("Please fill in all fields.");
             return;
         }
 
-        // 2. Kiểm tra CAPTCHA
-        if (!captchaInput.equalsIgnoreCase(currentCaptchaText)) {
-            showError("Mã xác nhận không đúng!");
-            generateCaptcha(); // Đổi mã mới ngay lập tức
+        if (!password.equals(confirmPassword)) {
+            messageLabel.setText("Passwords do not match.");
             return;
         }
-
-        // 3. Kiểm tra Checkbox điều khoản
-        if (!agreeCheckBox.isSelected()) {
-            showError("Bạn phải đồng ý với điều khoản dịch vụ!");
-            return;
+        try{
+            RegisterAuthenticationService service = new RegisterAuthenticationService(email, password, username);
+            System.out.println("Client: creating register request");
+            Request request = service.createAuthRequest();
+            System.out.println("Client: before sendRequest");
+            RegisterResponse response = (RegisterResponse) socket.sendRequest(request);
+            System.out.println("Client: after sendRequest");
+            if (response == null){
+                System.out.println("response is null");
+            }
+            if (response.getResponse() == true){
+                switchToMain(event);
+            }
+            else{
+                messageLabel.setText("Email already exist.");
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
 
-        // Nếu mọi thứ ổn
-        errorLabel.setStyle("-fx-text-fill: green;");
-        errorLabel.setText("Đăng ký thành công! Đang chuyển hướng...");
+        // Later, replace this with your real authentication class
+        // Example:
+        // AuthenticationService authService = new AuthenticationService();
+        // boolean success = authService.register(fullName, username, email, password);
 
-        // TODO: Gửi dữ liệu qua Socket/API lên Server để lưu vào database
-        System.out.println("Gửi yêu cầu đăng ký: " + username + " - " + email);
-    }
+        System.out.println("Full name: " + fullName);
+        System.out.println("Username: " + username);
+        System.out.println("Email: " + email);
+        System.out.println("Password: " + password);
 
-    /**
-     * Xử lý khi click vào Canvas để đổi mã CAPTCHA mới
-     */
-    @FXML
-    private void reloadCaptcha(MouseEvent event) {
-        generateCaptcha();
-    }
-
-    /**
-     * Thuật toán vẽ CAPTCHA trực tiếp lên Canvas
-     */
-    private void generateCaptcha() {
-        GraphicsContext gc = captchaCanvas.getGraphicsContext2D();
-        Random rand = new Random();
-
-        // Xóa Canvas và tô nền
-        gc.clearRect(0, 0, captchaCanvas.getWidth(), captchaCanvas.getHeight());
-        gc.setFill(Color.web("#f4f4f4"));
-        gc.fillRect(0, 0, captchaCanvas.getWidth(), captchaCanvas.getHeight());
-
-        // Tạo chuỗi ngẫu nhiên 5 ký tự
-        String chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 5; i++) {
-            sb.append(chars.charAt(rand.nextInt(chars.length())));
-        }
-        currentCaptchaText = sb.toString();
-
-        // Vẽ chữ với hiệu ứng nghiêng nhẹ
-        gc.setFont(Font.font("Verdana", 26));
-        for (int i = 0; i < currentCaptchaText.length(); i++) {
-            gc.setFill(Color.rgb(rand.nextInt(150), rand.nextInt(150), rand.nextInt(150)));
-            // Vẽ từng ký tự với vị trí x cách nhau, y ngẫu nhiên một chút
-            gc.fillText(String.valueOf(currentCaptchaText.charAt(i)), 20 + (i * 25), 35 + rand.nextInt(10) - 5);
-        }
-
-        // Vẽ thêm các đường kẻ gây nhiễu
-        for (int i = 0; i < 5; i++) {
-            gc.setStroke(Color.rgb(rand.nextInt(200), rand.nextInt(200), rand.nextInt(200)));
-            gc.strokeLine(rand.nextInt(150), rand.nextInt(50), rand.nextInt(150), rand.nextInt(50));
-        }
+        messageLabel.setText("Register button clicked.");
     }
 
     @FXML
-    private void handleGoToLogin() {
+    private void switchToLogin(ActionEvent event) {
         try {
-            // Chuyển về màn hình login.fxml
-            MainApp.setRoot("login");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoginView.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            boolean isMaximized = stage.isMaximized();
+            double width = stage.getWidth();
+            double height = stage.getHeight();
+
+            Scene scene = new Scene(root, width, height);
+            stage.setScene(scene);
+
+            stage.setMaximized(isMaximized);
+
+            if (!isMaximized) {
+                stage.centerOnScreen();
+            }
+
+            stage.setTitle("Login");
+
+            stage.show();
+
         } catch (IOException e) {
             e.printStackTrace();
-            showError("Không thể quay lại trang đăng nhập!");
+            messageLabel.setText("Could not open login page.");
         }
     }
 
-    private void showError(String message) {
-        errorLabel.setStyle("-fx-text-fill: red;");
-        errorLabel.setText(message);
+    public String getFullNameInput() {
+        return fullNameField.getText().trim();
     }
+
+    public String getUsernameInput() {
+        return usernameField.getText().trim();
+    }
+
+    public String getEmailInput() {
+        return emailField.getText().trim();
+    }
+
+    public String getPasswordInput() {
+        return passwordField.getText();
+    }
+
+    public String getConfirmPasswordInput() {
+        return confirmPasswordField.getText();
+    }
+
+    public void clearFields() {
+        fullNameField.clear();
+        usernameField.clear();
+        emailField.clear();
+        passwordField.clear();
+        confirmPasswordField.clear();
+        messageLabel.setText("");
+    }
+@FXML
+private void switchToMain(ActionEvent event) {
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainPageView.fxml"));
+        Parent root = loader.load();
+
+        // Get controller of MainPage
+        
+
+        // Switch scene
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Auction System");
+        stage.show();
+
+    } catch (IOException e) {
+        e.printStackTrace();
+        messageLabel.setText("Could not open main page.");
+    }
+}
 }

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane prefHeight="550.0" prefWidth="850.0" style="-fx-background-color: #f3f4f6;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.RegisterController">
+
+    <children>
+        <HBox alignment="CENTER" maxHeight="550.0" maxWidth="850.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 0);" StackPane.alignment="CENTER">
+            <children>
+
+                <VBox alignment="CENTER" prefHeight="550.0" prefWidth="470.0" spacing="12.0" style="-fx-background-color: #ffffff;">
+                    <children>
+                        <Label text="Create Account">
+                            <font>
+                                <Font name="System Bold" size="28.0" />
+                            </font>
+                            <VBox.margin>
+                                <Insets bottom="10.0" />
+                            </VBox.margin>
+                        </Label>
+
+                        <VBox maxWidth="300.0" spacing="5.0">
+                            <children>
+                                <Label text="Full Name" />
+                                <TextField fx:id="fullNameField" prefHeight="38.0" promptText="Enter full name" />
+                            </children>
+                        </VBox>
+
+                        <VBox maxWidth="300.0" spacing="5.0">
+                            <children>
+                                <Label text="Username" />
+                                <TextField fx:id="usernameField" prefHeight="38.0" promptText="Choose username" />
+                            </children>
+                        </VBox>
+
+                        <VBox maxWidth="300.0" spacing="5.0">
+                            <children>
+                                <Label text="Email" />
+                                <TextField fx:id="emailField" prefHeight="38.0" promptText="Enter email" />
+                            </children>
+                        </VBox>
+
+                        <VBox maxWidth="300.0" spacing="5.0">
+                            <children>
+                                <Label text="Password" />
+                                <PasswordField fx:id="passwordField" prefHeight="38.0" promptText="Create password" />
+                            </children>
+                        </VBox>
+
+                        <VBox maxWidth="300.0" spacing="5.0">
+                            <children>
+                                <Label text="Confirm Password" />
+                                <PasswordField fx:id="confirmPasswordField" prefHeight="38.0" promptText="Confirm password" />
+                            </children>
+                        </VBox>
+
+                        <Button fx:id="registerButton" mnemonicParsing="false" onAction="#handleRegister" prefHeight="42.0" prefWidth="300.0" style="-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;" text="Register">
+                            <VBox.margin>
+                                <Insets top="10.0" />
+                            </VBox.margin>
+                            <font>
+                                <Font name="System Bold" size="14.0" />
+                            </font>
+                        </Button>
+
+                        <Hyperlink fx:id="goToLoginLink" onAction="#switchToLogin" text="Already have an account? Back to login" />
+
+                        <Label fx:id="messageLabel" textFill="red" />
+                    </children>
+                </VBox>
+
+                <VBox alignment="CENTER_LEFT" prefHeight="550.0" prefWidth="380.0" style="-fx-background-color: linear-gradient(to bottom right, #7c3aed, #ec4899);">
+                    <children>
+                        <Label text="Join Us" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="32.0" />
+                            </font>
+                            <VBox.margin>
+                                <Insets left="40.0" />
+                            </VBox.margin>
+                        </Label>
+                        <Label text="Create an account and start participating in live auctions today." textFill="#f3e8ff" wrapText="true">
+                            <font>
+                                <Font size="16.0" />
+                            </font>
+                            <VBox.margin>
+                                <Insets left="40.0" right="40.0" top="15.0" />
+                            </VBox.margin>
+                        </Label>
+                    </children>
+                </VBox>
+
+            </children>
+        </HBox>
+    </children>
+</StackPane>

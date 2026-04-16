@@ -1,0 +1,43 @@
+public abstract class Item extends Entity {
+
+
+    protected String name;
+    protected String description;
+    protected Condition condition;
+    protected String imageUrl;
+    protected Seller seller;
+
+    public Item(String id, String name, String description, Condition condition, String imageUrl, Seller seller) {
+        super(id);
+        this.name = name;
+        this.description = description;
+        this.condition = condition;
+        this.imageUrl = imageUrl;
+        this.seller = seller;
+    }
+
+
+    public abstract void printInfo();
+
+    public boolean validate() {
+
+        return name != null && !name.trim().isEmpty() && seller != null;
+    }
+
+
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public Condition getCondition() { return condition; }
+    public void setCondition(Condition condition) { this.condition = condition; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public Seller getSeller() { return seller; }
+    public void setSeller(Seller seller) { this.seller = seller; }
+}

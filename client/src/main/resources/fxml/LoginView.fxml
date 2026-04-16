@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane alignment="CENTER" prefHeight="500.0" prefWidth="800.0" style="-fx-background-color: #f3f4f6;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.LoginController">
+    <children>
+        <HBox alignment="CENTER" maxHeight="500.0" maxWidth="800.0" StackPane.alignment="CENTER" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 0);">
+            <VBox prefWidth="350.0" style="-fx-background-color: linear-gradient(to bottom right, #4f46e5, #7c3aed);">
+                <children>
+                    <Label text="Welcome Back" textFill="WHITE"><font><Font size="30" /></font><VBox.margin><Insets left="40" top="120" /></VBox.margin></Label>
+                    <Label text="Login to continue using the auction system." textFill="#e5e7eb" wrapText="true"><font><Font size="16" /></font><VBox.margin><Insets left="40" right="40" top="10" /></VBox.margin></Label>
+                </children>
+            </VBox>
+            <VBox alignment="CENTER" prefWidth="450" spacing="15" style="-fx-background-color: white;">
+                <children>
+                    <Label text="Login"><font><Font size="28" /></font></Label>
+                    <VBox maxWidth="280" spacing="5"><children><Label text="Email" /><TextField fx:id="emailField" prefHeight="40" promptText="Enter Email" /></children></VBox>
+                    <VBox maxWidth="280" spacing="5"><children><Label text="Password" /><PasswordField fx:id="passwordField" prefHeight="40" promptText="Enter password" /></children></VBox>
+                    <Button onAction="#handleLogin" prefHeight="42" prefWidth="280" style="-fx-background-color: #4f46e5; -fx-text-fill: white; -fx-background-radius: 8;-fx-cursor: hand" text="Login" />
+                    <Button onAction="#switchToRegister" prefHeight="42" prefWidth="280" style="-fx-background-color: transparent; -fx-border-color: #4f46e5; -fx-text-fill: #4f46e5; -fx-border-radius: 8;-fx-cursor: hand" text="Register" />
+                    <Label fx:id="messageLabel" textFill="red" />
+                </children>
+            </VBox>
+        </HBox>
+    </children>
+</StackPane>
