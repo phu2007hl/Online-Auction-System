@@ -37,20 +37,9 @@ public class LoginAuthenticationService {
         return beforeCriteriaExists;
     }
 
-    public boolean getPasswordAuthentication() {
-        boolean validLength = password.length() >= 8;
-        boolean hasLetter = password.matches(".*[a-zA-Z].*");  // có chữ cái
-        boolean hasDigit = password.matches(".*\\d.*");         // có số (0-9)
-        return validLength && hasLetter && hasDigit;
-    }
-
     public Request createAuthRequest() {
         if (getEmailAuthentication() == false) {
             errorMessage = "Email không hợp lệ";
-            return null;
-        }
-        if (getPasswordAuthentication() == false) {
-            errorMessage = "Mật khẩu không hợp lệ";
             return null;
         }
         return new LoginRequest(email, password);
