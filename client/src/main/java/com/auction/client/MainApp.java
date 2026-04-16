@@ -23,6 +23,7 @@ public class MainApp extends Application {
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.setTitle("Auction System - Login");
+            
             primaryStage.show();
 
         } catch (Exception e) {

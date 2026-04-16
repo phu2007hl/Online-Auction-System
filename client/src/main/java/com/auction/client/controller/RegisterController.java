@@ -109,18 +109,8 @@ public class RegisterController {
             Parent root = loader.load();
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            boolean isMaximized = stage.isMaximized();
-            double width = stage.getWidth();
-            double height = stage.getHeight();
-
-            Scene scene = new Scene(root, width, height);
-            stage.setScene(scene);
-
-            stage.setMaximized(isMaximized);
-
-            if (!isMaximized) {
-                stage.centerOnScreen();
-            }
+            
+            stage.getScene().setRoot(root);
 
             stage.setTitle("Login");
 

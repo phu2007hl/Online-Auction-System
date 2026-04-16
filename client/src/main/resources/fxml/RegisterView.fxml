@@ -5,10 +5,10 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane prefHeight="550.0" prefWidth="850.0" style="-fx-background-color: #f3f4f6;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.RegisterController">
+<StackPane  style="-fx-background-color: #f3f4f6;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.RegisterController">
 
     <children>
-        <HBox alignment="CENTER" maxHeight="550.0" maxWidth="850.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 0);" StackPane.alignment="CENTER">
+        <HBox alignment="CENTER"  style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 0);" StackPane.alignment="CENTER">
             <children>
 
                 <VBox alignment="CENTER" prefHeight="550.0" prefWidth="470.0" spacing="12.0" style="-fx-background-color: #ffffff;">
