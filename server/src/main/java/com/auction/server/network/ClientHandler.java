@@ -18,66 +18,66 @@ public class ClientHandler implements Runnable {
     private Socket connection;
     private ObjectOutputStream out;
     private ObjectInputStream in;
-    public ClientHandler(Socket connection){
+
+    public ClientHandler(Socket connection) {
         this.connection = connection;
     }
-public void run() {
-    try {
-        ObjectOutputStream out = new ObjectOutputStream(connection.getOutputStream());
-        out.flush();
-        System.out.println("Server: output stream ready");
 
-        ObjectInputStream in = new ObjectInputStream(connection.getInputStream());
-        System.out.println("Server: input stream ready");
+    public void run() {
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(connection.getOutputStream());
+            out.flush();
+            System.out.println("Server: output stream ready");
 
-        while (true) {
-            System.out.println("Server: waiting for request");
-            Request request = (Request) in.readObject();
-            System.out.println("Server: request received");
+            ObjectInputStream in = new ObjectInputStream(connection.getInputStream());
+            System.out.println("Server: input stream ready");
 
-            if (request == null) {
-                System.out.println("Server: request is null");
-                continue;
+            while (true) {
+                System.out.println("Server: waiting for request");
+                Request request = (Request) in.readObject();
+                System.out.println("Server: request received");
+
+                if (request == null) {
+                    System.out.println("Server: request is null");
+                    continue;
+                }
+
+                System.out.println("Server: request type = " + request.getClass().getSimpleName());
+
+                if (request instanceof LoginRequest) {
+                    System.out.println("Server: building LoginResponse");
+                    LoginAuthentication loginAuth = new LoginAuthentication(request);
+                    LoginResponse response = (LoginResponse) loginAuth.createResponse();
+
+                    System.out.println("Server: calling responseBack()");
+
+                    System.out.println("Server: login result = " + response.getResponse());
+
+                    System.out.println("Server: writing response");
+                    out.writeObject(response);
+                    out.flush();
+                    System.out.println("Server: response written");
+                } else if (request instanceof RegisterRequest) {
+                    System.out.println("Server: building RegisterResponse");
+
+                    RegisterAuthentication registerAuth = new RegisterAuthentication(request);
+                    RegisterResponse response = (RegisterResponse) registerAuth.createResponse();
+
+                    System.out.println("Server: calling responseBack()");
+
+                    System.out.println("Server: register result = " + response.getResponse());
+
+                    System.out.println("Server: writing response");
+                    out.writeObject(response);
+                    out.flush();
+                    System.out.println("Server: response written");
+                }
             }
 
-            System.out.println("Server: request type = " + request.getClass().getSimpleName());
-
-            if (request instanceof LoginRequest) {
-                System.out.println("Server: building LoginResponse");
-                LoginAuthentication loginAuth = new LoginAuthentication(request);
-                LoginResponse response = (LoginResponse) loginAuth.createResponse();
-
-                System.out.println("Server: calling responseBack()");
-
-                System.out.println("Server: login result = " + response.getResponse());
-
-                System.out.println("Server: writing response");
-                out.writeObject(response);
-                out.flush();
-                System.out.println("Server: response written");
-            }
-
-            else if (request instanceof RegisterRequest) {
-                System.out.println("Server: building RegisterResponse");
-
-                RegisterAuthentication registerAuth = new RegisterAuthentication(request);
-                RegisterResponse response = (RegisterResponse) registerAuth.createResponse();
-
-                System.out.println("Server: calling responseBack()");
-
-                System.out.println("Server: register result = " + response.getResponse());
-
-                System.out.println("Server: writing response");
-                out.writeObject(response);
-                out.flush();
-                System.out.println("Server: response written");
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-    } catch (Exception e) {
-        e.printStackTrace();
     }
-}
 
-    
+
 }

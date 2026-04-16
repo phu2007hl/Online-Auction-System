@@ -6,10 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="932e961d-1e0f-4ad0-998a-ff4a5cbce6b7" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/auction/client/controller/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/auction/client/controller/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/auction/client/controller/RegisterController.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/auction/client/controller/RegisterController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/auction/client/service/LoginAuthenticationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/auction/client/service/LoginAuthenticationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/auction/client/service/RegisterAuthenticationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/auction/client/service/RegisterAuthenticationService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -168,7 +164,7 @@
       <workItem from="1776276299420" duration="1142000" />
       <workItem from="1776305679399" duration="11685000" />
       <workItem from="1776325589390" duration="552000" />
-      <workItem from="1776326163421" duration="1580000" />
+      <workItem from="1776326163421" duration="2472000" />
     </task>
     <servers />
   </component>
