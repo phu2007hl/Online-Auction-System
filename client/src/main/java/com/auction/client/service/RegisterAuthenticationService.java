@@ -25,12 +25,11 @@ public class RegisterAuthenticationService {
     }
 
     public boolean getEmailAuthentication() {
-        if (!email.contains("@gmail.com")) {
+        if (!email.contains("@gmail.com") || !email.endsWith("@gmail.com")) {
             return false;
         }
-
-        String beforeCriteria = email.substring(0, email.indexOf("@")); // trước @gmail.com phải có xâu
-        return beforeCriteria.matches(".*[a-zA-Z].*");
+        String beforeAt = email.substring(0, email.indexOf("@"));
+        return !beforeAt.isEmpty();
     }
     public boolean getPasswordAuthentication(){
         boolean validLength = password.length() >= 8;
