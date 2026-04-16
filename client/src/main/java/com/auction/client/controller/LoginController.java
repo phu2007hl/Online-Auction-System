@@ -44,24 +44,29 @@ public class LoginController {
         System.out.println(password);
 
         if (email.isEmpty() || password.isEmpty()) {
-            messageLabel.setText("Please enter both username and password.");
+            messageLabel.setText("Vui lòng nhập email và mật khẩu.");
             return;
         }
         try{
             LoginAuthenticationService service = new  LoginAuthenticationService(email,password); 
             System.out.println("Client: creating login request");
             Request request = service.createAuthRequest();
+
+            if (request == null) {
+                String errorMessage = service.getErrorMessage();
+                messageLabel.setText(errorMessage);
+                return;
+            }
+
             System.out.println("Client: before sendRequest");
             LoginResponse response = (LoginResponse) socket.sendRequest(request);
             System.out.println("Client: after sendRequest");
-            if (response == null){
-                System.out.println("response is null");
-            }
+
             if (response.getResponse()==true){
                 switchToMain(event);
             }
             else{
-                messageLabel.setText("Invalid email or password.");
+                messageLabel.setText("Email hoặc mật khẩu không hợp lệ.");
             }
         }
         catch (Exception e){

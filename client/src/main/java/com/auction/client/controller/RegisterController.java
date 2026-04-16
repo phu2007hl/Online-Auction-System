@@ -53,12 +53,12 @@ public class RegisterController {
 
         if (fullName.isEmpty() || username.isEmpty() || email.isEmpty()
                 || password.isEmpty() || confirmPassword.isEmpty()) {
-            messageLabel.setText("Please fill in all fields.");
+            messageLabel.setText("Vui lòng điền đầy đủ thông tin.");
             return;
         }
 
         if (!password.equals(confirmPassword)) {
-            messageLabel.setText("Passwords do not match.");
+            messageLabel.setText("Mật khẩu không khớp.");
             return;
         }
         try{
@@ -66,11 +66,18 @@ public class RegisterController {
             System.out.println("Client: creating register request");
             Request request = service.createAuthRequest();
             System.out.println("Client: before sendRequest");
+
+            if (request == null) {
+                String errorMessage = service.getErrorMessage();
+                messageLabel.setText(errorMessage);
+                return;
+            }
+
+
+
             RegisterResponse response = (RegisterResponse) socket.sendRequest(request);
             System.out.println("Client: after sendRequest");
-            if (response == null){
-                System.out.println("response is null");
-            }
+
             if (response.getResponse() == true){
                 switchToMain(event);
             }
