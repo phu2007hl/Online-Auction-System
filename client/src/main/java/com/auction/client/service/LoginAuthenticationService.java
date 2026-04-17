@@ -26,15 +26,11 @@ public class LoginAuthenticationService {
     }
 
     public boolean getEmailAuthentication() {
-        String criteria = "@gmail.com";
-        if (!email.contains(criteria)) {
+        if (!email.contains("@gmail.com") || !email.endsWith("@gmail.com")) {
             return false;
-        }// phải có @gmail.com
-
-        String beforeCriteria = email.substring(0, email.indexOf("@")); // trước @gmail.com phải có xâu
-        boolean beforeCriteriaExists = beforeCriteria.matches(".*[a-zA-Z].*");
-
-        return beforeCriteriaExists;
+        }
+        String beforeAt = email.substring(0, email.indexOf("@"));
+        return !beforeAt.isEmpty();
     }
 
     public Request createAuthRequest() {

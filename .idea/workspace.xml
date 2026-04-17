@@ -5,15 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="932e961d-1e0f-4ad0-998a-ff4a5cbce6b7" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/client/src/main/resources/images/gatsby (1).gif" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/main/resources/images/humph.gif" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/client/src/main/resources/images/wave.gif" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/auction/client/controller/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/auction/client/controller/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/resources/fxml/LoginView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/resources/fxml/LoginView.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/resources/fxml/RegisterView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/resources/fxml/RegisterView.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/auction/server/service/LoginAuthentication.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/auction/server/service/LoginAuthentication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sharemodel/src/main/java/com/auction/shared/response/LoginResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/sharemodel/src/main/java/com/auction/shared/response/LoginResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/auction/server/network/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/auction/server/network/ClientHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,7 +14,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="60" />
+    <option name="cachedIndexableFilesCount" value="61" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">

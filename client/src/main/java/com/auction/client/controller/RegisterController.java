@@ -105,6 +105,7 @@ public class RegisterController {
     @FXML
     private void switchToLogin(ActionEvent event) {
         try {
+            System.out.println("Getting ready to load login page");
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoginView.fxml"));
             Parent root = loader.load();
 
