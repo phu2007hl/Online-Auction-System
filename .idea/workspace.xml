@@ -5,17 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="932e961d-1e0f-4ad0-998a-ff4a5cbce6b7" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/sharemodel/src/main/java/com/auction/shared/enums/.gitkeep" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/sharemodel/src/main/java/com/auction/shared/enums/AuctionStatus.java" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/sharemodel/src/main/java/com/auction/shared/enums/LoginResponseStatus.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/User.ser" beforeDir="false" afterPath="$PROJECT_DIR$/User.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/auction/client/controller/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/auction/client/controller/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/auction/client/controller/RegisterController.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/auction/client/controller/RegisterController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/auction/client/service/LoginAuthenticationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/auction/client/service/LoginAuthenticationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/auction/server/ServerApp.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/auction/server/model/enums/.gitkeep" beforeDir="false" afterPath="$PROJECT_DIR$/sharemodel/src/main/java/com/auction/shared/enums/.gitkeep" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/auction/server/service/LoginAuthentication.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/auction/server/service/LoginAuthentication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sharemodel/src/main/java/com/auction/shared/response/LoginResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/sharemodel/src/main/java/com/auction/shared/response/LoginResponse.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,7 +79,7 @@
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/UET/SEM_2/LTNC/Online-Auction-System/server/src/main/java/com/auction/server/model/enums",
+    "last_opened_file_path": "D:/UET/SEM_2/LTNC/Online-Auction-System/sharemodel/src/main/java/com/auction/shared",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -103,6 +95,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\UET\SEM_2\LTNC\Online-Auction-System\sharemodel\src\main\java\com\auction\shared" />
       <recent name="D:\UET\SEM_2\LTNC\Online-Auction-System\server\src\main\java\com\auction\server\model\enums" />
       <recent name="C:\Users\DANG PHU\Documents\BTL\Online-Auction-System\client\src\main\java\com\auction\client" />
       <recent name="C:\Users\DANG PHU\Documents\BTL\Online-Auction-System\sharemodel\src" />

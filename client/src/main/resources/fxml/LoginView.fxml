@@ -9,7 +9,7 @@
         <HBox alignment="CENTER" maxHeight="500.0" maxWidth="800.0" StackPane.alignment="CENTER" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 0);">
             <VBox prefWidth="350.0" style="-fx-background-color: linear-gradient(to bottom right, #4f46e5, #7c3aed);">
                 <children>
-                    <Label text="Welcome Back" textFill="WHITE"><font><Font size="30" /></font><VBox.margin><Insets left="40" top="120" /></VBox.margin></Label>
+                    <Label text="Welcome Back" textFill="WHITE"><font><Font name = "System Bold" size="30" /></font><VBox.margin><Insets left="40" top="120" /></VBox.margin></Label>
                     <Label text="Login to continue using the auction system." textFill="#e5e7eb" wrapText="true"><font><Font size="16" /></font><VBox.margin><Insets left="40" right="40" top="10" /></VBox.margin></Label>
                 </children>
             </VBox>

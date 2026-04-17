@@ -10,21 +10,21 @@ import com.auction.shared.response.RegisterResponse;
 import java.util.HashMap;
 
 public class RegisterAuthentication {
-    private Request request;
+    private RegisterRequest request;
+    HashMap<String, User> userdata = UserDatabase.loadUser();
     public RegisterAuthentication(Request request) {
-        this.request =  request;
+        this.request = (RegisterRequest) request;
     }
 
     public boolean authenticateRegistration() {
-        HashMap<String, User> userdata = UserDatabase.loadUser();
-        RegisterRequest regReq = (RegisterRequest) request;
+        
 
-        if (userdata.containsKey(regReq.getEmail())) {
+        if (userdata.containsKey(request.getEmail())) {
             return false;
         }
 
-        User user = new User(regReq.getEmail(), regReq.getPassword(), regReq.getUsername());
-        userdata.put(regReq.getEmail(), user);
+        User user = new User(request.getEmail(), request.getPassword(), request.getUsername());
+        userdata.put(request.getEmail(), user);
         UserDatabase.saveUser(userdata);
 
         return true;
@@ -35,5 +35,8 @@ public class RegisterAuthentication {
         } else {
             return new RegisterResponse(false);
         }
+    }
+    public User getUserData(){
+        return userdata.get(request.getEmail());
     }
 }
