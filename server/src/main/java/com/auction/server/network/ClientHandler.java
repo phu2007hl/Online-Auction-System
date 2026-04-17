@@ -7,6 +7,7 @@ import java.net.Socket;
 
 import com.auction.server.service.LoginAuthentication;
 import com.auction.server.service.RegisterAuthentication;
+import com.auction.shared.model.User;
 import com.auction.shared.request.LoginRequest;
 import com.auction.shared.request.RegisterRequest;
 import com.auction.shared.request.Request;
@@ -48,6 +49,8 @@ public class ClientHandler implements Runnable {
                     System.out.println("Server: building LoginResponse");
                     LoginAuthentication loginAuth = new LoginAuthentication(request);
                     LoginResponse response = (LoginResponse) loginAuth.createResponse();
+                    User currentUser = loginAuth.getUserData(); //Lưu user đang trong từng luồng
+                    System.out.println(currentUser.getUsername());
 
                     System.out.println("Server: calling responseBack()");
 
@@ -62,6 +65,8 @@ public class ClientHandler implements Runnable {
 
                     RegisterAuthentication registerAuth = new RegisterAuthentication(request);
                     RegisterResponse response = (RegisterResponse) registerAuth.createResponse();
+                    User currentUser = registerAuth.getUserData();
+                    System.out.println(currentUser.getUsername());
 
                     System.out.println("Server: calling responseBack()");
 

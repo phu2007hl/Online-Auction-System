@@ -39,4 +39,7 @@ public class LoginAuthentication {
             return new LoginResponse(false, LoginResponseStatus.EMAIL_NOT_FOUND);
         }
     }
+    public User getUserData(){
+        return userdata.get(request.getEmail());
+    }
 }
