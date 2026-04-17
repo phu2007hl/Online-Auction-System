@@ -37,6 +37,8 @@ public class LoginController {
     @FXML
     private Label messageLabel;
 
+
+
     @FXML
     private void handleLogin(ActionEvent event) {
         String email = emailField.getText().trim();
