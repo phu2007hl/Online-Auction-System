@@ -13,7 +13,7 @@
 
                 <VBox alignment="CENTER" prefHeight="550.0" prefWidth="470.0" spacing="12.0" style="-fx-background-color: #ffffff;">
                     <children>
-                        <Label text="Create Account">
+                        <Label text="Tạo tài khoản">
                             <font>
                                 <Font name="System Bold" size="28.0" />
                             </font>
@@ -57,7 +57,7 @@
                             </children>
                         </VBox>
 
-                        <Button fx:id="registerButton" mnemonicParsing="false" onAction="#handleRegister" prefHeight="42.0" prefWidth="300.0" style="-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;" text="Register">
+                        <Button fx:id="registerButton" mnemonicParsing="false" onAction="#handleRegister" prefHeight="42.0" prefWidth="300.0" style="-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;" text="Đăng ký">
                             <VBox.margin>
                                 <Insets top="10.0" />
                             </VBox.margin>
@@ -66,7 +66,7 @@
                             </font>
                         </Button>
 
-                        <Hyperlink fx:id="goToLoginLink" onAction="#switchToLogin" text="Already have an account? Back to login" />
+                        <Hyperlink fx:id="goToLoginLink" onAction="#switchToLogin" text="Quay trở lại đăng nhập" />
 
                         <Label fx:id="messageLabel" textFill="red" />
                     </children>
@@ -74,15 +74,21 @@
 
                 <VBox alignment="CENTER_LEFT" prefHeight="550.0" prefWidth="380.0" style="-fx-background-color: linear-gradient(to bottom right, #7c3aed, #ec4899);">
                     <children>
-                        <Label text="Join Us" textFill="WHITE">
+                        <Label text="Tham gia vào các phiên đấu giá kịch tính"
+                               textFill="WHITE"
+                               wrapText="true"
+                               maxWidth="330.0">
                             <font>
                                 <Font name="System Bold" size="32.0" />
                             </font>
                             <VBox.margin>
-                                <Insets left="40.0" />
+                                <Insets left="40.0" right="40.0" />
                             </VBox.margin>
                         </Label>
-                        <Label text="Create an account and start participating in live auctions today." textFill="#f3e8ff" wrapText="true">
+                        <Label text="Trao niềm tin, nhận tài lộc."
+                               textFill="#f3e8ff"
+                               wrapText="true"
+                               maxWidth="300.0">
                             <font>
                                 <Font size="16.0" />
                             </font>

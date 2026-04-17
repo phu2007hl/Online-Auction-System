@@ -5,9 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="932e961d-1e0f-4ad0-998a-ff4a5cbce6b7" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/sharemodel/src/main/java/com/auction/shared/enums/.gitkeep" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sharemodel/src/main/java/com/auction/shared/enums/AuctionStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/sharemodel/src/main/java/com/auction/shared/enums/LoginResponseStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/main/resources/images/gatsby (1).gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/main/resources/images/humph.gif" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/client/src/main/resources/images/wave.gif" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/java/com/auction/client/controller/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/java/com/auction/client/controller/LoginController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/resources/fxml/LoginView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/resources/fxml/LoginView.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client/src/main/resources/fxml/RegisterView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/client/src/main/resources/fxml/RegisterView.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/src/main/java/com/auction/server/service/LoginAuthentication.java" beforeDir="false" afterPath="$PROJECT_DIR$/server/src/main/java/com/auction/server/service/LoginAuthentication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sharemodel/src/main/java/com/auction/shared/response/LoginResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/sharemodel/src/main/java/com/auction/shared/response/LoginResponse.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,7 +21,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="52" />
+    <option name="cachedIndexableFilesCount" value="60" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
@@ -75,11 +81,11 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "develop",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/UET/SEM_2/LTNC/Online-Auction-System/sharemodel/src/main/java/com/auction/shared",
+    "last_opened_file_path": "D:/UET/SEM_2/LTNC/Online-Auction-System/client/src/main/resources/images",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -95,13 +101,16 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\UET\SEM_2\LTNC\Online-Auction-System\client\src\main\resources\images" />
       <recent name="D:\UET\SEM_2\LTNC\Online-Auction-System\sharemodel\src\main\java\com\auction\shared" />
       <recent name="D:\UET\SEM_2\LTNC\Online-Auction-System\server\src\main\java\com\auction\server\model\enums" />
       <recent name="C:\Users\DANG PHU\Documents\BTL\Online-Auction-System\client\src\main\java\com\auction\client" />
       <recent name="C:\Users\DANG PHU\Documents\BTL\Online-Auction-System\sharemodel\src" />
-      <recent name="C:\Users\DANG PHU\Documents\BTL\Online-Auction-System\client\src\main\resources\fxml" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\UET\SEM_2\LTNC\Online-Auction-System\client\src\main\resources\images" />
+      <recent name="D:\UET\SEM_2\LTNC\Online-Auction-System\client\src\main\resources" />
+      <recent name="D:\UET\SEM_2\LTNC\Online-Auction-System\server\src\main\resources" />
       <recent name="C:\Users\DANG PHU\Documents\BTL\Online-Auction-System\sharemodel" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
@@ -135,17 +144,6 @@
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
-    </configuration>
-    <configuration default="true" type="JetRunConfigurationType">
-      <module name="client" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
-      <module name="client" />
-      <option name="filePath" />
-      <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
