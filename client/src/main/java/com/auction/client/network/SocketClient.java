@@ -16,7 +16,7 @@ public class SocketClient {
 
     public SocketClient() {
         try {
-            socket = new Socket("localhost", 3339);
+            socket = new Socket("localhost", 4000);
             System.out.println("Connected to server");
 
             out = new ObjectOutputStream(socket.getOutputStream());
