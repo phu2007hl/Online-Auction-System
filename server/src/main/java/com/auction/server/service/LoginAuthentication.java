@@ -31,12 +31,12 @@ public class LoginAuthentication {
         if (containsEmail()) { // email ton tai
 
             if (!matchPassword()) { // mat khau request tren ui khop voi mat khau co trong database
-                return new LoginResponse(false, LoginResponseStatus.INVALID_PASSWORD,null);
+                return new LoginResponse(false, LoginResponseStatus.INVALID_PASSWORD);
             }
-            return new LoginResponse(true, LoginResponseStatus.SUCCESS,getUserData());
+            return new LoginResponse(true, LoginResponseStatus.SUCCESS);
         }
         else{
-            return new LoginResponse(false, LoginResponseStatus.EMAIL_NOT_FOUND,null);
+            return new LoginResponse(false, LoginResponseStatus.EMAIL_NOT_FOUND);
         }
     }
     public User getUserData(){

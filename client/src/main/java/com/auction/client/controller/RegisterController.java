@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 import com.auction.client.network.SocketClient;
+import com.auction.shared.model.User;
 import com.auction.shared.request.Request;
 import com.auction.client.service.RegisterAuthenticationService;
 import com.auction.shared.response.RegisterResponse;
@@ -76,11 +77,12 @@ public class RegisterController {
 
 
             RegisterResponse response = (RegisterResponse) socket.sendRequest(request);
+            String  userName = socket.getCurrentUser().getUsername();
             System.out.println("Client: after sendRequest");
 
             if (response.getResponse() == true){
                 messageLabel.setText("Đăng ký thành công. Đang chuyển trang...");
-                switchToMain(event);
+                switchToMain(event,userName);
             }
             else{
                 messageLabel.setText("Email đã tồn tại.");
@@ -152,10 +154,13 @@ public class RegisterController {
         messageLabel.setText("");
     }
 @FXML
-private void switchToMain(ActionEvent event) {
+private void switchToMain(ActionEvent event, String currentUser) {
     try {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainPageView.fxml"));
         Parent root = loader.load();
+        MainPageController controller = loader.getController();
+        controller.setUserName(currentUser);
+        controller.setSocketClient(socket);
 
         // Get controller of MainPage
         
