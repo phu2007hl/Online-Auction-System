@@ -32,7 +32,6 @@ public class MainPageController {
             stage.setScene(new Scene(root));
             stage.show();
 
-
         }
         catch (IOException e){
             e.printStackTrace();

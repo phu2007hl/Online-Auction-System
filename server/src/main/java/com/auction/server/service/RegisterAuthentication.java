@@ -11,7 +11,7 @@ import java.util.HashMap;
 
 public class RegisterAuthentication {
     private RegisterRequest request;
-    HashMap<String, User> userdata = UserDatabase.loadUser();
+    private static HashMap<String, User> userdata = UserDatabase.loadUser();
     public RegisterAuthentication(Request request) {
         this.request = (RegisterRequest) request;
     }
@@ -31,9 +31,9 @@ public class RegisterAuthentication {
     }
     public RegisterResponse createResponse() {
         if (authenticateRegistration()) {
-            return new RegisterResponse(true);
+            return new RegisterResponse(true, getUserData());
         } else {
-            return new RegisterResponse(false);
+            return new RegisterResponse(false,null );
         }
     }
     public User getUserData(){

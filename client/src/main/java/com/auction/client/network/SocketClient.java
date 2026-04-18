@@ -1,6 +1,5 @@
 package com.auction.client.network;
 
-import com.auction.shared.model.User;
 import com.auction.shared.request.Request;
 import com.auction.shared.response.Response;
 
@@ -12,7 +11,6 @@ public class SocketClient {
     private Socket socket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
-    private User user;
 
     public SocketClient() {
         try {
@@ -37,8 +35,6 @@ public class SocketClient {
             System.out.println("Client: waiting for response");
 
             Response response =  (Response) in.readObject();
-            User user = (User) in.readObject();
-            this.user = user;
             System.out.println("Client: response received");
             return response;
             
@@ -46,9 +42,6 @@ public class SocketClient {
             e.printStackTrace();
             return null;
         }
-    }
-    public User getCurrentUser(){
-        return user;
     }
 }
 

@@ -1,13 +1,17 @@
+package com.auction.server.model.item;
+
+import com.auction.shared.entity.Entity;
+import com.auction.shared.enums.ItemCondition;
+import com.auction.shared.model.User;
+
 public abstract class Item extends Entity {
-
-
     protected String name;
     protected String description;
-    protected Condition condition;
+    protected ItemCondition condition;
     protected String imageUrl;
-    protected Seller seller;
+    protected User seller;
 
-    public Item(String id, String name, String description, Condition condition, String imageUrl, Seller seller) {
+    public Item(String id, String name, String description, ItemCondition condition, String imageUrl, User seller) {
         super(id);
         this.name = name;
         this.description = description;
@@ -15,10 +19,7 @@ public abstract class Item extends Entity {
         this.imageUrl = imageUrl;
         this.seller = seller;
     }
-
-
     public abstract void printInfo();
-
     public boolean validate() {
 
         return name != null && !name.trim().isEmpty() && seller != null;
@@ -32,12 +33,12 @@ public abstract class Item extends Entity {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public Condition getCondition() { return condition; }
-    public void setCondition(Condition condition) { this.condition = condition; }
+    public ItemCondition getCondition() { return condition; }
+    public void setCondition(ItemCondition condition) { this.condition = condition; }
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public Seller getSeller() { return seller; }
-    public void setSeller(Seller seller) { this.seller = seller; }
+    public User getSeller() { return seller; }
+    public void setSeller(User seller) { this.seller = seller; }
 }

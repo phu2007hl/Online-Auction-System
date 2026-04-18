@@ -8,11 +8,11 @@ public class LoginResponse extends Response implements Serializable  {
 
     private boolean valid;
     private LoginResponseStatus status;
-    
-    public LoginResponse(boolean valid, LoginResponseStatus status) {
+    private User currentUser;
+    public LoginResponse(boolean valid, LoginResponseStatus status, User currentUser) {
         this.valid = valid;
         this.status = status;
-        
+        this.currentUser = currentUser;
     }
 
     public boolean getResponse() {
@@ -23,4 +23,7 @@ public class LoginResponse extends Response implements Serializable  {
         return status;
     }
 
+    public User getCurrentUser() {
+        return currentUser;
+    }
 }

@@ -5,20 +5,17 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 
-import com.auction.server.service.LoginAuthentication;
-import com.auction.server.service.RegisterAuthentication;
-import com.auction.shared.model.User;
-import com.auction.shared.request.LoginRequest;
-import com.auction.shared.request.RegisterRequest;
+import com.auction.server.handler.RequestDispatcher;
+import com.auction.server.handler.RequestHandler;
 import com.auction.shared.request.Request;
-import com.auction.shared.response.LoginResponse;
-import com.auction.shared.response.RegisterResponse;
+import com.auction.shared.response.Response;
 
 
 public class ClientHandler implements Runnable {
     private Socket connection;
     private ObjectOutputStream out;
     private ObjectInputStream in;
+    private RequestDispatcher dispatcher = new RequestDispatcher();
 
     public ClientHandler(Socket connection) {
         this.connection = connection;
@@ -45,46 +42,15 @@ public class ClientHandler implements Runnable {
 
                 System.out.println("Server: request type = " + request.getClass().getSimpleName());
 
-                if (request instanceof LoginRequest) {
-                    System.out.println("Server: building LoginResponse");
-                    LoginAuthentication loginAuth = new LoginAuthentication(request);
-                    LoginResponse response = (LoginResponse) loginAuth.createResponse();
-                    User currentUser = loginAuth.getUserData(); //Lưu user đang trong từng luồng
+                // tùy vào loại request mà RequestDispatcher sẽ chọn handler thích hợp để xử lý request
+                RequestHandler handler = dispatcher.getHandler(request);
+                Response response = handler.handle(request);
 
-                    if(currentUser!=null) System.out.println("Server: currentUse is " + currentUser.getUsername());
-                    else System.out.println("Server: currentUser is null");
+                System.out.println("Server: writing response");
+                out.writeObject(response);
+                out.flush();
+                System.out.println("Server: response written");
 
-                    System.out.println("Server: calling responseBack()");
-
-                    System.out.println("Server: login result = " + response.getResponse());
-
-                    System.out.println("Server: writing response");
-                    out.writeObject(response);
-                    out.flush();
-                    out.writeObject(currentUser);
-                    out.flush();
-                    System.out.println("Server: response written");
-                } else if (request instanceof RegisterRequest) {
-                    System.out.println("Server: building RegisterResponse");
-
-                    RegisterAuthentication registerAuth = new RegisterAuthentication(request);
-                    RegisterResponse response = (RegisterResponse) registerAuth.createResponse();
-                    User currentUser = registerAuth.getUserData();
-
-                    if(currentUser!=null) System.out.println("Server: currentUse is " + currentUser.getUsername());
-                    else System.out.println("Server: currentUser is null");
-
-                    System.out.println("Server: calling responseBack()");
-
-                    System.out.println("Server: register result = " + response.getResponse());
-
-                    System.out.println("Server: writing response");
-                    out.writeObject(response);
-                    out.flush();
-                    out.writeObject(currentUser);
-                    out.flush();
-                    System.out.println("Server: response written");
-                }
             }
 
         } catch (Exception e) {
