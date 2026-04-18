@@ -1,6 +1,7 @@
 package com.auction.client.controller;
 
 import com.auction.shared.enums.LoginResponseStatus;
+import com.auction.shared.model.User;
 import com.auction.shared.response.LoginResponse;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -63,10 +64,11 @@ public class LoginController {
 
             System.out.println("Client: before sendRequest");
             LoginResponse response = (LoginResponse) socket.sendRequest(request);
+            String  userName = socket.getCurrentUser().getUsername();
             System.out.println("Client: after sendRequest");
 
             if (response.getResponse()){
-                switchToMain(event);
+                switchToMain(event,userName);
             }
             else{
                 if(response.getStatus()==LoginResponseStatus.EMAIL_NOT_FOUND){
@@ -130,10 +132,13 @@ public class LoginController {
         messageLabel.setText("");
     }
 @FXML
-private void switchToMain(ActionEvent event) {
+private void switchToMain(ActionEvent event,String currentUser) {
     try {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainPageView.fxml"));
         Parent root = loader.load();
+        MainPageController controller = loader.getController();
+        controller.setUserName(currentUser);
+        controller.setSocketClient(socket);
 
         // Get controller of MainPage
         

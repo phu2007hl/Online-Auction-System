@@ -22,6 +22,7 @@ public class UserDatabase {
         }
         catch (Exception e){
             e.printStackTrace();
+            
         }
     }
     public static HashMap<String,User> loadUser(){

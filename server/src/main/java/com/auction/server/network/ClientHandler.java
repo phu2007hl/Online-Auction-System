@@ -59,6 +59,8 @@ public class ClientHandler implements Runnable {
                     System.out.println("Server: writing response");
                     out.writeObject(response);
                     out.flush();
+                    out.writeObject(currentUser);
+                    out.flush();
                     System.out.println("Server: response written");
                 } else if (request instanceof RegisterRequest) {
                     System.out.println("Server: building RegisterResponse");
@@ -74,6 +76,8 @@ public class ClientHandler implements Runnable {
 
                     System.out.println("Server: writing response");
                     out.writeObject(response);
+                    out.flush();
+                    out.writeObject(currentUser);
                     out.flush();
                     System.out.println("Server: response written");
                 }
