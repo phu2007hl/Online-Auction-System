@@ -66,22 +66,24 @@ public class RegisterController {
             RegisterAuthenticationService service = new RegisterAuthenticationService(email, password, username);
             System.out.println("Client: creating register request");
             Request request = service.createAuthRequest();
-            System.out.println("Client: before sendRequest");
+
 
             if (request == null) {
                 String errorMessage = service.getErrorMessage();
                 messageLabel.setText(errorMessage);
+                System.out.println("Client: Can not create register request because of error");
                 return;
             }
 
 
-
+            System.out.println("Client: before sendRequest");
             RegisterResponse response = (RegisterResponse) socket.sendRequest(request);
-            String  userName = socket.getCurrentUser().getUsername();
+
             System.out.println("Client: after sendRequest");
 
             if (response.getResponse() == true){
                 messageLabel.setText("Đăng ký thành công. Đang chuyển trang...");
+                String  userName = socket.getCurrentUser().getUsername();
                 switchToMain(event,userName);
             }
             else{

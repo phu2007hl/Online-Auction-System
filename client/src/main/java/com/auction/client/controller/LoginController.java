@@ -59,15 +59,17 @@ public class LoginController {
             if (request == null) {
                 String errorMessage = service.getErrorMessage();
                 messageLabel.setText(errorMessage);
+                System.out.println("Client: Can not create login request because of error");
                 return;
             }
 
             System.out.println("Client: before sendRequest");
             LoginResponse response = (LoginResponse) socket.sendRequest(request);
-            String  userName = socket.getCurrentUser().getUsername();
+
             System.out.println("Client: after sendRequest");
 
             if (response.getResponse()){
+                String userName = socket.getCurrentUser().getUsername();
                 switchToMain(event,userName);
             }
             else{

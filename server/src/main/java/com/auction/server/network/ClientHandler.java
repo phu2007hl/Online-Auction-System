@@ -51,7 +51,7 @@ public class ClientHandler implements Runnable {
                     LoginResponse response = (LoginResponse) loginAuth.createResponse();
                     User currentUser = loginAuth.getUserData(); //Lưu user đang trong từng luồng
 
-                    if(currentUser!=null) System.out.println(currentUser.getUsername());
+                    if(currentUser!=null) System.out.println("Server: currentUse is " + currentUser.getUsername());
                     else System.out.println("Server: currentUser is null");
 
                     System.out.println("Server: calling responseBack()");
@@ -71,7 +71,7 @@ public class ClientHandler implements Runnable {
                     RegisterResponse response = (RegisterResponse) registerAuth.createResponse();
                     User currentUser = registerAuth.getUserData();
 
-                    if(currentUser!=null) System.out.println(currentUser.getUsername());
+                    if(currentUser!=null) System.out.println("Server: currentUse is " + currentUser.getUsername());
                     else System.out.println("Server: currentUser is null");
 
                     System.out.println("Server: calling responseBack()");
