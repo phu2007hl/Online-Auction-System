@@ -5,10 +5,10 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane  style="-fx-background-color: #f3f4f6;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.RegisterController">
+<StackPane style="-fx-background-color: #f3f4f6;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.RegisterController">
 
     <children>
-        <HBox alignment="CENTER"  style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 0);" StackPane.alignment="CENTER">
+        <HBox alignment="CENTER" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 0);" StackPane.alignment="CENTER">
             <children>
 
                 <VBox alignment="CENTER" prefHeight="550.0" prefWidth="470.0" spacing="12.0" style="-fx-background-color: #ffffff;">
@@ -57,7 +57,7 @@
                             </children>
                         </VBox>
 
-                        <Button fx:id="registerButton" mnemonicParsing="false" onAction="#handleRegister" prefHeight="42.0" prefWidth="300.0" style="-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;" text="Đăng ký">
+                        <Button fx:id="registerButton" defaultButton="true" mnemonicParsing="false" onAction="#handleRegister" prefHeight="42.0" prefWidth="300.0" style="-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;" text="Đăng ký">
                             <VBox.margin>
                                 <Insets top="10.0" />
                             </VBox.margin>
@@ -74,10 +74,7 @@
 
                 <VBox alignment="CENTER_LEFT" prefHeight="550.0" prefWidth="380.0" style="-fx-background-color: linear-gradient(to bottom right, #7c3aed, #ec4899);">
                     <children>
-                        <Label text="Tham gia vào các phiên đấu giá kịch tính"
-                               textFill="WHITE"
-                               wrapText="true"
-                               maxWidth="330.0">
+                        <Label maxWidth="330.0" text="Tham gia vào các phiên đấu giá kịch tính" textFill="WHITE" wrapText="true">
                             <font>
                                 <Font name="System Bold" size="32.0" />
                             </font>
@@ -85,10 +82,7 @@
                                 <Insets left="40.0" right="40.0" />
                             </VBox.margin>
                         </Label>
-                        <Label text="Trao niềm tin, nhận tài lộc."
-                               textFill="#f3e8ff"
-                               wrapText="true"
-                               maxWidth="300.0">
+                        <Label maxWidth="300.0" text="Trao niềm tin, nhận tài lộc." textFill="#f3e8ff" wrapText="true">
                             <font>
                                 <Font size="16.0" />
                             </font>

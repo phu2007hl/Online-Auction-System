@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
 <StackPane alignment="CENTER" prefHeight="500.0" prefWidth="924.0" style="-fx-background-color: #f3f4f6;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.LoginController">
     <children>
-        <HBox alignment="CENTER" maxHeight="500.0" maxWidth="924.0" StackPane.alignment="CENTER" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 18, 0, 0, 4);">
+        <HBox alignment="CENTER" maxHeight="500.0" maxWidth="924.0" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 18, 0, 0, 4);" StackPane.alignment="CENTER">
             <children>
                 <VBox alignment="CENTER" prefWidth="424.0" spacing="18.0" style="-fx-background-color: white;">
                     <children>
@@ -30,37 +30,31 @@
                                 <PasswordField fx:id="passwordField" prefHeight="40.0" promptText="Nhập mật khẩu" />
                             </children>
                         </VBox>
-                        <Button onAction="#handleLogin" prefHeight="42.0" prefWidth="300.0" style="-fx-background-color: #4f46e5; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;" text="Đăng nhập" />
+                        <Button defaultButton="true" onAction="#handleLogin" prefHeight="42.0" prefWidth="300.0" style="-fx-background-color: #4f46e5; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;" text="Đăng nhập" />
                         <Button onAction="#switchToRegister" prefHeight="42.0" prefWidth="300.0" style="-fx-background-color: transparent; -fx-border-color: #4f46e5; -fx-text-fill: #4f46e5; -fx-border-radius: 8; -fx-cursor: hand;" text="Đăng ký" />
                         <Label fx:id="messageLabel" maxWidth="300.0" textFill="red" wrapText="true" />
                     </children>
                 </VBox>
 
-                <StackPane prefWidth="500.0" prefHeight="500.0" style="-fx-background-color: #111827;">
+                <StackPane prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: #111827;">
                     <children>
-                        <ImageView fitWidth="500.0" fitHeight="500.0" preserveRatio="false">
+                        <ImageView fitHeight="500.0" fitWidth="500.0" preserveRatio="false">
                             <image>
                                 <Image url="@../images/humph.gif" />
                             </image>
                         </ImageView>
-                        <Rectangle width="500.0" height="500.0" fill="#00000088" />
-                        <VBox alignment="TOP_LEFT" prefWidth="500.0" prefHeight="500.0" spacing="12.0">
+                        <Rectangle fill="#00000088" height="500.0" width="500.0" />
+                        <VBox alignment="TOP_LEFT" prefHeight="500.0" prefWidth="500.0" spacing="12.0">
                             <padding>
-                                <Insets top="120.0" right="40.0" bottom="40.0" left="40.0" />
+                                <Insets bottom="40.0" left="40.0" right="40.0" top="120.0" />
                             </padding>
                             <children>
-                                <Label text="Chào mừng trở lại"
-                                       textFill="WHITE"
-                                       wrapText="true"
-                                       style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.55), 18, 0.2, 0, 4);">
+                                <Label style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.55), 18, 0.2, 0, 4);" text="Chào mừng trở lại" textFill="WHITE" wrapText="true">
                                     <font>
                                         <Font name="System Bold" size="30.0" />
                                     </font>
                                 </Label>
-                                <Label text="Đăng nhập để tiếp tục sử dụng phần mềm đấu giá."
-                                       textFill="#f3f4f6"
-                                       wrapText="true"
-                                       style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 10, 0.1, 0, 2);">
+                                <Label style="-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.45), 10, 0.1, 0, 2);" text="Đăng nhập để tiếp tục sử dụng phần mềm đấu giá." textFill="#f3f4f6" wrapText="true">
                                     <font>
                                         <Font size="16.0" />
                                     </font>
