@@ -1,5 +1,6 @@
 package com.auction.client.controller;
 
+import com.auction.shared.model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,7 +14,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 import com.auction.client.network.SocketClient;
-import com.auction.shared.model.User;
 import com.auction.shared.request.Request;
 import com.auction.client.service.RegisterAuthenticationService;
 import com.auction.shared.response.RegisterResponse;
@@ -83,8 +83,8 @@ public class RegisterController {
 
             if (response.getResponse() == true){
                 messageLabel.setText("Đăng ký thành công. Đang chuyển trang...");
-                String  userName = socket.getCurrentUser().getUsername();
-                switchToMain(event,userName);
+                User currentUser = response.getCurrentUser();
+                switchToMain(event,currentUser);
             }
             else{
                 messageLabel.setText("Email đã tồn tại.");
@@ -156,12 +156,12 @@ public class RegisterController {
         messageLabel.setText("");
     }
 @FXML
-private void switchToMain(ActionEvent event, String currentUser) {
+private void switchToMain(ActionEvent event, User currentUser) {
     try {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainPageView.fxml"));
         Parent root = loader.load();
         MainPageController controller = loader.getController();
-        controller.setUserName(currentUser);
+        controller.setUserName(currentUser.getUsername());
         controller.setSocketClient(socket);
 
         // Get controller of MainPage

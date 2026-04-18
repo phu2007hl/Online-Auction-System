@@ -19,9 +19,6 @@ import java.io.IOException;
 import com.auction.client.network.SocketClient;
 import com.auction.shared.request.Request;
 import com.auction.client.service.LoginAuthenticationService;
-import com.auction.client.service.RegisterAuthenticationService;
-import com.auction.shared.response.Response;
-import com.auction.shared.response.LoginResponse;
 
 public class LoginController {
     private SocketClient socket;
@@ -69,8 +66,8 @@ public class LoginController {
             System.out.println("Client: after sendRequest");
 
             if (response.getResponse()){
-                String userName = socket.getCurrentUser().getUsername();
-                switchToMain(event,userName);
+                User currentUser = response.getCurrentUser();
+                switchToMain(event,currentUser);
             }
             else{
                 if(response.getStatus()==LoginResponseStatus.EMAIL_NOT_FOUND){
@@ -134,12 +131,12 @@ public class LoginController {
         messageLabel.setText("");
     }
 @FXML
-private void switchToMain(ActionEvent event,String currentUser) {
+private void switchToMain(ActionEvent event, User currentUser) {
     try {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainPageView.fxml"));
         Parent root = loader.load();
         MainPageController controller = loader.getController();
-        controller.setUserName(currentUser);
+        controller.setUserName(currentUser.getUsername());
         controller.setSocketClient(socket);
 
         // Get controller of MainPage
