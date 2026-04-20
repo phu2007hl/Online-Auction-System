@@ -54,3 +54,16 @@ Dự án được tổ chức theo các module để tối ưu hóa việc tái 
 ```` bash
 cd client
 mvn javafx:run
+````
+#### 👥 Phân công công việc
+
+| Thành viên          | Nhiệm vụ         |
+|:--------------------|:-----------------|
+| **Đặng Trấn Phong** | Service và Model |
+| **Đặng Đức Phú**    | GUI              |
+| **Phạm Quốc Quân**  | Service và Model |
+| **Bùi Hoàng Sơn**   | Server           |
+### 🛠 Quy trình phối hợp
+* **Quản lý source code:** Sử dụng Git trên nền tảng GitHub.
+* **Tiêu chuẩn mã nguồn:** Code phải được định dạng chuẩn và vượt qua các bài kiểm thử tự động trên GitHub Actions trước khi merge.
+* **Trao đổi:** Các vấn đề phát sinh được thảo luận qua Issues hoặc các buổi họp nhóm định kỳ.
