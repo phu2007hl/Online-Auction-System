@@ -91,7 +91,7 @@ public class CreateAuctionPageController {
             }
 
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
+            stage.getScene().setRoot(root);
             stage.setTitle("Auction System");
             stage.show();
 
