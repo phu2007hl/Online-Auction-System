@@ -16,6 +16,7 @@ public class ClientHandler implements Runnable {
     private ObjectOutputStream out;
     private ObjectInputStream in;
     private RequestDispatcher dispatcher = new RequestDispatcher();
+    private AdminHandler adminHandler;
 
     public ClientHandler(Socket connection) {
         this.connection = connection;
@@ -57,6 +58,17 @@ public class ClientHandler implements Runnable {
             e.printStackTrace();
         }
     }
-
+    public ObjectOutputStream getOutputStream() {
+        return out;
+    }
+    public ObjectInputStream getInputStream() {
+        return in;
+    }
+    public Socket getConnection() {
+        return connection;
+    }
+    public AdminHandler getAdminHandler() {
+        return adminHandler;
+    }
 
 }
