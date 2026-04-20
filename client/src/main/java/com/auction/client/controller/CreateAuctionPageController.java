@@ -71,6 +71,7 @@ public class CreateAuctionPageController {
         LocalDate endDate = endDatePicker.getValue();       // Ngày kết thúc
         String description = descriptionArea.getText().trim();      //  Mô tả
 
+
         System.out.println("Tạo đấu giá thành công: " + productNameField.getText());
     }
 

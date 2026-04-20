@@ -29,7 +29,7 @@ public class MainPageController {
         try{
             Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
+            stage.getScene().setRoot(root);
             stage.show();
 
         }
@@ -47,9 +47,7 @@ public class MainPageController {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             LoginController controller = loader.getController();
             controller.setSocketClient(socket);
-            Scene loginScene = new Scene(root);
-            stage.setScene(loginScene);
-            stage.sizeToScene();
+            stage.getScene().setRoot(root);
             stage.setTitle("Auction System - Login");
             stage.show();
 
