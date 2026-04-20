@@ -1,69 +1,45 @@
-# 🔨 Online Auction System (Hệ thống đấu giá trực tuyến)
+# Online-Auction-System
 
-## 📖 Giới thiệu dự án
-Đây là dự án thuộc môn học **Lập trình nâng cao**, nhằm mục đích xây dựng một nền tảng phần mềm theo mô hình Client-Server cho phép nhiều người dùng tham gia cạnh tranh giá để mua sản phẩm trong một khoảng thời gian xác định.
+## Giới thiệu
+Đây là dự án bài tập lớn môn Lập trình nâng cao của nhóm sinh viên năm nhất CNTT, UET. Hệ thống được xây dựng theo mô hình client-server, sử dụng Java để xử lý logic nghiệp vụ và JavaFX để phát triển giao diện người dùng cho hệ thống đấu giá trực tuyến.
 
-Hệ thống được thiết kế chặt chẽ theo các nguyên lý Lập trình hướng đối tượng (OOP) như Encapsulation, Inheritance, Polymorphism và Abstraction. Mã nguồn có cấu trúc rõ ràng, dễ bảo trì, mở rộng và đảm bảo an toàn luồng (thread-safe) khi có nhiều người dùng tương tác đồng thời.
+## Phân chia công việc
 
-## 🚀 Công nghệ & Kiến trúc
-* **Ngôn ngữ:** Java
-* **Giao diện người dùng (GUI):** JavaFX kết hợp FXML (Áp dụng mô hình MVC phía Client).
-* **Kiến trúc hệ thống:** Client - Server.
-* **Giao tiếp mạng:** Socket.
-* **Quản lý dự án & Build tool:** Maven (`pom.xml`).
-* **Sơ đồ thiết kế:** File `Online-Auction-System-UML.drawio`.
-* **Kiểm thử (Testing):** JUnit cho các logic nghiệp vụ quan trọng.
+| Thành viên | Phần việc chính | Mô tả chi tiết |
+| --- | --- | --- |
+| Phú | JavaFX giao diện UI | Phụ trách thiết kế và phát triển giao diện người dùng bằng JavaFX, bao gồm các màn hình như Login, Register, Main Page, Create Auction và các view liên quan. Đồng thời xử lý bố cục, điều hướng giữa các màn hình, thông báo lỗi, trải nghiệm hiển thị và các thành phần tương tác phía client. |
+| Sơn | Set-up server và giao tiếp client-server | Phụ trách phần server, socket connection và luồng gửi/nhận dữ liệu giữa client và server. Công việc bao gồm tổ chức server, tiếp nhận request từ client, dispatch request đến đúng handler, trả response về client và duy trì luồng giao tiếp ổn định giữa các phía của hệ thống. |
+| Quân | Model và service | Phụ trách xây dựng các lớp model và service phục vụ nghiệp vụ chính của hệ thống, bao gồm các đối tượng dùng chung giữa client-server, các class hỗ trợ xác thực, đấu giá và xử lý dữ liệu. Đồng thời tham gia hoàn thiện cấu trúc dữ liệu cho user, auction, bid transaction và các thành phần liên quan. |
+| Phong | Model và service | Phối hợp cùng Quân để xây dựng và mở rộng các model/service của hệ thống. Công việc tập trung vào việc chuẩn hóa các lớp dữ liệu, bổ sung enum, entity, item model, service xử lý nghiệp vụ, cũng như hỗ trợ hoàn thiện phần logic backend cho các tính năng đấu giá. |
 
-## 🧩 Design Patterns Áp dụng
-* **Singleton:** Quản lý kết nối mạng và khởi tạo duy nhất cho `AuctionManager`.
-* **Observer:** Cập nhật giá thầu (bid) theo thời gian thực đến toàn bộ Client đang theo dõi phiên đấu giá.
-* **Factory Method:** Khởi tạo linh hoạt các loại sản phẩm đấu giá (Electronics, Art, Vehicle,...).
-* **MVC (Model-View-Controller):** Phân tách rõ ràng giữa giao diện, logic điều khiển và truy xuất dữ liệu.
+## Tiến độ hiện tại
 
-## ✨ Chức năng chính
+### 1. Phần đã hoàn thành tương đối ổn
+- Đã thiết lập cấu trúc project theo hướng tách `client`, `server`, `sharemodel`.
+- Đã xây dựng luồng `login/register` cơ bản giữa client và server.
+- Đã xử lý cơ chế gửi `Request` từ client lên server và nhận `Response` trả về.
+- Đã tách xử lý request phía server theo hướng `RequestDispatcher` và `RequestHandler`, giúp code dễ mở rộng hơn khi thêm nhiều request mới.
+- Đã bổ sung `currentUser` trong `LoginResponse` và `RegisterResponse` để client có thể lưu trạng thái người dùng sau khi đăng nhập hoặc đăng ký thành công.
+- Đã có các class nền cho hệ thống đấu giá như `Auction`, `BidTransaction`, `Entity`, `User`.
+- Đã xây dựng khung model cho `Item`, các lớp con của item và `ItemFactory`.
+- Đã có các enum phục vụ nghiệp vụ như `AuctionStatus`, `ItemCondition`, `LoginResponseStatus`.
+- Đã có một số màn hình JavaFX chính như `LoginView`, `RegisterView`, `MainPageView`, `CreateAuctionPage`.
 
-### 1. Chức năng cốt lõi (Bắt buộc)
-* **Quản lý người dùng:** Đăng ký/Đăng nhập.
-* **Quản lý sản phẩm:** Seller có thể Thêm/Sửa/Xóa sản phẩm (Tên, mô tả, giá khởi điểm, thời gian đấu giá).
-* **Cơ chế đấu giá:** Bidder đặt giá cao hơn giá hiện tại. Hệ thống kiểm tra tính hợp lệ và cập nhật người dẫn đầu.
-* **Vòng đời phiên đấu giá:** Chuyển đổi trạng thái tự động (`OPEN` → `RUNNING` → `FINISHED` → `PAID`/`CANCELED`) và xác định người thắng cuộc khi hết giờ.
-* **Xử lý ngoại lệ:** Ngăn chặn đặt giá thấp, đấu giá khi phiên đã đóng hoặc lỗi rớt mạng.
+### 2. Phần đang triển khai
+- Hoàn thiện luồng hiển thị `AuctionList` sau khi đăng nhập vào màn hình chính.
+- Hoàn thiện chức năng tạo phiên đấu giá mới và cập nhật lại danh sách phiên đấu giá sau khi tạo.
+- Hoàn thiện luồng đặt giá (`PlaceBid`) và kiểm tra quyền thao tác của người dùng đối với từng auction.
+- Kết nối chặt hơn giữa phần giao diện JavaFX và các request/response mới của hệ thống đấu giá.
+- Tiếp tục tổ chức lại sơ đồ lớp, tài liệu và README để nhóm dễ theo dõi tiến độ hơn.
 
-### 2. Chức năng nâng cao
-* **Auto-Bidding:** Cho phép Bidder thiết lập giá tối đa (`maxBid`) và bước giá (`increment`). Hệ thống sẽ tự động cạnh tranh và trả giá thay người dùng.
-* **Concurrent Bidding:** Xử lý an toàn dữ liệu khi có nhiều người đặt giá cùng một mili-giây, ngăn chặn tuyệt đối tình trạng lost update hay race condition.
-* **Anti-sniping Algorithm:** Tự động gia hạn thêm thời gian nếu phát hiện có người đặt giá ở những giây cuối cùng của phiên.
-* **Realtime Update:** Dữ liệu giá được đồng bộ lập tức qua Socket/Observer Pattern mà không cần polling (tải lại trang).
-* **Bid History Visualization:** Hiển thị biểu đồ đường (line chart) trực quan hóa biến động giá thầu theo thời gian thực.
+### 3. Phần dự kiến làm tiếp
+- Bổ sung đầy đủ request/response cho các chức năng đấu giá thay vì chỉ dừng ở authentication.
+- Hoàn thiện xử lý nghiệp vụ cho seller và bidder trên cùng một tài khoản người dùng.
+- Xây dựng phần quản lý danh sách auction ở server và đồng bộ dữ liệu trả về client.
+- Hoàn thiện UI cho phần xem chi tiết auction, tạo auction và bid.
+- Kiểm tra lại toàn bộ luồng để chuẩn bị cho giai đoạn test và demo.
 
-## 📂 Cấu trúc thư mục (Nổi bật)
-Dự án được tổ chức theo các module để tối ưu hóa việc tái sử dụng mã nguồn:
-* `com.auction.shared`: Chứa các thành phần dùng chung giữa Client và Server (Entities, Enums, Models, Request/Response payload).
-* `server`: Chứa logic xử lý trung tâm, `ClientHandler`, `AuctionManager`, và kết nối Database.
-* `client`: Chứa các Controller của JavaFX và giao diện FXML.
-* `observer` & `singleton`: Chứa các package implement các Design Pattern cốt lõi.
-
-## ⚙️ Hướng dẫn cài đặt và chạy thử
-1. **Yêu cầu môi trường:** Cài đặt Java, Maven, và IDE (khuyến khích sử dụng IntelliJ/Eclipse).
-2. Tải toàn bộ mã nguồn về máy: `git clone <repository_url>`
-3. Mở mã nguồn bằng IDE.
-3. Mở terminal tại thư mục gốc của dự án (`Online-Auction-System`) và chạy lệnh sau để Maven dọn dẹp, tải các thư viện cần thiết và build module `sharemodel`:
-`mvn clean install`
-4. Chạy file `AuctionServer`
-5. Mở một terminal mới, chạy lệnh:
-```` bash
-cd client
-mvn javafx:run
-````
-#### 👥 Phân công công việc
-
-| Thành viên          | Nhiệm vụ         |
-|:--------------------|:-----------------|
-| **Đặng Trấn Phong** | Service và Model |
-| **Đặng Đức Phú**    | GUI              |
-| **Phạm Quốc Quân**  | Service và Model |
-| **Bùi Hoàng Sơn**   | Server           |
-### 🛠 Quy trình phối hợp
-* **Quản lý source code:** Sử dụng Git trên nền tảng GitHub.
-* **Tiêu chuẩn mã nguồn:** Code phải được định dạng chuẩn và vượt qua các bài kiểm thử tự động trên GitHub Actions trước khi merge.
-* **Trao đổi:** Các vấn đề phát sinh được thảo luận qua Issues hoặc các buổi họp nhóm định kỳ.
+## Ghi chú
+- Hiện tại project đã có nền tảng tốt ở phần authentication và kiến trúc request-response.
+- Phần tiếp theo quan trọng nhất là hoàn thiện các tính năng cốt lõi của hệ thống đấu giá để nối từ model, service, server handler đến giao diện người dùng.
+- README này có thể tiếp tục cập nhật theo từng mốc tiến độ của nhóm trong quá trình làm bài tập lớn.
