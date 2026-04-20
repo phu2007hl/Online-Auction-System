@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="your.package.YourController">
+
+    <children>
+
+        <!-- Logout Button -->
+        <Button text="Log out"
+                layoutX="520"
+                layoutY="10"
+                onAction="#switchToLogin" />
+
+        <!-- Table -->
+        <TableView fx:id="tableView"
+                   layoutX="20"
+                   layoutY="50"
+                   prefWidth="600"
+                   prefHeight="370">
+
+            <columns>
+
+                <TableColumn fx:id="categoryColumn" text="Category" prefWidth="200" />
+
+                <TableColumn fx:id="imageColumn" text="Image" prefWidth="200" />
+
+                <TableColumn fx:id="acceptColumn" text="Accept" prefWidth="200" />
+
+            </columns>
+        </TableView>
+
+    </children>
+
+</AnchorPane>
