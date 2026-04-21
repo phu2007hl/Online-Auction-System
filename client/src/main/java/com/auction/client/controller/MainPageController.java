@@ -48,6 +48,7 @@ public class MainPageController {
             LoginController controller = loader.getController();
             controller.setSocketClient(socket);
             stage.getScene().setRoot(root);
+            stage.sizeToScene();
             stage.setTitle("Auction System - Login");
             stage.show();
 
