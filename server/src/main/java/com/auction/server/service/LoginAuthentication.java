@@ -1,5 +1,6 @@
 package com.auction.server.service;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.auction.shared.enums.LoginResponseStatus;
 import com.auction.shared.request.Request;
@@ -11,10 +12,14 @@ import com.auction.shared.model.User;
 
 public class LoginAuthentication {
     private LoginRequest request;
-    private HashMap<String, User> userdata = UserDatabase.loadUser();
+    private ConcurrentHashMap<String, User> userdata;
 
     public LoginAuthentication(Request request) {
         this.request = (LoginRequest) request;
+        userdata = UserDatabase.getUserData();
+        if (userdata == null){
+            userdata = UserDatabase.loadUser();
+        }
     }
 
     public boolean containsEmail() {

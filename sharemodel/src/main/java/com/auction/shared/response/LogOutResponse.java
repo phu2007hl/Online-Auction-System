@@ -1,11 +1,12 @@
 package com.auction.shared.response;
 
-public class createAuctionResponse extends Response{
+public class LogOutResponse extends Response {
     private boolean valid;
-    public createAuctionResponse(boolean valid){
+    public LogOutResponse(boolean valid){
         this.valid = valid;
     }
     public boolean getResponse(){
         return valid;
     }
+    
 }

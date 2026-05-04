@@ -2,6 +2,10 @@ package com.auction.client.controller;
 
 import com.auction.client.network.SocketClient;
 import com.auction.shared.model.User;
+import com.auction.shared.request.createAuctionRequest;
+import com.auction.shared.response.Response;
+import com.auction.shared.response.createAuctionResponse;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -70,6 +74,11 @@ public class CreateAuctionPageController {
         String startingPrice = startingPriceField.getText().trim();   // Giá khởi điểm
         LocalDate endDate = endDatePicker.getValue();       // Ngày kết thúc
         String description = descriptionArea.getText().trim();      //  Mô tả
+        createAuctionRequest request = new createAuctionRequest(imageContent, category,startingPrice,description,endDate);
+        socket.sendRequest(request);
+        System.out.println("Da gui thanh cong");
+        //Them j vao day sau cx dc
+        
 
 
         System.out.println("Tạo đấu giá thành công: " + productNameField.getText());
@@ -99,5 +108,8 @@ public class CreateAuctionPageController {
             e.printStackTrace();
             System.out.println("Could not open main page.");
         }
+    }
+    public void setSocketClient(SocketClient socket){
+        this.socket = socket;
     }
 }

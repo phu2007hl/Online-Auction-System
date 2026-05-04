@@ -21,7 +21,8 @@ public class AdminHandler { // thêm class riêng dành cho admin, vì t muốn 
     public void forwardRequest(Request request,ClientHandler clientHandler){
         try{
             out.writeObject(request);
-            out.writeObject(clientHandler); // gửi luôn cả người gửi đấu giá để sau này gửi response về vì mỗi người có những cuộc đấu giá khác nhau
+             // gửi luôn cả người gửi đấu giá để sau này gửi response về vì mỗi người có những cuộc đấu giá khác nhau
+            System.out.println("Forwarded succesfully");
             
         }
         catch(Exception e){

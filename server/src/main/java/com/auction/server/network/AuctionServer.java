@@ -7,8 +7,8 @@ public class AuctionServer {
 
     public static void main(String[] args) {
         try {
-            ServerSocket server = new ServerSocket(4002);
-            System.out.println("Server started on port 4002...");
+            ServerSocket server = new ServerSocket(4100);
+            System.out.println("Server started on port 4100");
 
             while (true) {
                 Socket connection = server.accept();

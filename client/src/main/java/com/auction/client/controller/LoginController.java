@@ -1,11 +1,20 @@
 package com.auction.client.controller;
 
-import com.auction.shared.enums.LoginResponseStatus;
+import com.auction.client.network.SocketClient;
+import com.auction.client.service.LoginAuthenticationService;
 import com.auction.shared.model.User;
+import com.auction.shared.request.AdminLoginRequest;
+import com.auction.shared.request.Request;
+import com.auction.shared.request.createAuctionRequest;
+import com.auction.shared.response.AdminLoginResponse;
+import com.auction.shared.response.LoadAuctionResponse;
 import com.auction.shared.response.LoginResponse;
+
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -13,18 +22,16 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
 import java.io.IOException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.ResourceBundle;
 
+public class LoginController extends Controller implements Initializable {
 
-import com.auction.client.network.SocketClient;
-import com.auction.shared.request.Request;
-import com.auction.client.service.LoginAuthenticationService;
-
-public class LoginController {
     private SocketClient socket;
-    public void  setSocketClient(SocketClient socket){
-        this.socket = socket;
-    }
+    private Stage currentStage;
 
     @FXML
     private TextField emailField;
@@ -35,85 +42,122 @@ public class LoginController {
     @FXML
     private Label messageLabel;
 
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        Platform.runLater(() -> {
+            if (emailField != null && emailField.getScene() != null) {
+                currentStage = (Stage) emailField.getScene().getWindow();
+            }
+        });
+    }
 
+    public void setSocketClient(SocketClient socket) {
+        this.socket = socket;
+        socket.setController(this);
+        socket.startListening();
+    }
 
     @FXML
     private void handleLogin(ActionEvent event) {
+        currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
         String email = emailField.getText().trim();
         String password = passwordField.getText();
-        System.out.println(email);
-        System.out.println(password);
 
         if (email.isEmpty() || password.isEmpty()) {
             messageLabel.setText("Vui lòng nhập email và mật khẩu.");
             return;
         }
-        try{
-            LoginAuthenticationService service = new  LoginAuthenticationService(email,password); 
-            System.out.println("Client: creating login request");
-            Request request = service.createAuthRequest();
 
-            if (request == null) {
-                String errorMessage = service.getErrorMessage();
-                messageLabel.setText(errorMessage);
-                System.out.println("Client: Can not create login request because of error");
+        try {
+            if (email.equals("admin")) {
+                AdminLoginRequest request = new AdminLoginRequest(password);
+                socket.sendRequest(request);
                 return;
             }
 
-            System.out.println("Client: before sendRequest");
-            LoginResponse response = (LoginResponse) socket.sendRequest(request);
+            LoginAuthenticationService service =
+                    new LoginAuthenticationService(email, password);
 
-            System.out.println("Client: after sendRequest");
+            Request request = service.createAuthRequest();
 
-            if (response.getResponse()){
-                User currentUser = response.getCurrentUser();
-                switchToMain(event,currentUser);
+            if (request == null) {
+                messageLabel.setText(service.getErrorMessage());
+                return;
             }
-            else{
-                if(response.getStatus()==LoginResponseStatus.EMAIL_NOT_FOUND){
-                    messageLabel.setText("Email không tồn tại.");
-                }
-                else if(response.getStatus()==LoginResponseStatus.INVALID_PASSWORD)
-                messageLabel.setText("Mật khẩu không hợp lệ.");
-            }
-        }
-        catch (Exception e){
+
+            socket.sendRequest(request);
+
+        } catch (Exception e) {
             e.printStackTrace();
-            //Show a text "can not connect to server" on screen
+            messageLabel.setText("Cannot connect to server.");
         }
-        
-
-        // Later, replace this with your real authentication class
-        // Example:
-        // AuthenticationService authService = new AuthenticationService();
-        // boolean success = authService.login(username, password);
-
-        System.out.println("Login email: " + email);
-        System.out.println("Login password: " + password);
-
-        
     }
 
     @FXML
     private void switchToRegister(ActionEvent event) {
+        currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
         try {
-            System.out.println("Getting ready to load register page");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/RegisterView.fxml"));
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/RegisterView.fxml")
+            );
+
             Parent root = loader.load();
-
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            
-            stage.getScene().setRoot(root);
-
-            stage.setTitle("Register");
-            stage.show();
 
             RegisterController controller = loader.getController();
             controller.setSocketClient(socket);
 
+            currentStage.getScene().setRoot(root);
+            currentStage.setTitle("Register");
+            currentStage.show();
+
         } catch (IOException e) {
             e.printStackTrace();
             messageLabel.setText("Could not open register page.");
+        }
+    }
+
+    public void switchToMain(User currentUser) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/MainPageView.fxml")
+            );
+
+            Parent root = loader.load();
+
+            MainPageController controller = loader.getController();
+            controller.setUserName(currentUser.getUsername());
+            controller.setSocketClient(socket);
+
+            currentStage.setScene(new Scene(root));
+            currentStage.setTitle("Auction System");
+            currentStage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            messageLabel.setText("Could not open main page.");
+        }
+    }
+
+    public void switchToAdminDashboard() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/AdminDashboard.fxml")
+            );
+
+            Parent root = loader.load();
+
+            AdminDashboardController controller = loader.getController();
+            controller.setSocketClient(socket);
+
+            currentStage.setScene(new Scene(root));
+            currentStage.setTitle("Admin Dashboard");
+            currentStage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            messageLabel.setText("Could not open admin page.");
         }
     }
 
@@ -130,27 +174,19 @@ public class LoginController {
         passwordField.clear();
         messageLabel.setText("");
     }
-@FXML
-private void switchToMain(ActionEvent event, User currentUser) {
-    try {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainPageView.fxml"));
-        Parent root = loader.load();
-        MainPageController controller = loader.getController();
-        controller.setUserName(currentUser.getUsername());
-        controller.setSocketClient(socket);
 
-        // Get controller of MainPage
-        
-
-        // Switch scene
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(root));
-        stage.setTitle("Auction System");
-        stage.show();
-
-    } catch (IOException e) {
-        e.printStackTrace();
-        messageLabel.setText("Could not open main page.");
+    public void handle(Object obj){
+        if (obj instanceof AdminLoginResponse){
+            AdminLoginResponse response = (AdminLoginResponse) obj;
+            if (response.getResponse()){
+                switchToAdminDashboard();
+            }
+        }
+        else if (obj instanceof LoginResponse){
+            LoginResponse response = (LoginResponse) obj;
+            if (response.getResponse()){
+                switchToMain(response.getCurrentUser());
+            }
+        }
     }
-}
 }

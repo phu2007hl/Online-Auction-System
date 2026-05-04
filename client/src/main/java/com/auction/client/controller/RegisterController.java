@@ -1,9 +1,16 @@
 package com.auction.client.controller;
 
+import com.auction.client.network.SocketClient;
+import com.auction.client.service.RegisterAuthenticationService;
 import com.auction.shared.model.User;
+import com.auction.shared.request.Request;
+import com.auction.shared.response.RegisterResponse;
+
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -11,15 +18,16 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
 import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-import com.auction.client.network.SocketClient;
-import com.auction.shared.request.Request;
-import com.auction.client.service.RegisterAuthenticationService;
-import com.auction.shared.response.RegisterResponse;
+public class RegisterController extends Controller implements Initializable {
 
-public class RegisterController {
     private SocketClient socket;
+    private Stage currentStage;
+    private User currentUser;
 
     @FXML
     private TextField fullNameField;
@@ -39,13 +47,23 @@ public class RegisterController {
     @FXML
     private Label messageLabel;
 
-    @FXML
-    public void setSocketClient(SocketClient socket){
-        this.socket = socket;
-
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        Platform.runLater(() -> {
+            currentStage = (Stage) emailField.getScene().getWindow();
+        });
     }
+
+    public void setSocketClient(SocketClient socket) {
+        this.socket = socket;
+        socket.setController(this);
+        socket.startListening();
+    }
+
     @FXML
     private void handleRegister(ActionEvent event) {
+        currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
         String fullName = fullNameField.getText().trim();
         String username = usernameField.getText().trim();
         String email = emailField.getText().trim();
@@ -62,64 +80,44 @@ public class RegisterController {
             messageLabel.setText("Mật khẩu không khớp.");
             return;
         }
-        try{
-            RegisterAuthenticationService service = new RegisterAuthenticationService(email, password, username);
-            System.out.println("Client: creating register request");
+
+        try {
+            RegisterAuthenticationService service =
+                    new RegisterAuthenticationService(email, password, username);
+
             Request request = service.createAuthRequest();
 
-
             if (request == null) {
-                String errorMessage = service.getErrorMessage();
-                messageLabel.setText(errorMessage);
-                System.out.println("Client: Can not create register request because of error");
+                messageLabel.setText(service.getErrorMessage());
                 return;
             }
 
+            socket.sendRequest(request);
+            System.out.println("Request sent");
 
-            System.out.println("Client: before sendRequest");
-            RegisterResponse response = (RegisterResponse) socket.sendRequest(request);
-
-            System.out.println("Client: after sendRequest");
-
-            if (response.getResponse() == true){
-                messageLabel.setText("Đăng ký thành công. Đang chuyển trang...");
-                User currentUser = response.getCurrentUser();
-                switchToMain(event,currentUser);
-            }
-            else{
-                messageLabel.setText("Email đã tồn tại.");
-            }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
+            messageLabel.setText("Cannot connect to server.");
         }
-
-        // Later, replace this with your real authentication class
-        // Example:
-        // AuthenticationService authService = new AuthenticationService();
-        // boolean success = authService.register(fullName, username, email, password);
-
-        System.out.println("Full name: " + fullName);
-        System.out.println("Username: " + username);
-        System.out.println("Email: " + email);
-        System.out.println("Password: " + password);
-
     }
 
     @FXML
     private void switchToLogin(ActionEvent event) {
+        currentStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
         try {
-            System.out.println("Getting ready to load login page");
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoginView.fxml"));
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/LoginView.fxml")
+            );
+
             Parent root = loader.load();
 
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            
-            stage.getScene().setRoot(root);
+            LoginController controller = loader.getController();
+            controller.setSocketClient(socket);
 
-            stage.setTitle("Login");
-
-            stage.show();
+            currentStage.getScene().setRoot(root);
+            currentStage.setTitle("Login");
+            currentStage.show();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -127,55 +125,34 @@ public class RegisterController {
         }
     }
 
-    public String getFullNameInput() {
-        return fullNameField.getText().trim();
-    }
+    public void switchToMain(String currentUser) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/fxml/MainPageView.fxml")
+            );
 
-    public String getUsernameInput() {
-        return usernameField.getText().trim();
-    }
+            Parent root = loader.load();
 
-    public String getEmailInput() {
-        return emailField.getText().trim();
-    }
+            MainPageController controller = loader.getController();
+            controller.setUserName(currentUser);
+            controller.setSocketClient(socket);
 
-    public String getPasswordInput() {
-        return passwordField.getText();
-    }
+            currentStage.setScene(new Scene(root));
+            currentStage.setTitle("Auction System");
+            currentStage.show();
 
-    public String getConfirmPasswordInput() {
-        return confirmPasswordField.getText();
+        } catch (IOException e) {
+            e.printStackTrace();
+            messageLabel.setText("Could not open main page.");
+        }
     }
-
-    public void clearFields() {
-        fullNameField.clear();
-        usernameField.clear();
-        emailField.clear();
-        passwordField.clear();
-        confirmPasswordField.clear();
-        messageLabel.setText("");
-    }
-@FXML
-private void switchToMain(ActionEvent event, User currentUser) {
-    try {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainPageView.fxml"));
-        Parent root = loader.load();
-        MainPageController controller = loader.getController();
-        controller.setUserName(currentUser.getUsername());
-        controller.setSocketClient(socket);
-
-        // Get controller of MainPage
+    public void handle(Object obj){
+        if (obj instanceof RegisterResponse){
+            RegisterResponse response = (RegisterResponse) obj;
+            if (response.getResponse()){
+                switchToMain(response.getCurrentUser().getUsername());
+            }
+        }
         
-
-        // Switch scene
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(root));
-        stage.setTitle("Auction System");
-        stage.show();
-
-    } catch (IOException e) {
-        e.printStackTrace();
-        messageLabel.setText("Could not open main page.");
     }
-}
 }

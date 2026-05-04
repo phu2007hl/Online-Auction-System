@@ -8,11 +8,13 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.auction.shared.model.User;
 
 public class UserDatabase {
-    public static void saveUser(HashMap<String, User> userData){
+    private static ConcurrentHashMap<String,User> userData;
+    public static void saveUser(ConcurrentHashMap<String, User> userData){
         try{
             ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("User.ser")));
             out.writeObject(userData);
@@ -25,10 +27,10 @@ public class UserDatabase {
             
         }
     }
-    public static HashMap<String,User> loadUser(){
+    public static ConcurrentHashMap<String,User> loadUser(){
         try{
             ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream("User.ser")));
-            HashMap<String,User>  userData = (HashMap<String,User>) in.readObject();
+            ConcurrentHashMap<String,User>  userData = (ConcurrentHashMap<String,User>) in.readObject();
             in.close();
             return userData;
             
@@ -36,8 +38,15 @@ public class UserDatabase {
         }
         catch (Exception e){
             e.printStackTrace();
-            return new HashMap<String,User>();
+            return new ConcurrentHashMap<String,User>();
         }
+    }
+    public static ConcurrentHashMap<String,User> getUserData(){
+        return userData;
+
+    }
+    public static void setUserData(ConcurrentHashMap<String,User> data){
+        userData = data;
     }
     
 }

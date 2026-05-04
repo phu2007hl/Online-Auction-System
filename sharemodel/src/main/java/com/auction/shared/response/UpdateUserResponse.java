@@ -1,8 +1,8 @@
 package com.auction.shared.response;
 
-public class createAuctionResponse extends Response{
+public class UpdateUserResponse extends Response{
     private boolean valid;
-    public createAuctionResponse(boolean valid){
+    public UpdateUserResponse(boolean valid){
         this.valid = valid;
     }
     public boolean getResponse(){
