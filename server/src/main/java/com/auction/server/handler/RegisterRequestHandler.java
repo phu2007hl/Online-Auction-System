@@ -3,6 +3,7 @@ package com.auction.server.handler;
 import com.auction.server.network.ClientHandler;
 import com.auction.server.service.RegisterAuthentication;
 import com.auction.shared.model.User;
+import com.auction.shared.request.RegisterRequest;
 import com.auction.shared.request.Request;
 import com.auction.shared.response.RegisterResponse;
 import com.auction.shared.response.Response;
@@ -11,8 +12,9 @@ public class RegisterRequestHandler implements RequestHandler {
 
     public Response handle(Request request,ClientHandler clienthandler) {
         System.out.println("Server: building RegisterResponse");
+        RegisterRequest req = (RegisterRequest) request;
 
-        RegisterAuthentication registerAuth = new RegisterAuthentication(request);
+        RegisterAuthentication registerAuth = new RegisterAuthentication(req);
         RegisterResponse response = (RegisterResponse) registerAuth.createResponse();
         User currentUser = registerAuth.getUserData();
         clienthandler.setUser(currentUser);

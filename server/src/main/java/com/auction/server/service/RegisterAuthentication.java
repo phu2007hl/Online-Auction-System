@@ -1,42 +1,46 @@
 package com.auction.server.service;
 
-
-import com.auction.server.database.UserDatabase;
 import com.auction.shared.model.User;
-import com.auction.shared.request.Request;
 import com.auction.shared.request.RegisterRequest;
 import com.auction.shared.response.RegisterResponse;
-
-import java.util.HashMap;
+import com.auction.server.database.UserDatabase;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class RegisterAuthentication {
     private RegisterRequest request;
-    private static HashMap<String, User> userdata = UserDatabase.loadUser();
-    public RegisterAuthentication(Request request) {
-        this.request = (RegisterRequest) request;
+    private static ConcurrentHashMap<String, User> userdata;
+    public RegisterAuthentication(RegisterRequest request) {
+        this.request = request;
     }
 
     public boolean authenticateRegistration() {
-        
-
-        if (userdata.containsKey(request.getEmail())) {
-            return false;
+        if (userdata == null) {
+            userdata = UserDatabase.getUserData();
+            if (userdata == null) {
+                userdata = UserDatabase.loadUser();
+                UserDatabase.setUserData(userdata);
+            }
         }
 
-        User user = new User(request.getEmail(), request.getPassword(), request.getUsername());
-        userdata.put(request.getEmail(), user);
-        UserDatabase.saveUser(userdata);
+        User newUser = new User(request.getEmail(), request.getPassword(), request.getUsername());
+        User result = userdata.putIfAbsent(request.getEmail(), newUser);
 
-        return true;
+        if (result == null) {
+            UserDatabase.saveUser(userdata);
+            return true;
+        }
+        return false;
     }
+
     public RegisterResponse createResponse() {
         if (authenticateRegistration()) {
             return new RegisterResponse(true, getUserData());
         } else {
-            return new RegisterResponse(false,null );
+            return new RegisterResponse(false, null);
         }
     }
-    public User getUserData(){
+
+    public User getUserData() {
         return userdata.get(request.getEmail());
     }
 }
