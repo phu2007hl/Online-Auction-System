@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class RegisterController extends Controller implements Initializable {
+    private static boolean switchToMainSuccess;
 
     private SocketClient socket;
     private Stage currentStage;
@@ -125,7 +126,8 @@ public class RegisterController extends Controller implements Initializable {
         }
     }
 
-    public void switchToMain(String currentUser) {
+    public void switchToMain(String currentUser,boolean valid) {
+        switchToMainSuccess = valid;
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/fxml/MainPageView.fxml")
@@ -150,9 +152,16 @@ public class RegisterController extends Controller implements Initializable {
         if (obj instanceof RegisterResponse){
             RegisterResponse response = (RegisterResponse) obj;
             if (response.getResponse()){
-                switchToMain(response.getCurrentUser().getUsername());
+                switchToMain(response.getCurrentUser().getUsername(),true);
+                
+            }
+            else{
+                switchToMainSuccess = false;
             }
         }
         
+    }
+    public static boolean getSwitchToMainSuccess(){
+        return switchToMainSuccess;
     }
 }

@@ -28,6 +28,12 @@
         </dependency>
         <dependency>
             <groupId>com.auction</groupId>
+            <artifactId>server</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.auction</groupId>
             <artifactId>sharemodel</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>

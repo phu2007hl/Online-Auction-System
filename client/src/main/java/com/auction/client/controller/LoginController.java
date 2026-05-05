@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.ResourceBundle;
 
 public class LoginController extends Controller implements Initializable {
+    private static  boolean switchToAdminSuccess;
+    private static boolean switchToMainSuccess;
 
     private SocketClient socket;
     private Stage currentStage;
@@ -118,7 +120,8 @@ public class LoginController extends Controller implements Initializable {
         }
     }
 
-    public void switchToMain(User currentUser) {
+    public void switchToMain(User currentUser,boolean valid) {
+        switchToMainSuccess = valid;
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/fxml/MainPageView.fxml")
@@ -140,7 +143,8 @@ public class LoginController extends Controller implements Initializable {
         }
     }
 
-    public void switchToAdminDashboard() {
+    public void switchToAdminDashboard(boolean valid) {
+        switchToAdminSuccess = valid;
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/fxml/AdminDashboard.fxml")
@@ -179,14 +183,26 @@ public class LoginController extends Controller implements Initializable {
         if (obj instanceof AdminLoginResponse){
             AdminLoginResponse response = (AdminLoginResponse) obj;
             if (response.getResponse()){
-                switchToAdminDashboard();
+                switchToAdminDashboard(true);
+            }
+            else{
+                switchToAdminSuccess = false;
             }
         }
         else if (obj instanceof LoginResponse){
             LoginResponse response = (LoginResponse) obj;
             if (response.getResponse()){
-                switchToMain(response.getCurrentUser());
+                switchToMain(response.getCurrentUser(),true);
+            }
+            else{
+                switchToMainSuccess = false;
             }
         }
+    }
+    public static boolean getSwitchToAdminSuccess(){
+        return switchToAdminSuccess;
+    }
+    public static boolean getSwitchToMainSuccess(){
+        return switchToMainSuccess;
     }
 }

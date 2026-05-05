@@ -11,9 +11,10 @@ import java.util.ArrayList;
 import com.auction.shared.request.Request;
 
 public class AuctionListDatabase {
+    private static String path;
     public static void saveAuction(ArrayList<Request> auctionList){
         try{
-            ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("AuctionList.ser")));
+            ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(path)));
             
             out.writeObject(auctionList);
             System.out.println("Written succesfully");
@@ -25,7 +26,7 @@ public class AuctionListDatabase {
     }
     public static ArrayList<Request> loadAuctionList(){
         try{
-            ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream("AuctionList.ser")));
+            ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(path)));
             ArrayList<Request> auctionList = (ArrayList<Request>) in.readObject();
             System.out.println("Load auctionList succesfully");
             in.close();
@@ -35,5 +36,8 @@ public class AuctionListDatabase {
             e.printStackTrace();
             return new ArrayList<Request>();
         }
+    }
+    public static void setPath(String pa){
+        path = pa;
     }
 }

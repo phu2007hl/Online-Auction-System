@@ -34,6 +34,7 @@ import java.util.concurrent.Executors;
 
 public class AdminDashboardController extends Controller implements Initializable {
     private SocketClient socket;
+    private static boolean  updateDashboardSuccess;
     @FXML private TableView<RequestRow>           requestTable;
     @FXML private TableColumn<RequestRow, Image>  pictureColumn;
     @FXML private TableColumn<RequestRow, String> categoryColumn;
@@ -160,7 +161,8 @@ public class AdminDashboardController extends Controller implements Initializabl
             createAuctionRequest request = (createAuctionRequest) obj;
             if (request != null){
                 Image image = new Image(new ByteArrayInputStream(request.getImageContent()));
-                requestRows.add(new RequestRow(image,request.getCategory() , request));
+               boolean success =  requestRows.add(new RequestRow(image,request.getCategory() , request));
+               updateDashboardSuccess = success;
 
 
             }
@@ -176,10 +178,14 @@ public class AdminDashboardController extends Controller implements Initializabl
                 createAuctionRequest auctionRequest = (createAuctionRequest) request;
                 System.out.println("Cast succesfully");
                 Image image = new Image(new ByteArrayInputStream(auctionRequest.getImageContent()));
-                requestRows.add(new RequestRow(image, auctionRequest.getCategory(), auctionRequest));
+               boolean success =  requestRows.add(new RequestRow(image, auctionRequest.getCategory(), auctionRequest));
+               updateDashboardSuccess = success;
 
             }
 
         }
+    }
+    public static  boolean getUpdateSuccess(){
+        return updateDashboardSuccess;
     }
 }

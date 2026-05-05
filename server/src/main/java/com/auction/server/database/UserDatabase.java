@@ -14,9 +14,10 @@ import com.auction.shared.model.User;
 
 public class UserDatabase {
     private static ConcurrentHashMap<String,User> userData;
+    private static String path;
     public static void saveUser(ConcurrentHashMap<String, User> userData){
         try{
-            ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("User.ser")));
+            ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(path)));
             out.writeObject(userData);
             out.close();
             
@@ -29,7 +30,7 @@ public class UserDatabase {
     }
     public static ConcurrentHashMap<String,User> loadUser(){
         try{
-            ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream("User.ser")));
+            ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(path)));
             ConcurrentHashMap<String,User>  userData = (ConcurrentHashMap<String,User>) in.readObject();
             in.close();
             return userData;
@@ -47,6 +48,9 @@ public class UserDatabase {
     }
     public static void setUserData(ConcurrentHashMap<String,User> data){
         userData = data;
+    }
+    public static void  setPath(String pa){
+        path = pa;
     }
     
 }

@@ -13,10 +13,11 @@ import com.auction.server.network.ClientHandler;
 import com.auction.shared.request.Request;
 
 public class  createAuctionDatabase{
+    private static String path;
     public static void saveAuctionRequest(ArrayList<Request> requestList){
         try{
             System.out.println("Saving to database");
-            ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("AucRequest.ser")));
+            ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(path)));
             out.writeObject(requestList);
             System.out.println("Saved to database");
             out.flush();
@@ -31,7 +32,7 @@ public class  createAuctionDatabase{
     public static ArrayList<Request> loadRequestList(){
         try{
             System.out.println("Loading list from database");
-            ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream("AucRequest.ser")));
+            ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(path)));
             
             ArrayList<Request> requestList = (ArrayList<Request>) in.readObject();
             System.out.println("List loaded");
@@ -51,6 +52,9 @@ public class  createAuctionDatabase{
         System.out.println("Request removed from list");
         createAuctionDatabase.saveAuctionRequest(requestList);
 
+    }
+    public static void setPath(String pa){
+        path = pa;
     }
 
 }

@@ -2,6 +2,10 @@ package com.auction.client;
 
 import com.auction.client.controller.LoginController;
 import com.auction.client.network.SocketClient;
+import com.auction.server.database.AuctionListDatabase;
+import com.auction.server.database.UserDatabase;
+import com.auction.server.database.createAuctionDatabase;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,7 +17,11 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            SocketClient socketClient = new SocketClient();
+            UserDatabase.setPath("User.ser");
+            createAuctionDatabase.setPath("AuctionRequest.ser");
+            AuctionListDatabase.setPath("AuctionList.ser");
+
+            SocketClient socketClient = new SocketClient(4100);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoginView.fxml"));
             Parent root = loader.load();
 

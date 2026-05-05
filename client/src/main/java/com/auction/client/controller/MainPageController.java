@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 public class MainPageController extends Controller implements Initializable {
+    private static boolean updateMainPageSuccess;
+    private static boolean logOutSuccess;
 
     private SocketClient socket;
     private Stage currentStage;
@@ -60,6 +62,7 @@ public class MainPageController extends Controller implements Initializable {
     }
 
     public void addProductBox(createAuctionRequest request) {
+        updateMainPageSuccess = true;
         try {
             FXMLLoader loader = new FXMLLoader(
                     getClass().getResource("/fxml/ProductBox.fxml")
@@ -80,9 +83,12 @@ public class MainPageController extends Controller implements Initializable {
             );
 
             productContainer.getChildren().add(productBox);
+            updateMainPageSuccess = true;
+
 
         } catch (Exception e) {
             e.printStackTrace();
+            
         }
     }
 
@@ -101,10 +107,12 @@ public class MainPageController extends Controller implements Initializable {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.getScene().setRoot(root);
             stage.show();
+            
 
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Cannot switch to Create Auction Page");
+           
         }
     }
 
@@ -140,6 +148,7 @@ public class MainPageController extends Controller implements Initializable {
             LogOutResponse response = (LogOutResponse) obj;
 
             if (response.getResponse()) {
+                logOutSuccess = true;
                 try {
                     FXMLLoader loader = new FXMLLoader(
                             getClass().getResource("/fxml/LoginView.fxml")
@@ -152,6 +161,7 @@ public class MainPageController extends Controller implements Initializable {
 
                     currentStage.setScene(new Scene(root));
                     currentStage.show();
+                    
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -159,5 +169,11 @@ public class MainPageController extends Controller implements Initializable {
                 }
             }
         }
+    }
+    public static boolean getUpdateMainSuccess(){
+        return updateMainPageSuccess;
+    }
+    public static boolean getLogOutSuccess(){
+        return logOutSuccess;
     }
 }

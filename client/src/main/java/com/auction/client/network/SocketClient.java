@@ -21,9 +21,9 @@ public class SocketClient {
     private Thread listenerThread;
     private volatile boolean listening = false;
 
-    public SocketClient() {
+    public SocketClient(int port) {
         try {
-            socket = new Socket("localhost", 4100);
+            socket = new Socket("localhost", port);
             System.out.println("Connected to server");
 
             out = new ObjectOutputStream(socket.getOutputStream());
@@ -63,6 +63,7 @@ public class SocketClient {
             while (listening) {
                 try {
                     Object obj = in.readObject();
+                    
                     System.out.println("Response received");
 
                     Platform.runLater(()->controller.handle(obj));
@@ -90,6 +91,9 @@ public class SocketClient {
 
     public ObjectOutputStream getOutStream() {
         return out;
+    }
+    public void setSocket(){
+        this.socket = socket;
     }
 }
 
