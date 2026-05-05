@@ -142,12 +142,15 @@ public class DataFlowTest {
     @AfterAll
     public static void clearResource(){
         try{
-            FileOutputStream out1 = new FileOutputStream(new File("UserTest.ser"));
-            FileOutputStream out2 = new FileOutputStream(new File("AuctionListTest.ser"));
+            FileOutputStream out1 = new FileOutputStream("UserTest.ser");
+            FileOutputStream out2 = new FileOutputStream("AuctionListTest.ser");
             ClientHandler.getOnlineUser().clear();
             
 
-            FileOutputStream out3 = new FileOutputStream(new File("AuctionRequestTest.ser"));
+            FileOutputStream out3 = new FileOutputStream("AuctionRequestTest.ser");
+
+
+            
         }
         catch (Exception e){
             e.printStackTrace();
