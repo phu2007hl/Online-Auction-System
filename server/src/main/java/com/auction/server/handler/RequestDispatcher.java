@@ -1,54 +1,74 @@
 package com.auction.server.handler;
 
-import com.auction.server.network.ClientHandler;
-import com.auction.shared.request.AdminLoginRequest;
-import com.auction.shared.request.LoadAuctionRequest;
-import com.auction.shared.request.LogOutRequest;
-import com.auction.shared.request.LoginRequest;
-import com.auction.shared.request.RegisterRequest;
+import com.auction.server.handler.admin.GetPendingAuctionListHandler;
+import com.auction.server.handler.auction.AuctionReviewResultHandler;
+import com.auction.server.handler.auction.CreateAuctionRequestHandler;
+import com.auction.server.handler.auction.GetApprovedAuctionListHandler;
+import com.auction.server.handler.auction.PublishApprovedAuctionHandler;
+import com.auction.server.handler.auction.ToDatabaseHandler;
+import com.auction.server.handler.auth.AdminLoginHandler;
+import com.auction.server.handler.auth.LogOutHandler;
+import com.auction.server.handler.auth.LoginRequestHandler;
+import com.auction.server.handler.auth.RegisterRequestHandler;
 import com.auction.shared.request.Request;
-import com.auction.shared.request.ToDatabaseRequest;
-import com.auction.shared.request.UpdateMainPageRequest;
-import com.auction.shared.request.UpdateUserRequest;
-import com.auction.shared.request.createAuctionRequest;
-import com.auction.shared.request.getAuctionListRequest;
+import com.auction.shared.request.admin.GetPendingAuctionListRequest;
+import com.auction.shared.request.auction.AuctionReviewResultRequest;
+import com.auction.shared.request.auction.CreateAuctionRequest;
+import com.auction.shared.request.auction.GetApprovedAuctionListRequest;
+import com.auction.shared.request.auction.PublishApprovedAuctionRequest;
+import com.auction.shared.request.auction.ToDatabaseRequest;
+import com.auction.shared.request.auth.AdminLoginRequest;
+import com.auction.shared.request.auth.LogOutRequest;
+import com.auction.shared.request.auth.LoginRequest;
+import com.auction.shared.request.auth.RegisterRequest;
+import java.util.HashMap;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+* Chọn handler phù hợp dựa trên loại request nhận được.
+*/
 public class RequestDispatcher {
-    public static RequestHandler getHandler(Request requestType){
-        if(requestType instanceof LoginRequest){
-            return new LoginRequestHandler();
-        }
-        else if(requestType instanceof RegisterRequest){
-            return new RegisterRequestHandler();
-        }
-        else if (requestType instanceof AdminLoginRequest){
-            return new AdminLoginHandler();
-        }
-        else if (requestType instanceof createAuctionRequest){
-            return new createAuctionHandler();
-        }
-        else if (requestType instanceof getAuctionListRequest){
-            return new getAuctionListHandler();
-        }
-        else if (requestType instanceof LoadAuctionRequest){
-            return new LoadAuctionHandler();
-        }
-        else if (requestType instanceof LogOutRequest){
-            return new LogOutHandler();
-        }
-        else if (requestType instanceof ToDatabaseRequest){
-            return new ToDatabaseHandler();
-        }
-        else if (requestType instanceof UpdateMainPageRequest){
-            return new UpdateMainPageHandler();  
-        }
-        else if (requestType instanceof UpdateUserRequest){
-            return new UpdateUserRequestHandler();
-        }
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(RequestDispatcher.class);
+  private static final Map<Class<? extends Request>, RequestHandler>
+      HANDLER_MAP = new HashMap<>();
 
-        // nếu không phải loại request được xác định
-        throw new IllegalArgumentException(
-                "Unsupported request type: " + requestType.getClass().getSimpleName()
-        );
+  static {
+    HANDLER_MAP.put(LoginRequest.class, new LoginRequestHandler());
+    HANDLER_MAP.put(RegisterRequest.class, new RegisterRequestHandler());
+    HANDLER_MAP.put(AdminLoginRequest.class, new AdminLoginHandler());
+    HANDLER_MAP.put(CreateAuctionRequest.class, new CreateAuctionRequestHandler());
+    HANDLER_MAP.put(GetPendingAuctionListRequest.class, new GetPendingAuctionListHandler());
+    HANDLER_MAP.put(GetApprovedAuctionListRequest.class, new GetApprovedAuctionListHandler());
+    HANDLER_MAP.put(LogOutRequest.class, new LogOutHandler());
+    HANDLER_MAP.put(ToDatabaseRequest.class, new ToDatabaseHandler());
+    HANDLER_MAP.put(
+        PublishApprovedAuctionRequest.class,
+        new PublishApprovedAuctionHandler());
+    HANDLER_MAP.put(AuctionReviewResultRequest.class, new AuctionReviewResultHandler());
+  }
+
+  /**
+  * Trả về handler ứng với loại request.
+  *
+  * @param requestType request cần xử lý
+  * @return handler tương ứng
+  */
+  public static RequestHandler getHandler(Request requestType) {
+    LOGGER.debug("Đang điều phối request loại: {}", requestType.getClass().getSimpleName());
+    RequestHandler handler = HANDLER_MAP.get(requestType.getClass());
+    // Nếu không tìm thấy handler tương ứng thì request đang vượt qua boundary hiện có.
+    if (handler == null) {
+      LOGGER.error(
+          "Không hỗ trợ request loại: {} - không tìm thấy handler",
+          requestType.getClass().getSimpleName());
+      throw new IllegalArgumentException(
+          "Unsupported request type: "
+              + requestType.getClass().getSimpleName());
     }
+    LOGGER.debug("Đã tìm thấy handler cho request: {}", requestType.getClass().getSimpleName());
+    return handler;
+  }
 }

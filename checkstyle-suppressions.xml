@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+    "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+<suppressions>
+    <suppress checks=".*" files="[/\\]target[/\\].*"/>
+    <suppress checks=".*" files="[/\\]src[/\\]main[/\\]java[/\\]com[/\\]auction[/\\]shared[/\\](auction|entity|enums|model)[/\\].*"/>
+    <suppress checks=".*" files="[/\\]src[/\\]main[/\\]java[/\\]com[/\\]auction[/\\]server[/\\](database|model)[/\\].*"/>
+    <suppress checks=".*" files="[/\\]src[/\\]main[/\\]java[/\\]com[/\\]auction[/\\]client[/\\]service[/\\].*"/>
+    <suppress checks=".*" files="[/\\]src[/\\]test[/\\]java[/\\].*"/>
+</suppressions>
