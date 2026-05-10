@@ -5,12 +5,10 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane style="-fx-background-color: #f3f4f6;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.RegisterController">
-
+<StackPane style="-fx-background-color: #f3f4f6;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.auth.RegisterController">
     <children>
         <HBox alignment="CENTER" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 0);" StackPane.alignment="CENTER">
             <children>
-
                 <VBox alignment="CENTER" prefHeight="550.0" prefWidth="470.0" spacing="12.0" style="-fx-background-color: #ffffff;">
                     <children>
                         <Label text="Tạo tài khoản">
@@ -24,36 +22,36 @@
 
                         <VBox maxWidth="300.0" spacing="5.0">
                             <children>
-                                <Label text="Full Name" />
-                                <TextField fx:id="fullNameField" prefHeight="38.0" promptText="Enter full name" />
+                                <Label text="Họ và tên" />
+                                <TextField fx:id="fullNameField" prefHeight="38.0" promptText="Nhập họ và tên" />
                             </children>
                         </VBox>
 
                         <VBox maxWidth="300.0" spacing="5.0">
                             <children>
-                                <Label text="Username" />
-                                <TextField fx:id="usernameField" prefHeight="38.0" promptText="Choose username" />
+                                <Label text="Tên đăng nhập" />
+                                <TextField fx:id="usernameField" prefHeight="38.0" promptText="Chọn tên đăng nhập" />
                             </children>
                         </VBox>
 
                         <VBox maxWidth="300.0" spacing="5.0">
                             <children>
                                 <Label text="Email" />
-                                <TextField fx:id="emailField" prefHeight="38.0" promptText="Enter email" />
+                                <TextField fx:id="emailField" prefHeight="38.0" promptText="Nhập email" />
                             </children>
                         </VBox>
 
                         <VBox maxWidth="300.0" spacing="5.0">
                             <children>
-                                <Label text="Password" />
-                                <PasswordField fx:id="passwordField" prefHeight="38.0" promptText="Create password" />
+                                <Label text="Mật khẩu" />
+                                <PasswordField fx:id="passwordField" prefHeight="38.0" promptText="Tạo mật khẩu" />
                             </children>
                         </VBox>
 
                         <VBox maxWidth="300.0" spacing="5.0">
                             <children>
-                                <Label text="Confirm Password" />
-                                <PasswordField fx:id="confirmPasswordField" prefHeight="38.0" promptText="Confirm password" />
+                                <Label text="Xác nhận mật khẩu" />
+                                <PasswordField fx:id="confirmPasswordField" prefHeight="38.0" promptText="Nhập lại mật khẩu" />
                             </children>
                         </VBox>
 
@@ -92,7 +90,6 @@
                         </Label>
                     </children>
                 </VBox>
-
             </children>
         </HBox>
     </children>

@@ -7,12 +7,12 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #f3f4f6;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.CreateAuctionPageController">
+<BorderPane prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #f3f4f6;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.auction.CreateAuctionPageController">
 
     <center>
         <VBox alignment="TOP_CENTER" maxHeight="520" maxWidth="650" spacing="20" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 12; -fx-border-color: #e5e7eb; -fx-border-radius: 12;">
 
-            <Label style="-fx-text-fill: #111827;" text="Tạo Phiên Đấu Giá Mới">
+            <Label style="-fx-text-fill: #111827;" text="Tạo phiên đấu giá mới">
                 <font>
                     <Font name="System Bold" size="24" />
                 </font>
@@ -48,7 +48,7 @@
 
                 <Label style="-fx-text-fill: #374151; -fx-font-weight: bold;" text="Hình ảnh:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
                 <HBox alignment="CENTER_LEFT" spacing="10" GridPane.columnIndex="1" GridPane.rowIndex="4">
-                    <Button onAction="#handleUploadImage" style="-fx-background-color: #e5e7eb; -fx-text-fill: #374151; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 5 15;" text="Chọn file" />
+                    <Button onAction="#handleUploadImage" style="-fx-background-color: #e5e7eb; -fx-text-fill: #374151; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 5 15;" text="Chọn tệp" />
                     <Label fx:id="imagePathLabel" style="-fx-text-fill: #9ca3af; -fx-font-style: italic;" text="Chưa có ảnh nào được chọn" />
                 </HBox>
 
@@ -72,16 +72,18 @@
             </rowConstraints>
             </GridPane>
 
+            <Label fx:id="messageLabel" style="-fx-text-fill: #16a34a; -fx-font-weight: bold;" text="" />
+
             <HBox alignment="CENTER" spacing="15">
                 <VBox.margin>
                     <Insets top="15" />
                 </VBox.margin>
-                <Button onAction="#switchToMain" prefHeight="38" prefWidth="130" style="-fx-background-color: transparent; -fx-border-color: #9ca3af; -fx-text-fill: #4b5563; -fx-border-radius: 8; -fx-cursor: hand;" text="Quay Lại">
+                <Button onAction="#switchToMain" prefHeight="38" prefWidth="130" style="-fx-background-color: transparent; -fx-border-color: #9ca3af; -fx-text-fill: #4b5563; -fx-border-radius: 8; -fx-cursor: hand;" text="Quay lại">
                     <font>
                         <Font name="System Bold" size="14" />
                     </font>
                 </Button>
-                <Button defaultButton="true" onAction="#handleCreateAuction" prefHeight="38" prefWidth="130" style="-fx-background-color: #4f46e5; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;" text="Tạo Đấu Giá">
+                <Button defaultButton="true" onAction="#handleCreateAuction" prefHeight="38" prefWidth="130" style="-fx-background-color: #4f46e5; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;" text="Tạo đấu giá">
                     <font>
                         <Font name="System Bold" size="14" />
                     </font>

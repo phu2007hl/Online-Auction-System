@@ -2,98 +2,144 @@ package com.auction.client.network;
 
 import com.auction.client.controller.Controller;
 import com.auction.shared.request.Request;
-
-import javafx.application.Platform;
-
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.IOException;
 import java.net.Socket;
-import java.util.function.Consumer;
+import javafx.application.Platform;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+* Lớp giao tiếp socket của client.
+*/
 public class SocketClient {
+  private static final Logger LOGGER = LoggerFactory.getLogger(SocketClient.class);
 
-    private Socket socket;
-    private ObjectOutputStream out;
-    private ObjectInputStream in;
-    private Controller controller;
+  private final Socket socket;
+  private final ObjectOutputStream out;
+  private final ObjectInputStream in;
+  private Controller controller;
+  private Thread listenerThread;
+  private volatile boolean listening;
 
-    private Thread listenerThread;
-    private volatile boolean listening = false;
+  /**
+  * Tạo client socket và kết nối tới server.
+  *
+  * @param port cổng server
+  */
+  public SocketClient(int port) {
+    Socket createdSocket = null;
+    ObjectOutputStream createdOut = null;
+    ObjectInputStream createdIn = null;
 
-    public SocketClient(int port) {
-        try {
-            socket = new Socket("localhost", port);
-            System.out.println("Connected to server");
+    try {
+      createdSocket = new Socket("localhost", port);
+      LOGGER.info("Đã kết nối tới server ở cổng {}", port);
 
-            out = new ObjectOutputStream(socket.getOutputStream());
-            out.flush();
-
-            in = new ObjectInputStream(socket.getInputStream());
-
-        } catch (Exception e) {
-            System.out.println("Error");
-            e.printStackTrace();
-        }
-    }
-    public void setController(Controller controller){
-        this.controller = controller;
-    }
-
-    public synchronized void sendRequest(Request request) {
-        try {
-            System.out.println("Client: writing request");
-            out.writeObject(request);
-            out.flush();
-            out.reset();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+      createdOut = new ObjectOutputStream(createdSocket.getOutputStream());
+      createdOut.flush();
+      createdIn = new ObjectInputStream(createdSocket.getInputStream());
+    } catch (Exception e) {
+      LOGGER.error("Không thể khởi tạo kết nối client", e);
     }
 
+    socket = createdSocket;
+    out = createdOut;
+    in = createdIn;
+  }
 
-    public synchronized void startListening() {
-        if (listenerThread != null && listenerThread.isAlive()) {
-            return;
-        }
+  /**
+  * Gán controller đang nhận response.
+  *
+  * @param controller controller hiện tại
+  */
+  public void setController(Controller controller) {
+    this.controller = controller;
+  }
 
-        listening = true;
+  /**
+  * Gửi request lên server.
+  *
+  * @param request request cần gửi
+  */
+  public synchronized void sendRequest(Request request) {
+    if (out == null) {
+      LOGGER.warn("ObjectOutputStream chưa được khởi tạo");
+      return;
+    }
 
-        listenerThread = new Thread(() -> {
-            while (listening) {
-                try {
-                    Object obj = in.readObject();
-                    
-                    System.out.println("Response received");
+    try {
+      out.writeObject(request);
+      out.flush();
+      out.reset();
+    } catch (IOException e) {
+      LOGGER.error("Không thể gửi request {}", request.getClass().getSimpleName(), e);
+    }
+  }
 
-                    Platform.runLater(()->controller.handle(obj));
-                    System.out.println("Response handled");
+  /**
+  * Bật thread lắng nghe response từ server.
+  */
+  public synchronized void startListening() {
+    if (listenerThread != null && listenerThread.isAlive()) {
+      return;
+    }
+    if (in == null) {
+      LOGGER.warn("ObjectInputStream chưa được khởi tạo");
+      return;
+    }
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    listening = false;
-                    break;
-                }
+    listening = true;
+    listenerThread = new Thread(
+        () -> {
+          while (listening) {
+            try {
+              Object obj = in.readObject();
+              Platform.runLater(() -> controller.handle(obj));
+            } catch (Exception e) {
+              LOGGER.error("Lỗi khi lắng nghe response từ server", e);
+              listening = false;
+              break;
             }
-        });
+          }
+        }
+    );
+    listenerThread.setDaemon(true);
+    listenerThread.start();
+  }
 
-        listenerThread.setDaemon(true);
-        listenerThread.start();
-    }
+  /**
+  * Dừng thread lắng nghe.
+  */
+  public void stopListening() {
+    listening = false;
+  }
 
-    public void stopListening() {
-        listening = false;
-    }
+  /**
+  * Lấy input stream.
+  *
+  * @return input stream
+  */
+  public ObjectInputStream getInStream() {
+    return in;
+  }
 
-    public ObjectInputStream getInStream() {
-        return in;
-    }
+  /**
+  * Lấy output stream.
+  *
+  * @return output stream
+  */
+  public ObjectOutputStream getOutStream() {
+    return out;
+  }
 
-    public ObjectOutputStream getOutStream() {
-        return out;
-    }
-    public void setSocket(){
-        this.socket = socket;
-    }
+  /**
+  * Lấy socket đang sử dụng.
+  *
+  * @return socket hiện tại
+  */
+  public Socket getSocket() {
+    return socket;
+  }
 }
-

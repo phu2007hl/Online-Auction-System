@@ -1,12 +1,33 @@
+package com.auction.client;
 
-
-import com.auction.client.controller.*;
+import com.auction.client.controller.admin.AdminDashboardController;
+import com.auction.client.controller.auction.CreateAuctionPageController;
+import com.auction.client.controller.auction.MainPageController;
+import com.auction.client.controller.auth.LoginController;
+import com.auction.client.controller.auth.RegisterController;
 import com.auction.client.network.SocketClient;
-import com.auction.server.database.*;
+import com.auction.server.database.AuctionListDatabase;
+import com.auction.server.database.PendingAuctionDatabase;
+import com.auction.server.database.UserDatabase;
 import com.auction.server.network.ClientHandler;
-import com.auction.shared.request.*;
+import com.auction.shared.request.Request;
+import com.auction.shared.request.admin.GetPendingAuctionListRequest;
+import com.auction.shared.request.auction.CreateAuctionRequest;
+import com.auction.shared.request.auction.PublishApprovedAuctionRequest;
+import com.auction.shared.request.auth.AdminLoginRequest;
+import com.auction.shared.request.auth.LoginRequest;
+import com.auction.shared.request.auth.LogOutRequest;
+import com.auction.shared.request.auth.RegisterRequest;
+import com.auction.shared.response.admin.GetPendingAuctionListResponse;
 import javafx.application.Platform;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -20,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class DataFlowTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataFlowTest.class);
     private static SocketClient con;
     private static LoginController controller1;
     private static AdminDashboardController controller2;
@@ -32,6 +54,7 @@ public class DataFlowTest {
         try {
             Platform.startup(() -> {});
         } catch (IllegalStateException e) {
+            // Platform already started
         }
         controller1 = new LoginController();
         controller2 = new AdminDashboardController();
@@ -39,36 +62,44 @@ public class DataFlowTest {
         controller4 = new CreateAuctionPageController();
         controller5 = new RegisterController();
         UserDatabase.setPath("UserTest.ser");
-        createAuctionDatabase.setPath("AuctionRequestTest.ser");
+        PendingAuctionDatabase.setPath("AuctionRequestTest.ser");
         AuctionListDatabase.setPath("AuctionListTest.ser");
         new Thread(() -> {
             try (ServerSocket server = new ServerSocket(4556)) {
                 server.setSoTimeout(5000);
-                System.out.println("Test Server started on port 4555...");
+                LOGGER.info("Test Server started on port 4555...");
                 while (true) {
                     try {
                         Socket connection = server.accept();
                         new Thread(new ClientHandler(connection)).start();
                     } catch (java.net.SocketTimeoutException e) {
-                        System.out.println("No more test requests. Shutting down server.");
+                        LOGGER.info("Không còn request kiểm thử, đang dừng server.");
                         break;
                     }
                 }
             } catch (IOException e) {
-                System.err.println("Could not start test server: " + e.getMessage());
+                LOGGER.error("Không thể khởi động server kiểm thử", e);
             }
         }).start();
-        con = new SocketClient( 4556);
-        try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+        con = new SocketClient(4556);
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ignored) {
+            // Interruption expected in test
+        }
     }
 
     @Test
     @Order(1)
     public void testRegister() {
         controller5.setSocketClient(con);
-        RegisterRequest request = new RegisterRequest("MiroVeranda7882@gmail.com", "Hunghang7882@", "Miro");
+        RegisterRequest request =
+            new RegisterRequest(
+                "MiroVeranda7882@gmail.com",
+                "Hunghang7882@",
+                "Miro");
         con.sendRequest(request);
-        
+
         waitForResponse();
         assertTrue(RegisterController.getSwitchToMainSuccess());
         assertEquals(1, ClientHandler.getOnlineUser().size());
@@ -103,7 +134,10 @@ public class DataFlowTest {
     public void testLogin() {
         controller1.setSocketClient(con);
         con.setController(controller1);
-        LoginRequest request = new LoginRequest("MiroVeranda7882@gmail.com", "Hunghang7882@");
+        LoginRequest request =
+            new LoginRequest(
+                "MiroVeranda7882@gmail.com",
+                "Hunghang7882@");
         con.sendRequest(request);
 
         waitForResponse();
@@ -115,9 +149,25 @@ public class DataFlowTest {
     @Order(5)
     public void testCreateAuction() {
         controller2.setSocketClient(con);
-        con.setController(controller2); 
-        byte[] sampleImage = new byte[] { (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A };
-        createAuctionRequest request = new createAuctionRequest(sampleImage, "Electronic", "1000", "desc", LocalDate.now().plusDays(4));
+        con.setController(controller2);
+        byte[] sampleImage =
+            new byte[] {
+                (byte) 0x89,
+                0x50,
+                0x4E,
+                0x47,
+                0x0D,
+                0x0A,
+                0x1A,
+                0x0A
+            };
+        CreateAuctionRequest request =
+            new CreateAuctionRequest(
+                sampleImage,
+                "Electronic",
+                "1000",
+                "desc",
+                LocalDate.now().plusDays(4));
         con.sendRequest(request);
 
         waitForResponse();
@@ -128,33 +178,50 @@ public class DataFlowTest {
     @Order(6)
     public void testUpdateMainPage() {
         controller3.setSocketClient(con);
-        byte[] sampleImage = new byte[] { (byte) 0x89, 0x50, 0x4E, 0x47 };
-        createAuctionRequest request1 = new createAuctionRequest(sampleImage, "Electronic", "1000", "desc", LocalDate.now().plusDays(4));
-        UpdateMainPageRequest req = new UpdateMainPageRequest(request1);
-        
+        byte[] sampleImage =
+            new byte[] {
+                (byte) 0x89,
+                0x50,
+                0x4E,
+                0x47
+            };
+        CreateAuctionRequest request1 =
+            new CreateAuctionRequest(
+                sampleImage,
+                "Electronic",
+                "1000",
+                "desc",
+                LocalDate.now().plusDays(4));
+        PublishApprovedAuctionRequest req =
+            new PublishApprovedAuctionRequest(request1);
+
         con.sendRequest(req);
         waitForResponse();
         assertTrue(MainPageController.getUpdateMainSuccess());
     }
+
     private void waitForResponse() {
-        try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException ignored) {
+            // Interruption expected in test
+        }
     }
+
     @AfterAll
-    public static void clearResource(){
-        try{
-            FileOutputStream out1 = new FileOutputStream("UserTest.ser");
-            FileOutputStream out2 = new FileOutputStream("AuctionListTest.ser");
+    public static void clearResource() {
+        try {
+            FileOutputStream out1 =
+                new FileOutputStream("UserTest.ser");
+            FileOutputStream out2 =
+                new FileOutputStream("AuctionListTest.ser");
             ClientHandler.getOnlineUser().clear();
-            
 
-            FileOutputStream out3 = new FileOutputStream("AuctionRequestTest.ser");
+            FileOutputStream out3 =
+                new FileOutputStream("AuctionRequestTest.ser");
 
-
-            
+        } catch (Exception e) {
+            LOGGER.error("Không thể dọn tài nguyên kiểm thử", e);
         }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-
     }
 }

@@ -6,12 +6,12 @@
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.auction.client.controller.AdminDashboardController"
+            fx:controller="com.auction.client.controller.admin.AdminDashboardController"
             prefWidth="800"
             prefHeight="500">
 
     <top>
-        <Label text="Admin Dashboard"
+        <Label text="Bảng điều khiển admin"
                BorderPane.alignment="CENTER"
                style="-fx-font-size: 26px; -fx-font-weight: bold;">
             <BorderPane.margin>
@@ -23,21 +23,18 @@
     <center>
         <TableView fx:id="requestTable" prefWidth="760">
             <columns>
-
                 <TableColumn fx:id="pictureColumn"
-                             text="Picture"
+                             text="Hình ảnh"
                              prefWidth="250"/>
 
                 <TableColumn fx:id="categoryColumn"
-                             text="Category"
+                             text="Danh mục"
                              prefWidth="250"/>
 
                 <TableColumn fx:id="actionColumn"
-                             text="Action"
+                             text="Thao tác"
                              prefWidth="260"/>
-
             </columns>
         </TableView>
     </center>
-
 </BorderPane>

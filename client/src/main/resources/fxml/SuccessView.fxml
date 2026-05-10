@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
 <VBox xmlns="http://javafx.com/javafx"
@@ -18,7 +17,7 @@
         <Insets top="30" right="30" bottom="30" left="30"/>
     </padding>
 
-    <!-- Green circle with tick -->
+    <!-- Vòng tròn xanh với dấu tích -->
     <Label text="✓"
            alignment="CENTER"
            prefWidth="90"
@@ -31,8 +30,8 @@
                -fx-font-weight: bold;
            " />
 
-    <!-- Success message -->
-    <Label text="Auction Request has been successfully sent to admin"
+    <!-- Thông báo thành công -->
+    <Label text="Yêu cầu tạo đấu giá đã được gửi thành công tới admin"
            wrapText="true"
            textAlignment="CENTER"
            alignment="CENTER"
@@ -41,5 +40,4 @@
                -fx-font-size: 20px;
                -fx-font-weight: bold;
            " />
-
 </VBox>
