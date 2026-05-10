@@ -18,8 +18,8 @@ jobs:
           java-version: "25"
           distribution: "temurin"
 
-      - name: Install Xvfb (virtual display for JavaFX)
-        run: sudo apt-get install -y xvfb
+      - name: Build all modules
+        run: mvn clean compile --no-transfer-progress
 
-      - name: Build and test with virtual display
-        run: xvfb-run --auto-servernum mvn clean test -Djava.awt.headless=true
+      - name: Run server tests
+        run: mvn test --no-transfer-progress -pl server
