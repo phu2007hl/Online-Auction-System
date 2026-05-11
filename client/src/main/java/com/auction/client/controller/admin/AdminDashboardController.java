@@ -14,6 +14,8 @@ import java.io.ByteArrayInputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -149,7 +151,7 @@ public class AdminDashboardController extends Controller implements Initializabl
     CreateAuctionRequest req = pendingRequest.getRequest();
     try {
       socket.sendRequest(new AuctionReviewResultRequest(pendingRequest.getUser(), true));
-      socket.sendRequest(new PublishApprovedAuctionRequest(req));
+      socket.sendRequest(new PublishApprovedAuctionRequest(req,pendingRequest.getUser()));
     } catch (Exception e) {
       ToDatabaseRequest request = new ToDatabaseRequest(pendingRequest);
       socket.sendRequest(request);
@@ -243,18 +245,18 @@ public class AdminDashboardController extends Controller implements Initializabl
       GetPendingAuctionListResponse response = (GetPendingAuctionListResponse) obj;
       LOGGER.info("Đã nhận danh sách request chờ duyệt");
       requestRows.clear();
-      ArrayList<Request> requestList = response.getList();
-      for (Request request : requestList) {
-        if (request instanceof PendingAuctionReviewRequest) {
-          addPendingRequest((PendingAuctionReviewRequest) request);
-        } else if (request instanceof CreateAuctionRequest) {
-          CreateAuctionRequest auctionRequest = (CreateAuctionRequest) request;
+      ConcurrentHashMap<Integer,Request> requestList = response.getList();
+      for (Integer id : requestList.keySet()) {
+        if (requestList.get(id) instanceof PendingAuctionReviewRequest) {
+          addPendingRequest((PendingAuctionReviewRequest) requestList.get(id));
+        } else if (requestList.get(id) instanceof CreateAuctionRequest) {
+          CreateAuctionRequest auctionRequest = (CreateAuctionRequest) requestList.get(id);
           addPendingRequest(
               new PendingAuctionReviewRequest(auctionRequest, auctionRequest.getUser()));
         } else {
           LOGGER.warn(
               "Bỏ qua pending request không đúng kiểu: {}",
-              request.getClass().getSimpleName());
+              requestList.get(id).getClass().getSimpleName());
         }
       }
     }

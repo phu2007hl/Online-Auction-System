@@ -1,5 +1,6 @@
 package com.auction.shared.request.auction;
 
+import com.auction.shared.model.User;
 import com.auction.shared.request.Request;
 
 /**
@@ -7,14 +8,16 @@ import com.auction.shared.request.Request;
 */
 public class PublishApprovedAuctionRequest extends Request {
   private final CreateAuctionRequest request;
+  private final User user;
 
   /**
   * Tạo request publish auction đã duyệt.
   *
   * @param request request tạo auction cần publish
   */
-  public PublishApprovedAuctionRequest(CreateAuctionRequest request) {
+  public PublishApprovedAuctionRequest(CreateAuctionRequest request,User user) {
     this.request = request;
+    this.user = user;
   }
 
   /**
@@ -24,5 +27,12 @@ public class PublishApprovedAuctionRequest extends Request {
   */
   public CreateAuctionRequest getRequest() {
     return request;
+  }
+  /**
+   * Lấy user tạo request
+   * @return User tạo request
+   */
+  public User getUser(){
+    return user;
   }
 }

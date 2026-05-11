@@ -3,12 +3,13 @@ package com.auction.shared.response.admin;
 import com.auction.shared.request.Request;
 import com.auction.shared.response.Response;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
 * Kết quả lấy danh sách auction đang chờ duyệt.
 */
 public class GetPendingAuctionListResponse extends Response {
-  private final ArrayList<Request> requestList;
+  private final ConcurrentHashMap<Integer,Request> requestList;
   private final boolean valid;
 
   /**
@@ -17,7 +18,7 @@ public class GetPendingAuctionListResponse extends Response {
   * @param valid true nếu lấy dữ liệu thành công
   * @param requestList danh sách auction đang chờ duyệt
   */
-  public GetPendingAuctionListResponse(boolean valid, ArrayList<Request> requestList) {
+  public GetPendingAuctionListResponse(boolean valid, ConcurrentHashMap<Integer,Request> requestList) {
     this.requestList = requestList;
     this.valid = valid;
   }
@@ -36,7 +37,7 @@ public class GetPendingAuctionListResponse extends Response {
   *
   * @return danh sách pending auction
   */
-  public ArrayList<Request> getList() {
+  public ConcurrentHashMap<Integer,Request> getList() {
     return requestList;
   }
 }

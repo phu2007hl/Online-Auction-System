@@ -7,9 +7,9 @@ public class BidTransaction extends Entity {
 
   private User bidder;
   private double bidAmount;
-  private String auctionId;
+  private int auctionId;
 
-  public BidTransaction(String id, User bidder, double bidAmount, String auctionId) {
+  public BidTransaction(int id, User bidder, double bidAmount, int auctionId) {
     super(id);
     this.bidder = bidder;
     this.bidAmount = bidAmount;
@@ -24,7 +24,7 @@ public class BidTransaction extends Entity {
     return bidAmount;
   }
 
-  public String getAuctionId() {
+  public int getAuctionId() {
     return auctionId;
   }
 

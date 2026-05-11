@@ -25,7 +25,7 @@ public abstract class Item extends Entity {
   * @param seller user bán hàng
   */
   public Item(
-      String id,
+      int id,
       String name,
       String description,
       ItemCondition condition,

@@ -1,3 +1,4 @@
+
 package com.auction.client;
 
 import com.auction.client.controller.admin.AdminDashboardController;
@@ -10,6 +11,7 @@ import com.auction.server.database.AuctionListDatabase;
 import com.auction.server.database.PendingAuctionDatabase;
 import com.auction.server.database.UserDatabase;
 import com.auction.server.network.ClientHandler;
+import com.auction.shared.model.User;
 import com.auction.shared.request.Request;
 import com.auction.shared.request.admin.GetPendingAuctionListRequest;
 import com.auction.shared.request.auction.CreateAuctionRequest;
@@ -37,6 +39,7 @@ import java.net.Socket;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -109,7 +112,7 @@ public class DataFlowTest {
     @Order(2)
     public void testAdminLogin() {
         controller1.setSocketClient(con);
-        AdminLoginRequest request = new AdminLoginRequest("9999999999");
+        AdminLoginRequest request = new AdminLoginRequest("admin");
         con.sendRequest(request);
 
         waitForResponse();
@@ -165,9 +168,12 @@ public class DataFlowTest {
             new CreateAuctionRequest(
                 sampleImage,
                 "Electronic",
-                "1000",
+                1000,
                 "desc",
-                LocalDate.now().plusDays(4));
+                LocalDate.now().plusDays(4),
+                888888888,
+                "Laptop",
+                100);
         con.sendRequest(request);
 
         waitForResponse();
@@ -185,15 +191,18 @@ public class DataFlowTest {
                 0x4E,
                 0x47
             };
-        CreateAuctionRequest request1 =
+        CreateAuctionRequest request =
             new CreateAuctionRequest(
                 sampleImage,
                 "Electronic",
-                "1000",
+                1000,
                 "desc",
-                LocalDate.now().plusDays(4));
+                LocalDate.now().plusDays(4),
+                888888888,
+                "Laptop",
+                100);
         PublishApprovedAuctionRequest req =
-            new PublishApprovedAuctionRequest(request1);
+            new PublishApprovedAuctionRequest(request, new User("MaroMoro@gmail.com", "l888888888", "Miro"));
 
         con.sendRequest(req);
         waitForResponse();

@@ -7,6 +7,7 @@ import com.auction.shared.request.Request;
 import com.auction.shared.response.Response;
 import com.auction.shared.response.admin.GetPendingAuctionListResponse;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
 * Xử lý request lấy danh sách auction đang chờ duyệt.
@@ -21,7 +22,11 @@ public class GetPendingAuctionListHandler implements RequestHandler {
   */
   @Override
   public Response handle(Request request, ClientHandler clienthandler) {
-    ArrayList<Request> requestList = PendingAuctionDatabase.loadRequestList();
+    ConcurrentHashMap<Integer,Request> requestList = PendingAuctionDatabase.getPendingRequest();
+    if (requestList == null){
+      requestList = PendingAuctionDatabase.loadRequestList();
+      PendingAuctionDatabase.setPendingRequest(requestList);
+    }
     return new GetPendingAuctionListResponse(true, requestList);
   }
 }

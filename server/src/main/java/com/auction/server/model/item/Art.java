@@ -10,7 +10,7 @@ public class Art extends Item {
   private String artist;
   private int year;
 
-  public Art(String id, String name, String description, ItemCondition condition,
+  public Art(int id, String name, String description, ItemCondition condition,
   String imageUrl, User seller, String artist, int year) {
     super(id, name, description, condition, imageUrl, seller);
     this.artist = artist;

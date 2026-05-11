@@ -10,7 +10,7 @@ public class Vehicle extends Item {
   private String brand;
   private int year;
 
-  public Vehicle(String id, String name, String description, ItemCondition condition,
+  public Vehicle(int id, String name, String description, ItemCondition condition,
   String imageUrl, User seller, String brand, int year) {
     super(id, name, description, condition, imageUrl, seller);
     this.brand = brand;

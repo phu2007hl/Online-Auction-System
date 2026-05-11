@@ -3,6 +3,7 @@ package com.auction.shared.request.auction;
 import com.auction.shared.model.User;
 import com.auction.shared.request.Request;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -12,10 +13,14 @@ import java.util.Objects;
 public class CreateAuctionRequest extends Request {
   private final byte[] imageContent;
   private final String category;
-  private final String startingPrice;
+  private final double startingPrice;
   private final String description;
   private final LocalDate endDate;
+  private final int id;
   private User user;
+  private String itemName;
+  private double minimumIncrement;
+
 
   /**
   * Tạo request tạo auction mới.
@@ -29,14 +34,20 @@ public class CreateAuctionRequest extends Request {
   public CreateAuctionRequest(
       byte[] imageContent,
       String category,
-      String startingPrice,
+      double startingPrice,
       String description,
-      LocalDate endDate) {
+      LocalDate endDate,
+      int id,
+      String name,
+      double minimumIncrement) {
     this.imageContent = imageContent;
     this.category = category;
     this.startingPrice = startingPrice;
     this.description = description;
     this.endDate = endDate;
+    this.id = id;
+    this.itemName = name;
+    this.minimumIncrement = minimumIncrement;
   }
 
   /**
@@ -62,7 +73,7 @@ public class CreateAuctionRequest extends Request {
   *
   * @return giá khởi điểm
   */
-  public String getStartingPrice() {
+  public double getStartingPrice() {
     return startingPrice;
   }
 
@@ -101,28 +112,19 @@ public class CreateAuctionRequest extends Request {
   public User getUser() {
     return user;
   }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (!(o instanceof CreateAuctionRequest)) {
-      return false;
-    }
-
-    CreateAuctionRequest request = (CreateAuctionRequest) o;
-    return Arrays.equals(imageContent, request.getImageContent())
-      && Objects.equals(category, request.getCategory())
-      && Objects.equals(startingPrice, request.getStartingPrice())
-      && Objects.equals(description, request.getDescription())
-      && Objects.equals(endDate, request.getEndDate());
+  /**
+   * Lấy id của Request tạo auction này
+   * @return ID request
+   */
+  public int getId(){
+    return id;
+  }
+  /**
+   * Lấy tên sản phẩm
+   * @return tên sản phẩm
+   */
+  public String getName(){
+    return itemName;
   }
 
-  @Override
-  public int hashCode() {
-    int result = Objects.hash(category, startingPrice, description, endDate);
-    result = 31 * result + Arrays.hashCode(imageContent);
-    return result;
-  }
 }

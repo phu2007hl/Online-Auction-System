@@ -9,6 +9,8 @@ import com.auction.shared.request.auction.PendingAuctionReviewRequest;
 import com.auction.shared.response.Response;
 import com.auction.shared.response.auction.CreateAuctionResponse;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +31,11 @@ public class CreateAuctionRequestHandler implements RequestHandler {
   @Override
   public Response handle(Request request, ClientHandler clienthandler) {
     try {
+        ConcurrentHashMap<Integer,Request> requestList = PendingAuctionDatabase.getPendingRequest();
+        if (requestList == null){
+            requestList = PendingAuctionDatabase.loadRequestList();
+            PendingAuctionDatabase.saveAuctionRequest(requestList);
+        }
       CreateAuctionRequest req = (CreateAuctionRequest) request;
       String userContext = clienthandler.getUser().getUsername();
       LOGGER.info(
@@ -41,6 +48,8 @@ public class CreateAuctionRequestHandler implements RequestHandler {
       ClientHandler.getAdminHandler()
           .forwardRequest(pendingRequest, clienthandler);
       ClientHandler.addRequest(clienthandler.getUser(), clienthandler);
+      requestList.put(pendingRequest.getRequest().getId(), pendingRequest);
+      PendingAuctionDatabase.saveAuctionRequest(requestList);
       LOGGER.info("Auction request được chuyển tiếp tới admin cho user: {}", userContext);
       return new CreateAuctionResponse(true);
     } catch (Exception e) {
@@ -50,12 +59,16 @@ public class CreateAuctionRequestHandler implements RequestHandler {
               + "sẽ lưu vào AuctionDatabase [user: {}]",
           userContext,
           e);
-      ArrayList<Request> requestList =
-          PendingAuctionDatabase.loadRequestList();
+      ConcurrentHashMap<Integer,Request> requestList =
+          PendingAuctionDatabase.getPendingRequest();
+          if (requestList == null){
+            requestList = PendingAuctionDatabase.loadRequestList();
+            PendingAuctionDatabase.setPendingRequest(requestList);
+          }
       CreateAuctionRequest req = (CreateAuctionRequest) request;
       PendingAuctionReviewRequest pendingRequest =
           new PendingAuctionReviewRequest(req, clienthandler.getUser());
-      requestList.add(pendingRequest);
+      requestList.put(pendingRequest.getRequest().getId(), pendingRequest);
       PendingAuctionDatabase.saveAuctionRequest(requestList);
       LOGGER.info("Auction request đã được lưu vào pending database cho user: {}",
           userContext);
