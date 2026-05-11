@@ -10,90 +10,80 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.auction.client.controller.MainPageController"
+            fx:controller="com.auction.client.controller.auction.MainPageController"
             prefWidth="900.0"
             prefHeight="600.0"
             style="-fx-background-color: #f3f4f6;">
 
-    <!-- TOP BAR -->
+    <!-- Thanh trên cùng -->
     <top>
         <HBox alignment="CENTER_RIGHT"
               spacing="15"
               style="-fx-background-color: white; -fx-padding: 15; -fx-border-color: #e5e7eb;">
-
             <children>
-
-                <Label text="Welcome,"
+                <Label text="Xin chào,"
                        style="-fx-text-fill: #6b7280;" />
 
                 <Label fx:id="usernameLabel"
-                       text="User"
+                       text="Người dùng"
                        style="-fx-text-fill: #111827;">
                     <font>
                         <Font name="System Bold" size="13" />
                     </font>
                 </Label>
 
-                <Button text="Log Out"
+                <Button text="Đăng xuất"
                         onAction="#switchToLogin"
                         prefWidth="90"
                         prefHeight="30"
                         style="-fx-background-color: transparent; -fx-border-color: #ef4444; -fx-text-fill: #ef4444; -fx-background-radius: 6; -fx-border-radius: 6;" />
-
             </children>
         </HBox>
     </top>
 
-    <!-- LEFT SIDEBAR -->
+    <!-- Thanh menu bên trái -->
     <left>
         <VBox spacing="15"
               prefWidth="200"
               style="-fx-background-color: white; -fx-padding: 20; -fx-border-color: #e5e7eb;">
-
             <children>
-
                 <Label text="Menu">
                     <font>
                         <Font name="System Bold" size="18" />
                     </font>
                 </Label>
 
-                <Button text="Create Auction"
+                <Button text="Tạo đấu giá"
                         onAction="#switchToCreateAuction"
                         prefWidth="160"
                         prefHeight="40"
                         style="-fx-background-color: #4f46e5; -fx-text-fill: white; -fx-background-radius: 8;" />
-
             </children>
         </VBox>
     </left>
 
-    <!-- CENTER CONTENT -->
+    <!-- Nội dung chính -->
     <center>
         <VBox spacing="15"
               alignment="TOP_CENTER"
               style="-fx-padding: 20;">
-
             <children>
-
-                <Label text="Main Page">
+                <Label text="Trang chính">
                     <font>
                         <Font size="24" />
                     </font>
                 </Label>
 
-                <Label text="Welcome to the Auction System"
+                <Label text="Chào mừng đến với hệ thống đấu giá"
                        style="-fx-text-fill: #6b7280;" />
 
-                <!-- THIS FIXES YOUR NULL POINTER -->
+                <!-- Vùng hiển thị các sản phẩm đấu giá -->
                 <FlowPane fx:id="productContainer"
                           hgap="15"
                           vgap="15"
                           prefWrapLength="600"
                           style="-fx-padding: 10;" />
-
             </children>
         </VBox>
     </center>
-
 </BorderPane>

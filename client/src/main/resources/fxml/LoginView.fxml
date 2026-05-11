@@ -7,7 +7,7 @@
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane alignment="CENTER" prefHeight="500.0" prefWidth="924.0" style="-fx-background-color: #f3f4f6;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.LoginController">
+<StackPane alignment="CENTER" prefHeight="500.0" prefWidth="924.0" style="-fx-background-color: #f3f4f6;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.auth.LoginController">
     <children>
         <HBox alignment="CENTER" maxHeight="500.0" maxWidth="924.0" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 18, 0, 0, 4);" StackPane.alignment="CENTER">
             <children>
@@ -21,7 +21,7 @@
                         <VBox maxWidth="300.0" spacing="5.0">
                             <children>
                                 <Label text="Email" />
-                                <TextField fx:id="emailField" prefHeight="40.0" promptText="Nhập Email" />
+                                <TextField fx:id="emailField" prefHeight="40.0" promptText="Nhập email" />
                             </children>
                         </VBox>
                         <VBox maxWidth="300.0" spacing="5.0">
