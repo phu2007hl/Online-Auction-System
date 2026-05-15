@@ -32,7 +32,7 @@ public class AuctionReviewResultHandler implements RequestHandler {
     try {
       map.get(req.getUser()).getOutputStream().writeObject(req);
     } catch (Exception e) {
-      LOGGER.error("Không thể gửi kết quả duyệt về user", e);
+          LOGGER.error("Không thể gửi kết quả duyệt về user", e);
     }
     return new UpdateUserResponse(true);
   }

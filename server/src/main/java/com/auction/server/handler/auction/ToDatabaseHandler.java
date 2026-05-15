@@ -1,22 +1,26 @@
 package com.auction.server.handler.auction;
 
 import com.auction.server.database.AdminResponseDatabase;
+import com.auction.server.database.PendingAuctionDatabase;
 import com.auction.server.handler.RequestHandler;
 import com.auction.server.network.ClientHandler;
-import com.auction.shared.model.User;
 import com.auction.shared.request.Request;
-import com.auction.shared.request.auction.AuctionReviewResultRequest;
-import com.auction.shared.request.auction.CreateAuctionRequest;
 import com.auction.shared.request.auction.PendingAuctionReviewRequest;
 import com.auction.shared.request.auction.ToDatabaseRequest;
 import com.auction.shared.response.Response;
 import com.auction.shared.response.auction.ToDatabaseResponse;
-import java.util.HashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.LinkedHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
-* Xử lý request lưu tạm các dữ liệu chưa xử lý xuống database file.
+* Xử lý request lưu các dữ liệu duyệt auction xuống database file.
 */
 public class ToDatabaseHandler implements RequestHandler {
+  private static final Logger LOGGER =
+          LoggerFactory.getLogger(ToDatabaseHandler.class);
   /**
   * Lưu request trung gian xuống database file.
   *
@@ -26,31 +30,15 @@ public class ToDatabaseHandler implements RequestHandler {
   */
   @Override
   public Response handle(Request request, ClientHandler clientHandler) {
-    HashMap<User, Request> adminResponse = AdminResponseDatabase.loadAdminResponse();
+    LinkedHashMap<Integer, PendingAuctionReviewRequest> adminResponse =
+        AdminResponseDatabase.loadAdminResponse();
     ToDatabaseRequest toDatabaseRequest = (ToDatabaseRequest) request;
-    Request wrappedRequest = toDatabaseRequest.getRequest();
-    adminResponse.put(extractUser(wrappedRequest), wrappedRequest);
+    PendingAuctionReviewRequest pendingAuctionReviewRequest = toDatabaseRequest.getRequest();
+    adminResponse.put(pendingAuctionReviewRequest.getRequest().getId(), pendingAuctionReviewRequest);
     AdminResponseDatabase.saveAdminResponse(adminResponse);
+    PendingAuctionDatabase.removeRequest(pendingAuctionReviewRequest.getRequest().getId());
+    ConcurrentHashMap<Integer,Request> requestList = PendingAuctionDatabase.loadRequestList();
+    LOGGER.info("Còn lại {} request trong danh sách chờ duyệt", requestList.size());
     return new ToDatabaseResponse(true);
-  }
-
-  /**
-  * Rút user từ request được bọc trong ToDatabaseRequest.
-  *
-  * @param request request cần lấy user
-  * @return user tương ứng
-  */
-  private User extractUser(Request request) {
-    if (request instanceof PendingAuctionReviewRequest pendingAuctionRequest) {
-      return pendingAuctionRequest.getUser();
-    }
-    if (request instanceof CreateAuctionRequest createAuctionRequest) {
-      return createAuctionRequest.getUser();
-    }
-    if (request instanceof AuctionReviewResultRequest updateUserRequest) {
-      return updateUserRequest.getUser();
-    }
-    throw new IllegalArgumentException(
-    "Request does not contain user payload: " + request.getClass().getSimpleName());
   }
 }

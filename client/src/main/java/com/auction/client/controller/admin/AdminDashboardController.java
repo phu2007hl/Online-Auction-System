@@ -2,6 +2,7 @@ package com.auction.client.controller.admin;
 
 import com.auction.client.controller.Controller;
 import com.auction.client.network.SocketClient;
+import com.auction.shared.enums.CreateAuctionStatus;
 import com.auction.shared.request.Request;
 import com.auction.shared.request.admin.GetPendingAuctionListRequest;
 import com.auction.shared.request.auction.AuctionReviewResultRequest;
@@ -10,17 +11,22 @@ import com.auction.shared.request.auction.PendingAuctionReviewRequest;
 import com.auction.shared.request.auction.PublishApprovedAuctionRequest;
 import com.auction.shared.request.auction.ToDatabaseRequest;
 import com.auction.shared.response.admin.GetPendingAuctionListResponse;
+
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -30,6 +36,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,10 +53,22 @@ public class AdminDashboardController extends Controller implements Initializabl
   private TableView<RequestRow> requestTable;
 
   @FXML
+  private TableColumn<RequestRow, Integer> idColumn;
+
+  @FXML
   private TableColumn<RequestRow, Image> pictureColumn;
 
   @FXML
+  private TableColumn<RequestRow, String> nameColumn;
+
+  @FXML
   private TableColumn<RequestRow, String> categoryColumn;
+
+  @FXML
+  private TableColumn<RequestRow, String> ownerColumn;
+
+  @FXML
+  private TableColumn<RequestRow, Double> priceColumn;
 
   @FXML
   private TableColumn<RequestRow, Void> actionColumn;
@@ -64,8 +83,12 @@ public class AdminDashboardController extends Controller implements Initializabl
   */
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
     configurePictureColumn();
+    nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
     configureCategoryColumn();
+    ownerColumn.setCellValueFactory(new PropertyValueFactory<>("owner"));
+    priceColumn.setCellValueFactory(new PropertyValueFactory<>("startingPrice"));
     configureActionColumn();
     requestTable.setItems(requestRows);
     requestTable.setPlaceholder(new Label("Đang chờ yêu cầu tạo đấu giá..."));
@@ -148,14 +171,18 @@ public class AdminDashboardController extends Controller implements Initializabl
   */
   private void handleAccept(RequestRow row) {
     PendingAuctionReviewRequest pendingRequest = row.getRequest();
+    pendingRequest.setStatus(CreateAuctionStatus.SUCCESS);
     CreateAuctionRequest req = pendingRequest.getRequest();
     try {
-      socket.sendRequest(new AuctionReviewResultRequest(pendingRequest.getUser(), true));
+      socket.sendRequest(new AuctionReviewResultRequest(pendingRequest.getUser(), true, CreateAuctionStatus.SUCCESS));
       socket.sendRequest(new PublishApprovedAuctionRequest(req,pendingRequest.getUser()));
-    } catch (Exception e) {
+      LOGGER.info("ADMIN: Đã gửi request chấp nhận auction đến client tương ứng và broadcast đến tất cả user");
+
       ToDatabaseRequest request = new ToDatabaseRequest(pendingRequest);
       socket.sendRequest(request);
-      LOGGER.error("Không thể gửi kết quả duyệt, đã chuyển sang lưu tạm", e);
+      LOGGER.info("Đã gửi request lưu auction SUCCESS vào database");
+    } catch (Exception e) {
+      LOGGER.error("Không thể gửi kết quả duyệt auction", e);
     }
     requestRows.remove(row);
   }
@@ -166,9 +193,15 @@ public class AdminDashboardController extends Controller implements Initializabl
   * @param row dòng dữ liệu được chọn
   */
   private void handleDecline(RequestRow row) {
-    PendingAuctionReviewRequest request = row.getRequest();
+    PendingAuctionReviewRequest pendingRequest = row.getRequest();
+    pendingRequest.setStatus(CreateAuctionStatus.DECLINED);
     try {
-      socket.sendRequest(new AuctionReviewResultRequest(request.getUser(), false));
+      socket.sendRequest(new AuctionReviewResultRequest(pendingRequest.getUser(), false, CreateAuctionStatus.DECLINED));
+      LOGGER.info("ADMIN: Đã gửi request từ chối auction đến client tương ứng");
+
+      ToDatabaseRequest request = new ToDatabaseRequest(pendingRequest);
+      socket.sendRequest(request);
+      LOGGER.info("Đã gửi request lưu auction DECLINED vào database");
     } catch (Exception e) {
       LOGGER.error("Không thể gửi kết quả từ chối auction", e);
     }
@@ -179,8 +212,12 @@ public class AdminDashboardController extends Controller implements Initializabl
   * Dòng dữ liệu hiển thị trong table.
   */
   public static class RequestRow {
+    private final int id;
     private final Image image;
+    private final String name;
     private final String category;
+    private final String owner;
+    private final double startingPrice;
     private final PendingAuctionReviewRequest request;
 
     /**
@@ -190,10 +227,25 @@ public class AdminDashboardController extends Controller implements Initializabl
     * @param category loại sản phẩm
     * @param request request cho admin duyệt
     */
-    public RequestRow(Image image, String category, PendingAuctionReviewRequest request) {
+    public RequestRow(
+        int id,
+        Image image,
+        String name,
+        String category,
+        String owner,
+        double startingPrice,
+        PendingAuctionReviewRequest request) {
+      this.id = id;
       this.image = image;
+      this.name = name;
       this.category = category;
+      this.owner = owner;
+      this.startingPrice = startingPrice;
       this.request = request;
+    }
+
+    public int getId() {
+      return id;
     }
 
     /**
@@ -205,6 +257,10 @@ public class AdminDashboardController extends Controller implements Initializabl
       return image;
     }
 
+    public String getName() {
+      return name;
+    }
+
     /**
     * Lấy loại sản phẩm.
     *
@@ -212,6 +268,14 @@ public class AdminDashboardController extends Controller implements Initializabl
     */
     public String getCategory() {
       return category;
+    }
+
+    public String getOwner() {
+      return owner;
+    }
+
+    public double getStartingPrice() {
+      return startingPrice;
     }
 
     /**
@@ -283,7 +347,14 @@ public class AdminDashboardController extends Controller implements Initializabl
     Image image = new Image(new ByteArrayInputStream(imageContent));
     boolean success =
         requestRows.add(
-            new RequestRow(image, auctionRequest.getCategory(), pendingRequest));
+            new RequestRow(
+                auctionRequest.getId(),
+                image,
+                auctionRequest.getName(),
+                auctionRequest.getCategory(),
+                pendingRequest.getUser().getUsername(),
+                auctionRequest.getStartingPrice(),
+                pendingRequest));
     updateDashboardSuccess = success;
   }
 
@@ -294,5 +365,22 @@ public class AdminDashboardController extends Controller implements Initializabl
   */
   public static boolean getUpdateSuccess() {
     return updateDashboardSuccess;
+  }
+  @FXML
+  private void switchToCheckedAuctionHistory(ActionEvent event) {
+    try {
+      FXMLLoader loader =
+              new FXMLLoader(getClass().getResource("/fxml/CheckedAuctionHistoryView.fxml"));
+      Parent root = loader.load();
+
+      CheckedAuctionHistoryController controller = loader.getController();
+      controller.setSocketClient(socket);
+
+      Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+      stage.getScene().setRoot(root);
+      stage.show();
+    } catch (IOException e) {
+      LOGGER.error("Không thể mở trang lịch sử duyệt auction", e);
+    }
   }
 }

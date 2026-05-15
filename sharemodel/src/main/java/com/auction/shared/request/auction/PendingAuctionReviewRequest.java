@@ -1,5 +1,6 @@
 package com.auction.shared.request.auction;
 
+import com.auction.shared.enums.CreateAuctionStatus;
 import com.auction.shared.model.User;
 import com.auction.shared.request.Request;
 
@@ -9,6 +10,7 @@ import com.auction.shared.request.Request;
 public class PendingAuctionReviewRequest extends Request {
   private final CreateAuctionRequest request;
   private final User user;
+  private CreateAuctionStatus status;
 
   /**
   * Tạo request cho admin duyệt.
@@ -19,6 +21,7 @@ public class PendingAuctionReviewRequest extends Request {
   public PendingAuctionReviewRequest(CreateAuctionRequest request, User user) {
     this.request = request;
     this.user = user;
+    this.status = CreateAuctionStatus.PENDING;
   }
 
   /**
@@ -37,5 +40,13 @@ public class PendingAuctionReviewRequest extends Request {
   */
   public User getUser() {
     return user;
+  }
+
+  public CreateAuctionStatus getStatus() {
+    return status;
+  }
+
+  public void setStatus(CreateAuctionStatus status) {
+    this.status = status;
   }
 }

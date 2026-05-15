@@ -34,7 +34,7 @@ public class CreateAuctionRequestHandler implements RequestHandler {
         ConcurrentHashMap<Integer,Request> requestList = PendingAuctionDatabase.getPendingRequest();
         if (requestList == null){
             requestList = PendingAuctionDatabase.loadRequestList();
-            PendingAuctionDatabase.saveAuctionRequest(requestList);
+            PendingAuctionDatabase.setPendingRequest(requestList);
         }
       CreateAuctionRequest req = (CreateAuctionRequest) request;
       String userContext = clienthandler.getUser().getUsername();
@@ -46,7 +46,7 @@ public class CreateAuctionRequestHandler implements RequestHandler {
       PendingAuctionReviewRequest pendingRequest =
           new PendingAuctionReviewRequest(req, clienthandler.getUser());
       ClientHandler.getAdminHandler()
-          .forwardRequest(pendingRequest, clienthandler);
+              .forwardRequest(pendingRequest, clienthandler);
       ClientHandler.addRequest(clienthandler.getUser(), clienthandler);
       requestList.put(pendingRequest.getRequest().getId(), pendingRequest);
       PendingAuctionDatabase.saveAuctionRequest(requestList);
