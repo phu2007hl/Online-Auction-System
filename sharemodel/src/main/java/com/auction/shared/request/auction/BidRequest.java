@@ -1,16 +1,21 @@
 package com.auction.shared.request.auction;
 
-import com.auction.shared.enums.BidStatus;
+import com.auction.shared.enums.AuctionStatus;
+import com.auction.shared.enums.BidRequestStatus;
+import com.auction.shared.enums.BidRequestStatus;
+import com.auction.shared.model.User;
 import com.auction.shared.request.Request;
 
 public class BidRequest extends Request {
     private int auctionId;
     private double bidPrice;
-    private BidStatus status;
-    public BidRequest(int auctionId, double bidPrice, BidStatus status){
+    private BidRequestStatus status;
+    private User bidder;
+    public BidRequest(int auctionId, double bidPrice, BidRequestStatus status, User bidder){
         this.auctionId = auctionId;
         this.bidPrice = bidPrice;
-        this.status = BidStatus.PENDING;
+        this.status = BidRequestStatus.PENDING;
+        this.bidder = bidder;
 
     }
     public void setBidPrice(double price){
@@ -25,5 +30,16 @@ public class BidRequest extends Request {
     public double getBidPrice(){
         return bidPrice;
     }
+    public User getBidder(){
+        return bidder;
+    }
+    public void setStatus(BidRequestStatus status){
+        this.status = status;
+
+    }
+    public BidRequestStatus getBidRequestStatus(){
+        return status;
+    }
+
     
 }
