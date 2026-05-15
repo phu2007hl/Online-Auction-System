@@ -105,6 +105,9 @@ public class Auction extends Entity {
     this.id = id;
 
   }
+  public double getCurrentPrice(){
+    return currentPrice;
+  }
   public void setItemName(String itemName){
     this.itemName = itemName;
   }
@@ -115,6 +118,9 @@ public class Auction extends Entity {
     this.status = status;
 
 
+  }
+  public void setCurrentPrice(double currentPrice){
+    this.currentPrice = currentPrice;
   }
   
 
