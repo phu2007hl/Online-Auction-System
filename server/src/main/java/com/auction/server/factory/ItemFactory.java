@@ -46,7 +46,7 @@ public class ItemFactory {
   */
   public Item createItem(
       String type,
-      String id,
+      int id,
       String name,
       String description,
       ItemCondition condition,

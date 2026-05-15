@@ -28,7 +28,7 @@ public class AuctionBoxController {
   * @param startingPrice giá khởi điểm
   * @param category loại sản phẩm
   */
-  public void setData(Image image, String startingPrice, String category) {
+  public void setData(Image image, double startingPrice, String category) {
     imageView.setImage(image);
     priceLabel.setText("Giá: $" + startingPrice);
     categoryLabel.setText("Danh mục: " + category);

@@ -1,11 +1,14 @@
 package com.auction.client.controller.auction;
 
 import com.auction.client.network.SocketClient;
+import com.auction.client.service.IdGenerator;
 import com.auction.shared.request.auction.CreateAuctionRequest;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -53,6 +56,8 @@ public class CreateAuctionPageController {
 
   @FXML
   private Label messageLabel;
+  @FXML
+  private TextField minimumIncrementField;
 
   /**
   * Gán socket client cho màn tạo auction.
@@ -108,19 +113,26 @@ public class CreateAuctionPageController {
     String startingPrice = startingPriceField.getText().trim();
     LocalDate endDate = endDatePicker.getValue();
     String description = descriptionArea.getText().trim();
+    String itemName = productNameField.getText();
+    String minimumIncrement = minimumIncrementField.getText();
     if (category == null
         || selectedImageFile == null
         || imageContent == null
         || imageContent.length == 0
         || startingPrice.isEmpty()
         || endDate == null
-        || description.isEmpty()) {
+        || description.isEmpty()
+        || itemName.isEmpty()
+        || minimumIncrement.isEmpty()) {
       messageLabel.setText("Vui lòng nhập thông tin của sản phẩm.");
       return;
     }
+    int id = IdGenerator.generateId();
+    double price = Double.parseDouble(startingPrice);
+    double increment = Double.parseDouble(minimumIncrement);
     CreateAuctionRequest request =
         new CreateAuctionRequest(
-            imageContent, category, startingPrice, description, endDate);
+            imageContent, category, price, description, endDate,id,itemName,increment); //Phần này phải thêm minimum increment 
     socket.sendRequest(request);
     LOGGER.info("Đã gửi yêu cầu tạo auction cho sản phẩm {}", productNameField.getText());
     messageLabel.setText("Đã gửi yêu cầu tạo đấu giá");

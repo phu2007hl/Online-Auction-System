@@ -1,5 +1,6 @@
 package com.auction.server.handler;
 
+import com.auction.server.handler.admin.GetCheckedAuctionListHandler;
 import com.auction.server.handler.admin.GetPendingAuctionListHandler;
 import com.auction.server.handler.auction.AuctionReviewResultHandler;
 import com.auction.server.handler.auction.CreateAuctionRequestHandler;
@@ -11,6 +12,7 @@ import com.auction.server.handler.auth.LogOutHandler;
 import com.auction.server.handler.auth.LoginRequestHandler;
 import com.auction.server.handler.auth.RegisterRequestHandler;
 import com.auction.shared.request.Request;
+import com.auction.shared.request.admin.GetCheckedAuctionListRequest;
 import com.auction.shared.request.admin.GetPendingAuctionListRequest;
 import com.auction.shared.request.auction.AuctionReviewResultRequest;
 import com.auction.shared.request.auction.CreateAuctionRequest;
@@ -23,6 +25,8 @@ import com.auction.shared.request.auth.LoginRequest;
 import com.auction.shared.request.auth.RegisterRequest;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.auction.shared.response.admin.GetCheckedAuctionListResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +52,7 @@ public class RequestDispatcher {
         PublishApprovedAuctionRequest.class,
         new PublishApprovedAuctionHandler());
     HANDLER_MAP.put(AuctionReviewResultRequest.class, new AuctionReviewResultHandler());
+    HANDLER_MAP.put(GetCheckedAuctionListRequest.class, new GetCheckedAuctionListHandler());
   }
 
   /**

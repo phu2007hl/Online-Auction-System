@@ -1,15 +1,17 @@
 package com.auction.shared.response.auction;
 
+import com.auction.shared.auction.Auction;
 import com.auction.shared.request.Request;
 import com.auction.shared.response.Response;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
 * Kết quả lấy danh sách auction đã được duyệt.
 */
 public class GetApprovedAuctionListResponse extends Response {
   private final boolean valid;
-  private final ArrayList<Request> auctionList;
+  private final ConcurrentHashMap<Integer,Auction> auctionList;
 
   /**
   * Tạo response danh sách auction đã duyệt.
@@ -17,7 +19,7 @@ public class GetApprovedAuctionListResponse extends Response {
   * @param valid true nếu lấy dữ liệu thành công
   * @param auctionList danh sách auction đã duyệt
   */
-  public GetApprovedAuctionListResponse(boolean valid, ArrayList<Request> auctionList) {
+  public GetApprovedAuctionListResponse(boolean valid, ConcurrentHashMap<Integer,Auction> auctionList) {
     this.valid = valid;
     this.auctionList = auctionList;
   }
@@ -36,7 +38,7 @@ public class GetApprovedAuctionListResponse extends Response {
   *
   * @return danh sách auction
   */
-  public ArrayList<Request> getAuctionList() {
+  public ConcurrentHashMap<Integer,Auction> getAuctionList() {
     return auctionList;
   }
 }

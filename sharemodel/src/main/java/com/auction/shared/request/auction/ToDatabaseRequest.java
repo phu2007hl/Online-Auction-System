@@ -6,14 +6,14 @@ import com.auction.shared.request.Request;
 * Yêu cầu lưu một request trung gian xuống database file.
 */
 public class ToDatabaseRequest extends Request {
-  private final Request request;
+  private final PendingAuctionReviewRequest request;
 
   /**
   * Tạo request lưu dữ liệu xuống database.
   *
   * @param request request cần lưu
   */
-  public ToDatabaseRequest(Request request) {
+  public ToDatabaseRequest(PendingAuctionReviewRequest request) {
     this.request = request;
   }
 
@@ -22,7 +22,7 @@ public class ToDatabaseRequest extends Request {
   *
   * @return request cần lưu
   */
-  public Request getRequest() {
+  public PendingAuctionReviewRequest getRequest() {
     return request;
   }
 }

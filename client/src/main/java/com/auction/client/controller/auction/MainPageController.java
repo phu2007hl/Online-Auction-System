@@ -3,6 +3,7 @@ package com.auction.client.controller.auction;
 import com.auction.client.controller.Controller;
 import com.auction.client.controller.auth.LoginController;
 import com.auction.client.network.SocketClient;
+import com.auction.shared.auction.Auction;
 import com.auction.shared.request.Request;
 import com.auction.shared.request.auction.CreateAuctionRequest;
 import com.auction.shared.request.auction.GetApprovedAuctionListRequest;
@@ -14,6 +15,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
+
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -86,16 +89,16 @@ public class MainPageController extends Controller implements Initializable {
   *
   * @param request request tạo auction
   */
-  public void addProductBox(CreateAuctionRequest request) {
+  public void addProductBox(Auction auction) {
     updateMainPageSuccess = true;
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ProductBox.fxml"));
       VBox productBox = loader.load();
 
       AuctionBoxController controller = loader.getController();
-      Image image = new Image(new ByteArrayInputStream(request.getImageContent()));
+      Image image = new Image(new ByteArrayInputStream(auction.getImageContent()));
 
-      controller.setData(image, request.getStartingPrice(), request.getCategory());
+      controller.setData(image, auction.getStartingPrice(), auction.getCategory());
       productContainer.getChildren().add(productBox);
       updateMainPageSuccess = true;
     } catch (Exception e) {
@@ -143,13 +146,13 @@ public class MainPageController extends Controller implements Initializable {
   public void handle(Object obj) {
     if (obj instanceof GetApprovedAuctionListResponse) {
       GetApprovedAuctionListResponse response = (GetApprovedAuctionListResponse) obj;
-      ArrayList<Request> auctionList = response.getAuctionList();
-      for (Request request : auctionList) {
-        addProductBox((CreateAuctionRequest) request);
+      ConcurrentHashMap<Integer,Auction> auctionList = response.getAuctionList();
+      for (Integer id : auctionList.keySet()) {
+        addProductBox((Auction) auctionList.get(id));
       }
-    } else if (obj instanceof CreateAuctionRequest) {
-      CreateAuctionRequest request = (CreateAuctionRequest) obj;
-      addProductBox(request);
+    } else if (obj instanceof Auction) {
+      Auction auction = (Auction) obj;
+      addProductBox(auction);
     } else if (obj instanceof LogOutResponse) {
       LogOutResponse response = (LogOutResponse) obj;
       if (response.getResponse()) {

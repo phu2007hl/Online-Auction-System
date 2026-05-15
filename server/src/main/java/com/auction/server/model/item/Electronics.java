@@ -10,7 +10,7 @@ public class Electronics extends Item {
   private String brand;
   private int warranty;
 
-  public Electronics(String id, String name, String description, ItemCondition condition,
+  public Electronics(int id, String name, String description, ItemCondition condition,
   String imageUrl, User seller, String brand, int warranty) {
     super(id, name, description, condition, imageUrl, seller);
     this.brand = brand;
