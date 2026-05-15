@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MainApp" type="Application" factoryName="Application" nameIsGenerated="true">
+    <option name="MAIN_CLASS_NAME" value="com.auction.client.MainApp" />
+    <module name="client" />
+    <option name="VM_PARAMETERS" value="--module-path client/target/libs --add-modules javafx.controls,javafx.fxml" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.auction.client.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+      <option name="Maven.BeforeRunTask" enabled="true" file="$PROJECT_DIR$/client/pom.xml" goal="dependency:copy-dependencies -DoutputDirectory=target/libs" />
+    </method>
+  </configuration>
+</component>
