@@ -74,4 +74,13 @@ public class PendingAuctionDatabase {
   public static ConcurrentHashMap<Integer,Request> getPendingRequest(){
     return pendingRequest;
   }
+  public static void removeRequest(int requestId){
+    ConcurrentHashMap<Integer,Request> requestList = PendingAuctionDatabase.getPendingRequest();
+    if (requestList == null){
+      requestList = PendingAuctionDatabase.loadRequestList();
+      PendingAuctionDatabase.setPendingRequest(requestList);
+    }
+    requestList.remove(requestId);
+    saveAuctionRequest(requestList);
+  }
 }
