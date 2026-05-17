@@ -23,10 +23,8 @@ public class LoginAuthentication {
   */
   public LoginAuthentication(Request request) {
     this.request = (LoginRequest) request;
-    userdata = UserDatabase.getUserData();
-    if (userdata == null) {
-      userdata = UserDatabase.loadUser();
-    }
+    UserDatabase database = UserDatabase.getInstance();
+    userdata = database.getData();
   }
 
   /**

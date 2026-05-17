@@ -23,7 +23,7 @@ public class GetApprovedAuctionListHandler implements RequestHandler {
   */
   @Override
   public Response handle(Request request, ClientHandler clientHandler) {
-    ConcurrentHashMap<Integer,Auction> auctionList = AuctionListDatabase.loadAuctionList();
+    ConcurrentHashMap<Integer,Auction> auctionList = AuctionListDatabase.getInstance().getData();
     return new GetApprovedAuctionListResponse(true, auctionList);
   }
 }

@@ -16,60 +16,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AuctionListDatabase {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AuctionListDatabase.class);
-  private static String path;
-  private static ConcurrentHashMap<Integer,Auction> auctionList;
-
-  public static void saveAuction(ConcurrentHashMap<Integer,Auction> auctionList) {
-    try {
-      ObjectOutputStream out =
-      new ObjectOutputStream(
-      new BufferedOutputStream(new FileOutputStream(path)));
-      out.writeObject(auctionList);
-      out.flush();
-      LOGGER.info("Đã lưu {} auction đã duyệt", auctionList.size());
-    } catch (Exception e) {
-      LOGGER.error("Không thể lưu danh sách auction", e);
+public class AuctionListDatabase extends Database<ConcurrentHashMap<Integer,Auction>> {
+  private static AuctionListDatabase instance;
+  private AuctionListDatabase(){
+    super("AuctionList.ser");
+  }
+  public static AuctionListDatabase getInstance(){
+    if (instance == null){
+      instance = new AuctionListDatabase();
     }
+    return instance;
+  }
+  public ConcurrentHashMap<Integer,Auction> createEmptyData(){
+    return new ConcurrentHashMap<Integer,Auction>();
   }
 
-  public static ConcurrentHashMap<Integer,Auction> loadAuctionList() {
-    if (path == null || !new File(path).exists() || new File(path).length() == 0) {
-      return new ConcurrentHashMap<Integer,Auction>();
-    }
-
-    try {
-      ObjectInputStream in =
-      new ObjectInputStream(
-      new BufferedInputStream(new FileInputStream(path)));
-      ConcurrentHashMap<Integer,Auction> auctionList = (ConcurrentHashMap<Integer,Auction>) in.readObject();
-      in.close();
-      LOGGER.info("Đã tải {} auction đã duyệt", auctionList.size());
-      return auctionList;
-    } catch (ClassNotFoundException e) {
-      LOGGER.warn("File {} không tương thích với package hiện tại, reset danh sách auction", path);
-      ConcurrentHashMap<Integer,Auction> emptyList = new ConcurrentHashMap<Integer,Auction>();
-      saveAuction(emptyList);
-      return emptyList;
-    } catch (IOException e) {
-      LOGGER.warn("Không thể đọc file {}, reset danh sách auction", path);
-      ConcurrentHashMap<Integer,Auction> emptyList = new ConcurrentHashMap<Integer,Auction>();
-      saveAuction(emptyList);
-      return emptyList;
-    } catch (Exception e) {
-      LOGGER.error("Không thể tải danh sách auction", e);
-      return new ConcurrentHashMap<Integer,Auction>();
-    }
-  }
-
-  public static void setPath(String pa) {
-    path = pa;
-  }
-  public static void setAuctionList(ConcurrentHashMap<Integer,Auction> list){
-    auctionList = list;
-  }
-  public static ConcurrentHashMap<Integer,Auction> getAuctionList(){
-    return auctionList;
-  }
 }

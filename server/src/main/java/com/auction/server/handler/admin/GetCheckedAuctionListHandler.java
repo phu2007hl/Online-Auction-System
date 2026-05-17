@@ -14,7 +14,7 @@ public class GetCheckedAuctionListHandler implements RequestHandler {
     @Override
     public Response handle(Request request, ClientHandler clientHandler) {
         LinkedHashMap<Integer, PendingAuctionReviewRequest> checkedAuctionList
-                = AdminResponseDatabase.loadAdminResponse();
+                = AdminResponseDatabase.getInstance().getData();
         return new GetCheckedAuctionListResponse(true, checkedAuctionList);
     }
 }

@@ -70,7 +70,7 @@ public class MainPageController extends Controller implements Initializable {
   public void setSocketClient(SocketClient socket) {
     this.socket = socket;
     socket.setController(this);
-    socket.startListening();
+    socket.startListening(); 
     socket.sendRequest(new GetApprovedAuctionListRequest());
   }
 
@@ -147,6 +147,7 @@ public class MainPageController extends Controller implements Initializable {
     if (obj instanceof GetApprovedAuctionListResponse) {
       GetApprovedAuctionListResponse response = (GetApprovedAuctionListResponse) obj;
       ConcurrentHashMap<Integer,Auction> auctionList = response.getAuctionList();
+
       for (Integer id : auctionList.keySet()) {
         addProductBox((Auction) auctionList.get(id));
       }
