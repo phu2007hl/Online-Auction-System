@@ -13,51 +13,18 @@ import java.util.LinkedHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AdminResponseDatabase {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AdminResponseDatabase.class);
-
-  public static void saveAdminResponse(
-      LinkedHashMap<Integer, PendingAuctionReviewRequest> adminResponse) {
-    try {
-      ObjectOutputStream out =
-      new ObjectOutputStream(
-      new BufferedOutputStream(new FileOutputStream("AdminResponse.ser")));
-      out.writeObject(adminResponse);
-      out.flush();
-      LOGGER.info("Đã lưu {} phản hồi admin", adminResponse.size());
-    } catch (Exception e) {
-      LOGGER.error("Không thể lưu phản hồi admin", e);
-    }
+public class AdminResponseDatabase extends Database<LinkedHashMap<Integer, PendingAuctionReviewRequest>> {
+  private static AdminResponseDatabase instance;
+  private AdminResponseDatabase(){
+    super("AdminResponse.ser");
   }
-
-  public static LinkedHashMap<Integer, PendingAuctionReviewRequest> loadAdminResponse() {
-    File file = new File("AdminResponse.ser");
-    if (!file.exists() || file.length() == 0) {
-      return new LinkedHashMap<>();
+  public static AdminResponseDatabase getInstance(){
+    if (instance == null){
+      instance = new AdminResponseDatabase();
     }
-
-    try {
-      ObjectInputStream in =
-      new ObjectInputStream(
-      new BufferedInputStream(new FileInputStream("AdminResponse.ser")));
-      LinkedHashMap<Integer, PendingAuctionReviewRequest> adminResponse =
-          (LinkedHashMap<Integer, PendingAuctionReviewRequest>) in.readObject();
-      in.close();
-      LOGGER.info("Đã tải {} phản hồi admin", adminResponse.size());
-      return adminResponse;
-    } catch (ClassNotFoundException e) {
-      LOGGER.warn("File AdminResponse.ser không tương thích với package hiện tại, reset dữ liệu");
-      LinkedHashMap<Integer, PendingAuctionReviewRequest> emptyMap = new LinkedHashMap<>();
-      saveAdminResponse(emptyMap);
-      return emptyMap;
-    } catch (IOException e) {
-      LOGGER.warn("Không thể đọc file AdminResponse.ser, reset dữ liệu");
-      LinkedHashMap<Integer, PendingAuctionReviewRequest> emptyMap = new LinkedHashMap<>();
-      saveAdminResponse(emptyMap);
-      return emptyMap;
-    } catch (Exception e) {
-      LOGGER.error("Có lỗi khi tải phản hồi admin", e);
-      return new LinkedHashMap<>();
-    }
+    return instance;
+  }
+  public LinkedHashMap<Integer, PendingAuctionReviewRequest> createEmptyData(){
+    return new LinkedHashMap<Integer, PendingAuctionReviewRequest>();
   }
 }

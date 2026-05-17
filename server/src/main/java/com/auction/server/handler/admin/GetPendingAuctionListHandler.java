@@ -22,8 +22,7 @@ public class GetPendingAuctionListHandler implements RequestHandler {
   */
   @Override
   public Response handle(Request request, ClientHandler clienthandler) {
-    ConcurrentHashMap<Integer,Request> requestList = PendingAuctionDatabase.loadRequestList();
-    PendingAuctionDatabase.setPendingRequest(requestList);
+    ConcurrentHashMap<Integer,Request> requestList = PendingAuctionDatabase.getInstance().getData();
     return new GetPendingAuctionListResponse(true, requestList);
   }
 }

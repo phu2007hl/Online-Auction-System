@@ -54,7 +54,7 @@ public class LoginAuthenticationService {
   *
   * @return true nếu email hợp lệ
   */
-  public boolean getEmailAuthentication() {
+  public boolean validEmail() {
     if (!email.contains("@gmail.com") || !email.endsWith("@gmail.com")) {
       return false;
     }
@@ -68,7 +68,7 @@ public class LoginAuthenticationService {
   * @return request đăng nhập hoặc null nếu dữ liệu không hợp lệ
   */
   public Request createAuthRequest() {
-    if (!getEmailAuthentication()) {
+    if (!validEmail()) {
       errorMessage = "Email không hợp lệ";
       return null;
     }

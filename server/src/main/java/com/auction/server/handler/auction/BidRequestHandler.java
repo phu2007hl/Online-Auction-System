@@ -42,12 +42,8 @@ public class BidRequestHandler implements RequestHandler {
      * @param outBidUser nhận user bị outbid để còn biết mà gửi về
      */
     public void broadcast(BidRequest request,Auction auction,User outBidUser){
-        ConcurrentHashMap<Integer,ArrayList<ClientHandler>> currentParticipant = AuctionDetailDatabase.getAuctionParticipant();
-        if (currentParticipant == null){
-            currentParticipant = AuctionDetailDatabase.loadData();
-            AuctionDetailDatabase.setAuctionPartcipant(currentParticipant);
-
-        }
+        ConcurrentHashMap<Integer,ArrayList<ClientHandler>> currentParticipant = AuctionDetailDatabase.getInstance().getData();
+        
         if (request.getBidRequestStatus().equals(BidRequestStatus.ACCEPTED)){
             for (ClientHandler connection:currentParticipant.get(request.getAuctionId())){
                 if (connection.getUser().equals(outBidUser)){

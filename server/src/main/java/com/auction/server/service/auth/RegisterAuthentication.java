@@ -32,13 +32,8 @@ public class RegisterAuthentication {
   * @return true nếu đăng ký thành công
   */
   public boolean authenticateRegistration() {
-    if (userdata == null) {
-      userdata = UserDatabase.getUserData();
-      if (userdata == null) {
-        userdata = UserDatabase.loadUser();
-        UserDatabase.setUserData(userdata);
-      }
-    }
+    UserDatabase database = UserDatabase.getInstance();
+    userdata = database.getData();
 
     User newUser =
         new User(
@@ -48,7 +43,7 @@ public class RegisterAuthentication {
     User result = userdata.putIfAbsent(request.getEmail(), newUser);
 
     if (result == null) {
-      UserDatabase.saveUser(userdata);
+      database.saveData(userdata);
       LOGGER.info(
           "User đăng ký thành công: {}",
           request.getUsername());

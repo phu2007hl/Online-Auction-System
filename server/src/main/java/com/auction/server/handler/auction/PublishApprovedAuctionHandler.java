@@ -5,6 +5,7 @@ import com.auction.server.database.PendingAuctionDatabase;
 import com.auction.server.handler.RequestHandler;
 import com.auction.server.network.ClientHandler;
 import com.auction.server.service.auction.IdGenerator;
+import com.auction.server.service.auction.RemoveRequestService;
 import com.auction.shared.auction.Auction;
 import com.auction.shared.request.Request;
 import com.auction.shared.request.auction.CreateAuctionRequest;
@@ -24,6 +25,9 @@ import org.slf4j.LoggerFactory;
 public class PublishApprovedAuctionHandler implements RequestHandler {
   private static final Logger LOGGER =
       LoggerFactory.getLogger(PublishApprovedAuctionHandler.class);
+  private PublishApprovedAuctionRequest request;
+  private Auction auction;
+  private ClientHandler clientHandler;
 
   /**
   * Publish auction ra main page.
@@ -33,44 +37,35 @@ public class PublishApprovedAuctionHandler implements RequestHandler {
   * @return response cập nhật main page
   */
   @Override
-  public Response handle(Request request, ClientHandler clientHandler) {
-    PublishApprovedAuctionRequest req = (PublishApprovedAuctionRequest) request;
-    Auction auction = new Auction(req.getRequest().getId(),req.getRequest().getName() ,req.getRequest().getDescription(),req.getUser(),req.getRequest().getStartingPrice() ,5 ,req.getRequest().getEndDate(),req.getRequest().getImageContent(),req.getRequest().getCategory());
-
-    for (ClientHandler user : ClientHandler.getOnlineUser()) {
+  public Response handle(Request req, ClientHandler clientHandler) {
+    this.request = (PublishApprovedAuctionRequest) req;
+    this.auction = new Auction(request.getRequest().getId(),request.getRequest().getName() ,request.getRequest().getDescription(),request.getUser(),request.getRequest().getStartingPrice() ,5 ,request.getRequest().getEndDate(),request.getRequest().getImageContent(),request.getRequest().getCategory());
+    this.clientHandler = clientHandler;
+    broadcast();
+    RemoveRequestService.removeRequest(request.getRequest().getId());
+    return new UpdateMainPageResponse(true);
+  }
+  private void broadcast(){
+      for (ClientHandler user : ClientHandler.getOnlineUser()) {
       try {
         user.getOutputStream().writeObject(auction);
       } catch (Exception e) {
         LOGGER.error("Không thể đẩy auction đã duyệt tới client online", e);
         continue;
       }
+      finally{
+        saveToDatabase();
+      }
     }
-    ConcurrentHashMap<Integer,Auction> auctionList = AuctionListDatabase.getAuctionList();
-    if (auctionList == null){
-      auctionList = AuctionListDatabase.loadAuctionList();
-      AuctionListDatabase.setAuctionList(auctionList);
-    }
+
+  }
+  private void saveToDatabase(){
+    AuctionListDatabase database = AuctionListDatabase.getInstance();
+    ConcurrentHashMap<Integer,Auction> auctionList = database.getData();
     int id = IdGenerator.generateId();
     auctionList.put(id,auction);
-    AuctionListDatabase.saveAuction(auctionList);
+    database.saveData(auctionList);
 
-    return new UpdateMainPageResponse(true);
   }
-
-  /**
-  * Rút CreateAuctionRequest từ pending request đang lưu.
-  *
-  * @param request request trong danh sách pending
-  * @return request tạo auction nếu dừng kieu
-  */
-  private CreateAuctionRequest extractCreateAuctionRequest(Request request) {
-    if (request instanceof PendingAuctionReviewRequest) {
-      PendingAuctionReviewRequest pendingRequest = (PendingAuctionReviewRequest) request;
-      return pendingRequest.getRequest();
-    }
-    if (request instanceof CreateAuctionRequest) {
-      return (CreateAuctionRequest) request;
-    }
-    return null;
-  }
+  
 }
