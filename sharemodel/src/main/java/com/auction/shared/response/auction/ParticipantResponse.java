@@ -3,32 +3,37 @@ package com.auction.shared.response.auction;
 import java.util.ArrayList;
 
 import com.auction.shared.auction.BidTransaction;
-import com.auction.shared.enums.BidRequestStatus;
-import com.auction.shared.enums.ParticipantStatus;
+import com.auction.shared.enums.BidResponseStatus;
+import com.auction.shared.enums.BidderStatus;
 import com.auction.shared.response.Response;
 
 
 public class ParticipantResponse extends Response {
-    private ParticipantStatus status;
-    private BidRequestStatus requestStatus;
+    private BidderStatus status;
+    private BidResponseStatus requestStatus;
     private double currentPrice;
     private ArrayList<BidTransaction> bidHistory;
-    public ParticipantResponse(double currentPrice, ArrayList<BidTransaction> bidHistory, ParticipantStatus status){
+    public ParticipantResponse(double currentPrice, ArrayList<BidTransaction> bidHistory, BidderStatus status){
         this.currentPrice = currentPrice;
         this.bidHistory = bidHistory;
         this.status = status;
         
     }
-    public ParticipantResponse(double currentPrice,ArrayList<BidTransaction> bidHistory,BidRequestStatus requestStatus){
+    public ParticipantResponse(double currentPrice, ArrayList<BidTransaction> bidHistory, BidResponseStatus requestStatus){
         this.currentPrice = currentPrice;
         this.bidHistory = bidHistory;
-        this.status = status;
+        this.requestStatus = requestStatus;
+
+    }
+    public ParticipantResponse(double currentPrice, ArrayList<BidTransaction> bidHistory){
+        this.currentPrice = currentPrice;
+        this.bidHistory = bidHistory;
 
     }
     public boolean getResponse(){
         return true;
     }
-    public ParticipantStatus getParticipantStatus(){
+    public BidderStatus getParticipantStatus(){
         return status;
     }
     public double getCurrentPrice(){
@@ -37,7 +42,7 @@ public class ParticipantResponse extends Response {
     public ArrayList<BidTransaction> getBidHistory(){
         return bidHistory;
     }
-    public BidRequestStatus getRequestStatus(){
+    public BidResponseStatus getRequestStatus(){
         return requestStatus;
     }
     

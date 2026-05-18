@@ -5,8 +5,8 @@ import com.auction.shared.enums.AuctionStatus;
 import com.auction.shared.model.User;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
 * Thông tin một phiên đấu giá.

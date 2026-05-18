@@ -32,7 +32,7 @@ public class PublishApprovedAuctionHandler implements RequestHandler {
   /**
   * Publish auction ra main page.
   *
-  * @param request request publish auction
+  * @param req request publish auction
   * @param clientHandler client connection hiện tại
   * @return response cập nhật main page
   */

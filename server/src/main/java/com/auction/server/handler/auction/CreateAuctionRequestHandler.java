@@ -58,7 +58,7 @@ public class CreateAuctionRequestHandler implements RequestHandler {
           new PendingAuctionReviewRequest(req, clientHandler.getUser());
       ClientHandler.getAdminHandler()
               .forwardRequest(pendingRequest, clientHandler);
-      ClientHandler.addRequest(clientHandler.getUser(), clientHandler);
+      ClientHandler.rememberAuctionRequestSender(clientHandler.getUser(), clientHandler);
       requestList.put(pendingRequest.getRequest().getId(), pendingRequest);
       database.saveData(requestList);
       LOGGER.info("Auction request được chuyển tiếp tới admin cho user: {}", userContext);
