@@ -57,7 +57,7 @@ public class RegisterAuthenticationService {
   *
   * @return true nếu email hợp lệ
   */
-  public boolean getEmailAuthentication() {
+  public boolean isValidEmail() {
     if (!email.contains("@gmail.com") || !email.endsWith("@gmail.com")) {
       return false;
     }
@@ -70,7 +70,7 @@ public class RegisterAuthenticationService {
   *
   * @return true nếu mật khẩu hợp lệ
   */
-  public boolean getPasswordAuthentication() {
+  public boolean isValidPassword() {
     boolean validLength = password.length() >= 8;
     boolean hasLetter = password.matches(".*[a-zA-Z].*");
     boolean hasDigit = password.matches(".*\\d.*");
@@ -83,11 +83,11 @@ public class RegisterAuthenticationService {
   * @return request đăng ký hoặc null nếu dữ liệu không hợp lệ
   */
   public Request createAuthRequest() {
-    if (!getEmailAuthentication()) {
+    if (!isValidEmail()) {
       errorMessage = "Email không hợp lệ (phải có dạng abc@gmail.com)";
       return null;
     }
-    if (!getPasswordAuthentication()) {
+    if (!isValidPassword()) {
       errorMessage =
           "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ cái và số";
       return null;

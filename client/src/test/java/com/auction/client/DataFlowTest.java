@@ -7,8 +7,11 @@ import com.auction.client.controller.auction.MainPageController;
 import com.auction.client.controller.auth.LoginController;
 import com.auction.client.controller.auth.RegisterController;
 import com.auction.client.network.SocketClient;
+import com.auction.server.database.AdminResponseDatabase;
+import com.auction.server.database.AuctionDetailDatabase;
 import com.auction.server.database.AuctionListDatabase;
 import com.auction.server.database.PendingAuctionDatabase;
+import com.auction.server.database.UserBidStatusDatabase;
 import com.auction.server.database.UserDatabase;
 import com.auction.server.network.ClientHandler;
 import com.auction.shared.model.User;
@@ -64,9 +67,9 @@ public class DataFlowTest {
         controller3 = new MainPageController();
         controller4 = new CreateAuctionPageController();
         controller5 = new RegisterController();
-        UserDatabase.setPath("UserTest.ser");
-        PendingAuctionDatabase.setPath("AuctionRequestTest.ser");
-        AuctionListDatabase.setPath("AuctionListTest.ser");
+      AuctionListDatabase auctionListDatabase = AuctionListDatabase.getInstance();
+      PendingAuctionDatabase pendingAuctionDatabase = PendingAuctionDatabase.getInstance();
+      UserDatabase userDatabase = UserDatabase.getInstance();       
         new Thread(() -> {
             try (ServerSocket server = new ServerSocket(4556)) {
                 server.setSoTimeout(5000);
@@ -221,13 +224,13 @@ public class DataFlowTest {
     public static void clearResource() {
         try {
             FileOutputStream out1 =
-                new FileOutputStream("UserTest.ser");
+                new FileOutputStream("User.ser");
             FileOutputStream out2 =
-                new FileOutputStream("AuctionListTest.ser");
+                new FileOutputStream("AuctionList.ser");
             ClientHandler.getOnlineUser().clear();
 
             FileOutputStream out3 =
-                new FileOutputStream("AuctionRequestTest.ser");
+                new FileOutputStream("PendingAuction.ser");
 
         } catch (Exception e) {
             LOGGER.error("Không thể dọn tài nguyên kiểm thử", e);

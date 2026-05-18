@@ -44,7 +44,8 @@ public class BidService {
      * @return object Auction đại diện cho phiên đấu giá đó
      */
     public Auction fetchData(){
-        ConcurrentHashMap<Integer,Auction> auctionList = AuctionListDatabase.getAuctionList();
+        AuctionListDatabase database = AuctionListDatabase.getInstance();
+        ConcurrentHashMap<Integer,Auction> auctionList = database.getData();
         Auction auction = auctionList.get(getAuctionId());
         return auction;
     }
@@ -53,11 +54,8 @@ public class BidService {
      * @return
      */
     public ConcurrentHashMap<Integer,HashMap<User,ParticipantStatus>> fetchBidderData(){
-        ConcurrentHashMap<Integer,HashMap<User,ParticipantStatus>> bidderStatus = UserBidStatusDatabase.getBidderStatus();
-        if (bidderStatus == null){
-            bidderStatus = UserBidStatusDatabase.loadData();
-            UserBidStatusDatabase.setBidderStatus(bidderStatus);
-        }
+        UserBidStatusDatabase database = UserBidStatusDatabase.getInstance();
+        ConcurrentHashMap<Integer,HashMap<User,ParticipantStatus>> bidderStatus = database.getData();
         return bidderStatus;
     }
     /**

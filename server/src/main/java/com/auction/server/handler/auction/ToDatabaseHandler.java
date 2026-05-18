@@ -4,6 +4,7 @@ import com.auction.server.database.AdminResponseDatabase;
 import com.auction.server.database.PendingAuctionDatabase;
 import com.auction.server.handler.RequestHandler;
 import com.auction.server.network.ClientHandler;
+import com.auction.server.service.auction.RemoveRequestService;
 import com.auction.shared.request.Request;
 import com.auction.shared.request.auction.PendingAuctionReviewRequest;
 import com.auction.shared.request.auction.ToDatabaseRequest;
@@ -30,14 +31,15 @@ public class ToDatabaseHandler implements RequestHandler {
   */
   @Override
   public Response handle(Request request, ClientHandler clientHandler) {
+    AdminResponseDatabase database = AdminResponseDatabase.getInstance();
     LinkedHashMap<Integer, PendingAuctionReviewRequest> adminResponse =
-        AdminResponseDatabase.loadAdminResponse();
+        database.getData();
     ToDatabaseRequest toDatabaseRequest = (ToDatabaseRequest) request;
     PendingAuctionReviewRequest pendingAuctionReviewRequest = toDatabaseRequest.getRequest();
     adminResponse.put(pendingAuctionReviewRequest.getRequest().getId(), pendingAuctionReviewRequest);
-    AdminResponseDatabase.saveAdminResponse(adminResponse);
-    PendingAuctionDatabase.removeRequest(pendingAuctionReviewRequest.getRequest().getId());
-    ConcurrentHashMap<Integer,Request> requestList = PendingAuctionDatabase.loadRequestList();
+    database.saveData(adminResponse);
+    RemoveRequestService.removeRequest(pendingAuctionReviewRequest.getRequest().getId());
+    ConcurrentHashMap<Integer,Request> requestList = PendingAuctionDatabase.getInstance().getData();
     LOGGER.info("Còn lại {} request trong danh sách chờ duyệt", requestList.size());
     return new ToDatabaseResponse(true);
   }

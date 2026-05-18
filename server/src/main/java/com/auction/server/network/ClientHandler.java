@@ -72,6 +72,7 @@ public class ClientHandler implements Runnable {
 
         out.writeObject(response);
         out.flush();
+        out.reset();
       }
     } catch (Exception e) {
       String userContext = (user != null) ? user.getUsername() : "unknown";
