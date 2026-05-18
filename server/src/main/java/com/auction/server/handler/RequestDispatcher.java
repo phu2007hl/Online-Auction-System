@@ -2,11 +2,7 @@ package com.auction.server.handler;
 
 import com.auction.server.handler.admin.GetCheckedAuctionListHandler;
 import com.auction.server.handler.admin.GetPendingAuctionListHandler;
-import com.auction.server.handler.auction.AuctionReviewResultHandler;
-import com.auction.server.handler.auction.CreateAuctionRequestHandler;
-import com.auction.server.handler.auction.GetApprovedAuctionListHandler;
-import com.auction.server.handler.auction.PublishApprovedAuctionHandler;
-import com.auction.server.handler.auction.ToDatabaseHandler;
+import com.auction.server.handler.auction.*;
 import com.auction.server.handler.auth.AdminLoginHandler;
 import com.auction.server.handler.auth.LogOutHandler;
 import com.auction.server.handler.auth.LoginRequestHandler;
@@ -14,11 +10,7 @@ import com.auction.server.handler.auth.RegisterRequestHandler;
 import com.auction.shared.request.Request;
 import com.auction.shared.request.admin.GetCheckedAuctionListRequest;
 import com.auction.shared.request.admin.GetPendingAuctionListRequest;
-import com.auction.shared.request.auction.AuctionReviewResultRequest;
-import com.auction.shared.request.auction.CreateAuctionRequest;
-import com.auction.shared.request.auction.GetApprovedAuctionListRequest;
-import com.auction.shared.request.auction.PublishApprovedAuctionRequest;
-import com.auction.shared.request.auction.ToDatabaseRequest;
+import com.auction.shared.request.auction.*;
 import com.auction.shared.request.auth.AdminLoginRequest;
 import com.auction.shared.request.auth.LogOutRequest;
 import com.auction.shared.request.auth.LoginRequest;
@@ -53,6 +45,7 @@ public class RequestDispatcher {
         new PublishApprovedAuctionHandler());
     HANDLER_MAP.put(AuctionReviewResultRequest.class, new AuctionReviewResultHandler());
     HANDLER_MAP.put(GetCheckedAuctionListRequest.class, new GetCheckedAuctionListHandler());
+    HANDLER_MAP.put(BidRequest.class, new BidRequestHandler());
   }
 
   /**

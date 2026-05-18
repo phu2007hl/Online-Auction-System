@@ -4,6 +4,7 @@ import com.auction.server.handler.RequestHandler;
 import com.auction.server.network.AdminHandler;
 import com.auction.server.network.ClientHandler;
 import com.auction.server.service.auth.AdminLoginAuthentication;
+import com.auction.shared.model.User;
 import com.auction.shared.request.Request;
 import com.auction.shared.response.Response;
 import com.auction.shared.response.auth.AdminLoginResponse;
@@ -25,9 +26,12 @@ public class AdminLoginHandler implements RequestHandler {
   */
   @Override
   public Response handle(Request request, ClientHandler clienthandler) {
+
     AdminLoginAuthentication adminAuth = new AdminLoginAuthentication(request);
     AdminLoginResponse response = (AdminLoginResponse) adminAuth.createResponse();
     if (response.getResponse()) {
+      User admin = new User("admin","admin","admindz");
+      clienthandler.setUser(admin);
       AdminHandler adminhandler = new AdminHandler(clienthandler);
       ClientHandler.setAdminHandler(adminhandler);
       LOGGER.info("Admin đã đăng nhập thành công");

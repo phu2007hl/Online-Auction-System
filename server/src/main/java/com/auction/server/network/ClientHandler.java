@@ -25,7 +25,7 @@ public class ClientHandler implements Runnable {
   private RequestDispatcher dispatcher = new RequestDispatcher();
   private static AdminHandler adminHandler;
   private User user;
-  private static HashMap<User, ClientHandler> responseAdmin;
+  private static HashMap<String, ClientHandler> auctionRequestSenders;
   private static ArrayList<ClientHandler> onlineUser = new ArrayList<>();
 
   /**
@@ -171,38 +171,38 @@ public class ClientHandler implements Runnable {
   }
 
   /**
-  * Thêm mapping user và client handler phục vụ phản hồi admin.
+  * Ghi nhớ connection của user đã gửi auction request để trả kết quả duyệt.
   *
   * @param user user cần mapping
   * @param clientHandler client handler tương ứng
   */
-  public static void addRequest(User user, ClientHandler clientHandler) {
-    if (responseAdmin == null) {
-      responseAdmin = new HashMap<>();
+  public static void rememberAuctionRequestSender(User user, ClientHandler clientHandler) {
+    if (auctionRequestSenders == null) {
+      auctionRequestSenders = new HashMap<>();
     }
-    responseAdmin.put(user, clientHandler);
+    auctionRequestSenders.put(user.getEmail(), clientHandler);
   }
 
   /**
-  * Xóa mapping phản hồi admin của một user.
+  * Xóa connection đã lưu của user gửi auction request.
   *
   * @param user user cần xóa mapping
   */
-  public static void removeRequest(User user) {
-    if (responseAdmin != null) {
-      responseAdmin.remove(user);
+  public static void removeAuctionRequestSender(User user) {
+    if (auctionRequestSenders != null) {
+      auctionRequestSenders.remove(user.getEmail());
     }
   }
 
   /**
-  * Lấy mapping user -> client handler.
+  * Lấy mapping user tạo auction request -> client handler.
   *
   * @return map user-client
   */
-  public static HashMap<User, ClientHandler> getMap() {
-    if (responseAdmin == null) {
-      responseAdmin = new HashMap<>();
+  public static HashMap<String, ClientHandler> getAuctionRequestSenders() {
+    if (auctionRequestSenders == null) {
+      auctionRequestSenders = new HashMap<>();
     }
-    return responseAdmin;
+    return auctionRequestSenders;
   }
 }

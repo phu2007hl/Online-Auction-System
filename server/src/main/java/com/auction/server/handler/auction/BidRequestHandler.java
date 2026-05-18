@@ -1,39 +1,50 @@
 package com.auction.server.handler.auction;
 
-import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
-
-import com.auction.server.database.AuctionDetailDatabase;
 import com.auction.server.handler.RequestHandler;
+import com.auction.server.model.auction.BidProcessResult;
 import com.auction.server.network.ClientHandler;
 import com.auction.server.service.auction.BidService;
 import com.auction.shared.auction.Auction;
-import com.auction.shared.enums.BidRequestStatus;
-import com.auction.shared.enums.ParticipantStatus;
+import com.auction.shared.enums.BidResponseStatus;
 import com.auction.shared.model.User;
 import com.auction.shared.request.Request;
 import com.auction.shared.request.auction.BidRequest;
 import com.auction.shared.response.Response;
-import com.auction.shared.response.auction.ParticipantResponse;
+import com.auction.shared.response.auction.BidResultResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BidRequestHandler implements RequestHandler {
-    public Response handle(Request request,ClientHandler clientHandler){
+    private static final Logger LOGGER = LoggerFactory.getLogger(BidRequestHandler.class);
+
+    public Response handle(Request request, ClientHandler clientHandler) {
         BidRequest req = (BidRequest) request; //Downcast request
+        LOGGER.info(
+                "Nhận bid request [auctionId: {}, bidder: {}, bidPrice: {}]",
+                req.getAuctionId(),
+                req.getBidder().getEmail(),
+                req.getBidPrice());
         BidService service = new BidService(req); //Gọi service để thực thi logic
-        Auction auction = service.executeLogic(); //Thực thi logic
+        BidProcessResult bidProcessResult = service.executeLogic(); //Thực thi logic
         //Sau khi thực thi logic thì status của request đã được thay thế, từ đây kiểm tra
-        if (req.getBidRequestStatus().equals(BidRequestStatus.ACCEPTED)){ //Nếu status là ACCEPTED sẽ làm hai việc dưới
-            broadcast(req, auction, service.getoutBidUser()); //Broadcast các dữ liệu mới của phiên cho các người trong phiên
-            return new ParticipantResponse(auction.getCurrentPrice(), auction.getBidHistory(),ParticipantStatus.WINNER); //trả về cho người đặt bid rằng họ đang là winner hiện tại
+        if(bidProcessResult.getBidResponseStatus() == BidResponseStatus.ACCEPTED)
+        {
+            LOGGER.info(
+                    "Bid request được chấp nhận [auctionId: {}, bidder: {}]",
+                    req.getAuctionId(),
+                    req.getBidder().getEmail());
+            return new BidResultResponse(BidResponseStatus.ACCEPTED, "Đặt bid thành công");
         }
-        else{ //Nếu status là DECLINED
-            return new ParticipantResponse(auction.getCurrentPrice(), auction.getBidHistory(),ParticipantStatus.DECLINEDBID); //trả về cho người đặt bid rằng yêu cầu đặt bid của họ đã bị từ chối
-        
-
+        else{
+            LOGGER.info(
+                    "Bid request bị từ chối [auctionId: {}, bidder: {}, bidPrice: {}]",
+                    req.getAuctionId(),
+                    req.getBidder().getEmail(),
+                    req.getBidPrice());
+            return new BidResultResponse(BidResponseStatus.DECLINED, "Đặt bid thất bại: " +
+                    "Bid phải lớn hơn hoặc bằng giá hiện tại + bước giá tối thiểu");
         }
-
-
-        }
+    }
         
     /**
      * Hàm helper dùng để brroadcast về cho những người trong phiên
@@ -42,36 +53,7 @@ public class BidRequestHandler implements RequestHandler {
      * @param outBidUser nhận user bị outbid để còn biết mà gửi về
      */
     public void broadcast(BidRequest request,Auction auction,User outBidUser){
-        ConcurrentHashMap<Integer,ArrayList<ClientHandler>> currentParticipant = AuctionDetailDatabase.getInstance().getData();
-        
-        if (request.getBidRequestStatus().equals(BidRequestStatus.ACCEPTED)){
-            for (ClientHandler connection:currentParticipant.get(request.getAuctionId())){
-                if (connection.getUser().equals(outBidUser)){
-                    try{
-                        connection.getOutputStream().writeObject(new ParticipantResponse(auction.getCurrentPrice(),auction.getBidHistory(), ParticipantStatus.OUTBID));
-                    }
-                    catch (Exception e){
-                        ////
-                        /// 
-                        e.printStackTrace();
-
-                    }
-                    
-
-                }
-                else if (!connection.getUser().equals(request.getBidder())){
-                    try{
-                        connection.getOutputStream().writeObject(new ParticipantResponse(auction.getCurrentPrice(), auction.getBidHistory(), ParticipantStatus.VIEWER));
-
-                    }
-                    catch (Exception e){
-                        ////
-                        /// 
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
+        // TODO: broadcast bằng AuctionRoomManager, không dùng AuctionDetailDatabase để lưu ClientHandler.
 
     }
     
