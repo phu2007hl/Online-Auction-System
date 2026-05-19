@@ -9,6 +9,7 @@
       fx:controller="com.auction.client.controller.auction.AuctionBoxController"
       alignment="CENTER"
       spacing="10"
+      onMouseClicked="#handleClick"
       style="-fx-padding: 10; -fx-border-color: black; -fx-border-radius: 5;">
 
     <ImageView fx:id="imageView"

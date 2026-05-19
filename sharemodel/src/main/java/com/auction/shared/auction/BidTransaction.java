@@ -1,32 +1,24 @@
 package com.auction.shared.auction;
 
-import com.auction.shared.entity.Entity;
-import com.auction.shared.model.User;
+import java.io.Serializable;
 
-public class BidTransaction extends Entity {
+public class BidTransaction implements Serializable {
+  private static final long serialVersionUID = 1L;
 
-  private User bidder;
+  private String bidderUsername;
   private double bidAmount;
-  private int auctionId;
 
-  public BidTransaction(int id, User bidder, double bidAmount, int auctionId) {
-    super(id);
-    this.bidder = bidder;
+  public BidTransaction(String bidderUsername, double bidAmount) {
+    this.bidderUsername = bidderUsername;
     this.bidAmount = bidAmount;
-    this.auctionId = auctionId;
   }
 
-  public User getBidder() {
-    return bidder;
+  public String getBidderUsername() {
+    return bidderUsername;
   }
 
   public double getBidAmount() {
     return bidAmount;
   }
-
-  public int getAuctionId() {
-    return auctionId;
-  }
-
 
 }

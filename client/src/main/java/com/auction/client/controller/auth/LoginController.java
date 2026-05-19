@@ -153,7 +153,7 @@ public class LoginController extends Controller implements Initializable {
       Parent root = loader.load();
 
       MainPageController controller = loader.getController();
-      controller.setUserName(currentUser.getUsername());
+      controller.setCurrentUser(currentUser);
       controller.setSocketClient(socket);
 
       currentStage.setScene(new Scene(root));

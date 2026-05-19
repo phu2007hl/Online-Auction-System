@@ -27,10 +27,11 @@ public class AuctionReviewResultHandler implements RequestHandler {
   */
   @Override
   public Response handle(Request request, ClientHandler clienthandler) {
-    HashMap<User, ClientHandler> map = ClientHandler.getMap();
+    HashMap<String, ClientHandler> auctionRequestSenders =
+        ClientHandler.getAuctionRequestSenders();
     AuctionReviewResultRequest req = (AuctionReviewResultRequest) request;
     try {
-      map.get(req.getUser()).getOutputStream().writeObject(req);
+      auctionRequestSenders.get(req.getUser().getEmail()).getOutputStream().writeObject(req);
     } catch (Exception e) {
           LOGGER.error("Không thể gửi kết quả duyệt về user", e);
     }

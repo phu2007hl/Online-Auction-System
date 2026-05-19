@@ -4,6 +4,7 @@ import com.auction.client.controller.Controller;
 import com.auction.client.controller.auction.MainPageController;
 import com.auction.client.network.SocketClient;
 import com.auction.client.service.RegisterAuthenticationService;
+import com.auction.shared.model.User;
 import com.auction.shared.request.Request;
 import com.auction.shared.response.auth.RegisterResponse;
 import java.io.IOException;
@@ -138,14 +139,14 @@ public class RegisterController extends Controller implements Initializable {
   * @param currentUser tên user
   * @param valid trạng thái đăng ký
   */
-  public void switchToMain(String currentUser, boolean valid) {
+  public void switchToMain(User currentUser, boolean valid) {
     switchToMainSuccess = valid;
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainPageView.fxml"));
       Parent root = loader.load();
 
       MainPageController controller = loader.getController();
-      controller.setUserName(currentUser);
+      controller.setCurrentUser(currentUser);
       controller.setSocketClient(socket);
 
       currentStage.setScene(new Scene(root));
@@ -162,7 +163,7 @@ public class RegisterController extends Controller implements Initializable {
     if (obj instanceof RegisterResponse) {
       RegisterResponse response = (RegisterResponse) obj;
       if (response.getResponse()) {
-        switchToMain(response.getCurrentUser().getUsername(), true);
+        switchToMain(response.getCurrentUser(), true);
       } else {
         messageLabel.setText("Email đã tồn tại.");
         switchToMainSuccess = false;

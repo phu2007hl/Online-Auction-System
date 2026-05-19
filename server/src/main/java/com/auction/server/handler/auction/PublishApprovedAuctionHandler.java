@@ -4,7 +4,6 @@ import com.auction.server.database.AuctionListDatabase;
 import com.auction.server.database.PendingAuctionDatabase;
 import com.auction.server.handler.RequestHandler;
 import com.auction.server.network.ClientHandler;
-import com.auction.server.service.auction.IdGenerator;
 import com.auction.server.service.auction.RemoveRequestService;
 import com.auction.shared.auction.Auction;
 import com.auction.shared.request.Request;
@@ -32,7 +31,7 @@ public class PublishApprovedAuctionHandler implements RequestHandler {
   /**
   * Publish auction ra main page.
   *
-  * @param request request publish auction
+  * @param req request publish auction
   * @param clientHandler client connection hiện tại
   * @return response cập nhật main page
   */
@@ -41,6 +40,7 @@ public class PublishApprovedAuctionHandler implements RequestHandler {
     this.request = (PublishApprovedAuctionRequest) req;
     this.auction = new Auction(request.getRequest().getId(),request.getRequest().getName() ,request.getRequest().getDescription(),request.getUser(),request.getRequest().getStartingPrice() ,5 ,request.getRequest().getEndDate(),request.getRequest().getImageContent(),request.getRequest().getCategory());
     this.clientHandler = clientHandler;
+    saveToDatabase();
     broadcast();
     RemoveRequestService.removeRequest(request.getRequest().getId());
     return new UpdateMainPageResponse(true);
@@ -53,17 +53,13 @@ public class PublishApprovedAuctionHandler implements RequestHandler {
         LOGGER.error("Không thể đẩy auction đã duyệt tới client online", e);
         continue;
       }
-      finally{
-        saveToDatabase();
-      }
     }
 
   }
   private void saveToDatabase(){
     AuctionListDatabase database = AuctionListDatabase.getInstance();
     ConcurrentHashMap<Integer,Auction> auctionList = database.getData();
-    int id = IdGenerator.generateId();
-    auctionList.put(id,auction);
+    auctionList.put(auction.getId(),auction);
     database.saveData(auctionList);
 
   }
