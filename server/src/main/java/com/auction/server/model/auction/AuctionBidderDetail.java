@@ -2,9 +2,12 @@ package com.auction.server.model.auction;
 
 import com.auction.shared.enums.BidderStatus;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
-public class AuctionBidderDetail {
+public class AuctionBidderDetail implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String currentWinnerEmail;
     private HashMap<String, BidderStatus> bidderStatusHashMap;
 

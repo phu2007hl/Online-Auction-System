@@ -3,6 +3,7 @@ package com.auction.server.handler.auction;
 import com.auction.server.handler.RequestHandler;
 import com.auction.server.model.auction.BidProcessResult;
 import com.auction.server.network.ClientHandler;
+import com.auction.server.service.auction.AuctionRoomManager;
 import com.auction.server.service.auction.BidService;
 import com.auction.shared.auction.Auction;
 import com.auction.shared.enums.BidResponseStatus;
@@ -33,6 +34,7 @@ public class BidRequestHandler implements RequestHandler {
                     "Bid request được chấp nhận [auctionId: {}, bidder: {}]",
                     req.getAuctionId(),
                     req.getBidder().getEmail());
+            AuctionRoomManager.broadcast(req.getAuctionId(),bidProcessResult.getBidUpdateResponse());
             return new BidResultResponse(BidResponseStatus.ACCEPTED, "Đặt bid thành công");
         }
         else{
@@ -45,16 +47,4 @@ public class BidRequestHandler implements RequestHandler {
                     "Bid phải lớn hơn hoặc bằng giá hiện tại + bước giá tối thiểu");
         }
     }
-        
-    /**
-     * Hàm helper dùng để brroadcast về cho những người trong phiên
-     * @param request nhận bidRequest
-     * @param auction nhận phiên đã cập nhật sau khi xử lí logic
-     * @param outBidUser nhận user bị outbid để còn biết mà gửi về
-     */
-    public void broadcast(BidRequest request,Auction auction,User outBidUser){
-        // TODO: broadcast bằng AuctionRoomManager, không dùng AuctionDetailDatabase để lưu ClientHandler.
-
-    }
-    
 }

@@ -2,6 +2,7 @@ package com.auction.client.controller.auction;
 
 import com.auction.client.network.SocketClient;
 import com.auction.client.service.IdGenerator;
+import com.auction.shared.model.User;
 import com.auction.shared.request.auction.CreateAuctionRequest;
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +34,7 @@ public class CreateAuctionPageController {
 
   private SocketClient socket;
   private String currentUserName;
+  private User currentUser;
   private File selectedImageFile;
   private byte[] imageContent;
 
@@ -75,6 +77,18 @@ public class CreateAuctionPageController {
   */
   public void setUserName(String currentUserName) {
     this.currentUserName = currentUserName;
+  }
+
+  /**
+  * Gán user hiện tại để quay lại main page không mất context.
+  *
+  * @param currentUser user hiện tại
+  */
+  public void setCurrentUser(User currentUser) {
+    this.currentUser = currentUser;
+    if (currentUser != null) {
+      this.currentUserName = currentUser.getUsername();
+    }
   }
 
   /**
@@ -150,7 +164,9 @@ public class CreateAuctionPageController {
       Parent root = loader.load();
 
       MainPageController controller = loader.getController();
-      if (this.currentUserName != null) {
+      if (this.currentUser != null) {
+        controller.setCurrentUser(this.currentUser);
+      } else if (this.currentUserName != null) {
         controller.setUserName(this.currentUserName);
       }
       if (this.socket != null) {

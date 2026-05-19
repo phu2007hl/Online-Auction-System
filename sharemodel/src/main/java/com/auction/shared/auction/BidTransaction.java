@@ -1,8 +1,9 @@
 package com.auction.shared.auction;
 
-import com.auction.shared.model.User;
+import java.io.Serializable;
 
-public class BidTransaction{
+public class BidTransaction implements Serializable {
+  private static final long serialVersionUID = 1L;
 
   private String bidderUsername;
   private double bidAmount;

@@ -46,6 +46,9 @@ public class RequestDispatcher {
     HANDLER_MAP.put(AuctionReviewResultRequest.class, new AuctionReviewResultHandler());
     HANDLER_MAP.put(GetCheckedAuctionListRequest.class, new GetCheckedAuctionListHandler());
     HANDLER_MAP.put(BidRequest.class, new BidRequestHandler());
+    HANDLER_MAP.put(JoinRoomRequest.class, new JoinRoomRequestHandler());
+    HANDLER_MAP.put(GetAuctionDetailRequest.class, new GetAuctionDetailRequestHandler());
+    HANDLER_MAP.put(LeaveRoomRequest.class, new LeaveRoomRequestHandler());
   }
 
   /**

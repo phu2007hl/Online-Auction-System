@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane prefHeight="700.0" prefWidth="1000.0"
+            style="-fx-background-color: #f3f4f6;"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.auction.client.controller.auction.AuctionDetailController">
+
+    <!-- Thanh trên cùng -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="15"
+              style="-fx-background-color: white; -fx-padding: 12 20; -fx-border-color: #e5e7eb;">
+            <children>
+                <Button fx:id="backButton" text="← Quay lại"
+                        onAction="#handleBack"
+                        style="-fx-background-color: transparent; -fx-border-color: #9ca3af; -fx-text-fill: #4b5563; -fx-border-radius: 6; -fx-background-radius: 6; -fx-cursor: hand; -fx-padding: 6 16;">
+                    <font>
+                        <Font name="System Bold" size="13"/>
+                    </font>
+                </Button>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="auctionTitleLabel" text="Chi tiết đấu giá"
+                       style="-fx-text-fill: #111827;">
+                    <font>
+                        <Font name="System Bold" size="20"/>
+                    </font>
+                </Label>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label fx:id="auctionStatusBadge" text=""
+                       style="-fx-padding: 4 12; -fx-background-radius: 12;"/>
+            </children>
+        </HBox>
+    </top>
+
+    <center>
+        <HBox spacing="20" style="-fx-padding: 20;" alignment="TOP_CENTER">
+            <children>
+                <!-- ===== CỘT TRÁI: Thông tin bid ===== -->
+                <VBox spacing="12" prefWidth="550"
+                      style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 12; -fx-border-color: #e5e7eb; -fx-border-radius: 12;">
+                    <children>
+                        <!-- Tên sản phẩm -->
+                        <Label fx:id="itemNameLabel" text="Tên sản phẩm"
+                               style="-fx-text-fill: #111827;">
+                            <font>
+                                <Font name="System Bold" size="18"/>
+                            </font>
+                        </Label>
+
+                        <!-- Mô tả -->
+                        <Label fx:id="descriptionLabel" text=""
+                               wrapText="true"
+                               style="-fx-text-fill: #6b7280; -fx-font-size: 13;"/>
+
+                        <Separator/>
+
+                        <!-- Giá hiện tại -->
+                        <Label fx:id="currentPriceLabel" text="Bid hiện tại: $0"
+                               style="-fx-text-fill: #16a34a;">
+                            <font>
+                                <Font name="System Bold" size="28"/>
+                            </font>
+                        </Label>
+
+                        <!-- Thông báo trạng thái bidder -->
+                        <Label fx:id="bidderStatusLabel" text=""
+                               wrapText="true">
+                            <font>
+                                <Font size="14"/>
+                            </font>
+                        </Label>
+
+                        <!-- Thông báo phụ -->
+                        <Label fx:id="bidderSubStatusLabel" text=""
+                               wrapText="true"
+                               style="-fx-text-fill: #6b7280; -fx-font-size: 12;"/>
+
+                        <!-- Quick bid buttons (cho OUTBID) -->
+                        <HBox fx:id="quickBidBox" spacing="10" alignment="CENTER_LEFT"
+                              managed="false" visible="false">
+                            <children>
+                                <Button fx:id="quickBid1Button" text="Bid $0"
+                                        onAction="#handleQuickBid1"
+                                        prefHeight="38" prefWidth="140"
+                                        style="-fx-background-color: #4f46e5; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;">
+                                    <font>
+                                        <Font name="System Bold" size="13"/>
+                                    </font>
+                                </Button>
+                                <Button fx:id="quickBid2Button" text="Bid $0"
+                                        onAction="#handleQuickBid2"
+                                        prefHeight="38" prefWidth="140"
+                                        style="-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;">
+                                    <font>
+                                        <Font name="System Bold" size="13"/>
+                                    </font>
+                                </Button>
+                            </children>
+                        </HBox>
+
+                        <!-- Separator cho phần OR (outbid) -->
+                        <Label fx:id="orLabel" text="Hoặc nhập số tiền:"
+                               managed="false" visible="false"
+                               style="-fx-text-fill: #9ca3af; -fx-font-size: 12;"/>
+
+                        <!-- Bid tối thiểu -->
+                        <Label fx:id="minimumBidLabel" text="Bid tối thiểu: $0"
+                               style="-fx-text-fill: #6b7280; -fx-font-size: 12;"/>
+
+                        <!-- Input đặt bid -->
+                        <HBox fx:id="bidInputBox" spacing="10" alignment="CENTER_LEFT"
+                              managed="false" visible="false">
+                            <children>
+                                <TextField fx:id="bidAmountField"
+                                           prefHeight="40" prefWidth="300"
+                                           promptText="Nhập số tiền bid..."
+                                           style="-fx-background-color: #f9fafb; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8;"/>
+                                <Button fx:id="placeBidButton" text="Đặt bid"
+                                        onAction="#handlePlaceBid"
+                                        prefHeight="40" prefWidth="100"
+                                        style="-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-background-radius: 6; -fx-cursor: hand;">
+                                    <font>
+                                        <Font name="System Bold" size="13"/>
+                                    </font>
+                                </Button>
+                            </children>
+                        </HBox>
+
+                        <!-- Thông báo kết quả bid -->
+                        <Label fx:id="bidResultLabel" text=""
+                               wrapText="true"
+                               style="-fx-font-size: 13;"/>
+
+                        <Separator/>
+
+                        <!-- Thông tin bổ sung -->
+                        <HBox spacing="20" alignment="CENTER_LEFT">
+                            <children>
+                                <Label fx:id="endDateLabel" text=""
+                                       style="-fx-text-fill: #6b7280; -fx-font-size: 13;"/>
+                                <Label text="|" style="-fx-text-fill: #d1d5db;"/>
+                                <Label fx:id="totalBidsLabel" text="Tổng số bid: 0"
+                                       style="-fx-text-fill: #6b7280; -fx-font-size: 13;"/>
+                            </children>
+                        </HBox>
+
+                        <!-- Thông tin seller -->
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <children>
+                                <Label text="Người bán:"
+                                       style="-fx-text-fill: #9ca3af; -fx-font-size: 12;"/>
+                                <Label fx:id="sellerLabel" text=""
+                                       style="-fx-text-fill: #374151; -fx-font-size: 12; -fx-font-weight: bold;"/>
+                            </children>
+                        </HBox>
+
+                        <!-- Thông tin winner (cho CLOSED) -->
+                        <HBox fx:id="winnerBox" spacing="8" alignment="CENTER_LEFT"
+                              managed="false" visible="false">
+                            <children>
+                                <Label text="🏆 Người thắng:"
+                                       style="-fx-text-fill: #f59e0b; -fx-font-size: 14;">
+                                    <font>
+                                        <Font name="System Bold" size="14"/>
+                                    </font>
+                                </Label>
+                                <Label fx:id="winnerLabel" text=""
+                                       style="-fx-text-fill: #111827; -fx-font-size: 14; -fx-font-weight: bold;"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <!-- ===== CỘT PHẢI: Ảnh + Lịch sử bid ===== -->
+                <VBox spacing="15" prefWidth="380">
+                    <children>
+                        <!-- Ảnh sản phẩm -->
+                        <VBox alignment="CENTER"
+                              style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 12; -fx-border-color: #e5e7eb; -fx-border-radius: 12;">
+                            <children>
+                                <ImageView fx:id="productImageView"
+                                           fitWidth="340" fitHeight="240"
+                                           preserveRatio="true"/>
+                            </children>
+                        </VBox>
+
+                        <!-- Lịch sử đặt bid -->
+                        <VBox spacing="8"
+                              style="-fx-background-color: #ecfdf5; -fx-padding: 15; -fx-background-radius: 12; -fx-border-color: #a7f3d0; -fx-border-radius: 12;">
+                            <children>
+                                <Label text="Lịch sử đặt bid"
+                                       style="-fx-text-fill: #065f46;">
+                                    <font>
+                                        <Font name="System Bold" size="14"/>
+                                    </font>
+                                </Label>
+                                <ScrollPane fitToWidth="true" prefHeight="250"
+                                            style="-fx-background: transparent; -fx-background-color: transparent;">
+                                    <content>
+                                        <VBox fx:id="bidHistoryContainer" spacing="6"/>
+                                    </content>
+                                </ScrollPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+    </center>
+</BorderPane>

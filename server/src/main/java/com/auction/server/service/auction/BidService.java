@@ -13,6 +13,7 @@ import com.auction.shared.enums.BidResponseStatus;
 import com.auction.shared.enums.BidderStatus;
 import com.auction.shared.model.User;
 import com.auction.shared.request.auction.BidRequest;
+import com.auction.shared.response.auction.BidUpdateResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +78,7 @@ public class BidService {
                     getAuctionId(),
                     getBidder().getEmail(),
                     getBidPrice());
-            return new BidProcessResult(BidResponseStatus.DECLINED);
+            return new BidProcessResult(BidResponseStatus.DECLINED, null);
         }
         LOGGER.info(
                 "Đang xử lý bid [auctionId: {}, bidder: {}, bidPrice: {}, currentPrice: {}, minimumIncrement: {}]",
@@ -127,7 +128,9 @@ public class BidService {
                     getAuctionId(),
                     getBidder().getEmail(),
                     auctionBidderDetail.getBidderStatusHashMap().size());
-            return new BidProcessResult(BidResponseStatus.ACCEPTED);
+            return new BidProcessResult(BidResponseStatus.ACCEPTED,
+                    new BidUpdateResponse(getAuctionId(),getBidPrice(),getBidder().getEmail(),
+                            getBidder().getUsername(),auction.getBidHistory()));
         }
         LOGGER.info(
                 "Từ chối bid vì giá không đạt bước tối thiểu [auctionId: {}, bidder: {}, bidPrice: {}, requiredPrice: {}]",
@@ -135,6 +138,6 @@ public class BidService {
                 getBidder().getEmail(),
                 getBidPrice(),
                 auction.getCurrentPrice() + auction.getMinimumIncrement());
-        return new BidProcessResult(BidResponseStatus.DECLINED);
+        return new BidProcessResult(BidResponseStatus.DECLINED, null);
     }
 }
