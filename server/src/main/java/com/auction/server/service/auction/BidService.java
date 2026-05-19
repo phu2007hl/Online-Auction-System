@@ -71,73 +71,75 @@ public class BidService {
      * @return trả về một object Aucton đại diện cho thông tin của phiên đó sau khi đã cập nhật
      */
     public BidProcessResult executeLogic() {
-        Auction auction = fetchData();
-        if (auction == null) {
-            LOGGER.warn(
-                    "Từ chối bid vì không tìm thấy auction [auctionId: {}, bidder: {}, bidPrice: {}]",
+        synchronized (AuctionLockManager.getLock(getAuctionId())) {
+            Auction auction = fetchData();
+            if (auction == null) {
+                LOGGER.warn(
+                        "Từ chối bid vì không tìm thấy auction [auctionId: {}, bidder: {}, bidPrice: {}]",
+                        getAuctionId(),
+                        getBidder().getEmail(),
+                        getBidPrice());
+                return new BidProcessResult(BidResponseStatus.DECLINED, null);
+            }
+            LOGGER.info(
+                    "Đang xử lý bid [auctionId: {}, bidder: {}, bidPrice: {}, currentPrice: {}, minimumIncrement: {}]",
                     getAuctionId(),
                     getBidder().getEmail(),
-                    getBidPrice());
+                    getBidPrice(),
+                    auction.getCurrentPrice(),
+                    auction.getMinimumIncrement());
+            if (getBidPrice() >= auction.getCurrentPrice() + auction.getMinimumIncrement()) {
+                //Lưu các thông tin mới của Auction vào database;
+                auction.setCurrentPrice(getBidPrice());
+                auction.setWinner(getBidder());
+                BidTransaction bidTransaction = new BidTransaction(getBidder().getUsername(), getBidPrice());
+                auction.getBidHistory().add(bidTransaction);
+                ConcurrentHashMap<Integer, Auction> auctionList = AuctionListDatabase.getInstance().getData();
+                AuctionListDatabase.getInstance().saveData(auctionList);
+                LOGGER.info(
+                        "Đã cập nhật auction sau bid thành công [auctionId: {}, winner: {}, currentPrice: {}, bidHistorySize: {}]",
+                        getAuctionId(),
+                        getBidder().getEmail(),
+                        auction.getCurrentPrice(),
+                        auction.getBidHistory().size());
+
+                // Thay đổi Status của Bidder trong Auction tương ứng và lưu vào database
+                ConcurrentHashMap<Integer, AuctionBidderDetail> auctionBidderDetailHashMap = AuctionBidderDetailDatabase.
+                        getInstance().getData();
+                AuctionBidderDetail auctionBidderDetail = auctionBidderDetailHashMap.get(getAuctionId());
+                if (auctionBidderDetail == null) {
+                    auctionBidderDetail = new AuctionBidderDetail(null, new HashMap<>());
+                    auctionBidderDetailHashMap.put(getAuctionId(), auctionBidderDetail);
+                    LOGGER.info("Tạo mới AuctionBidderDetail [auctionId: {}]", getAuctionId());
+                }
+                String currentWinnerEmail = auctionBidderDetail.getCurrentWinnerEmail();
+                if (currentWinnerEmail != null) {
+                    auctionBidderDetail.getBidderStatusHashMap()
+                            .put(currentWinnerEmail, BidderStatus.OUTBID);
+                    LOGGER.info(
+                            "Cập nhật winner cũ thành OUTBID [auctionId: {}, oldWinner: {}]",
+                            getAuctionId(),
+                            currentWinnerEmail);
+                }
+                auctionBidderDetail.getBidderStatusHashMap().put(getBidder().getEmail(), BidderStatus.CURRENT_WINNER);
+                auctionBidderDetail.setCurrentWinnerEmail(getBidder().getEmail());
+                AuctionBidderDetailDatabase.getInstance().saveData(auctionBidderDetailHashMap);
+                LOGGER.info(
+                        "Đã cập nhật trạng thái bidder [auctionId: {}, currentWinner: {}, bidderCount: {}]",
+                        getAuctionId(),
+                        getBidder().getEmail(),
+                        auctionBidderDetail.getBidderStatusHashMap().size());
+                return new BidProcessResult(BidResponseStatus.ACCEPTED,
+                        new BidUpdateResponse(getAuctionId(),getBidPrice(),getBidder().getEmail(),
+                                getBidder().getUsername(),auction.getBidHistory()));
+            }
+            LOGGER.info(
+                    "Từ chối bid vì giá không đạt bước tối thiểu [auctionId: {}, bidder: {}, bidPrice: {}, requiredPrice: {}]",
+                    getAuctionId(),
+                    getBidder().getEmail(),
+                    getBidPrice(),
+                    auction.getCurrentPrice() + auction.getMinimumIncrement());
             return new BidProcessResult(BidResponseStatus.DECLINED, null);
         }
-        LOGGER.info(
-                "Đang xử lý bid [auctionId: {}, bidder: {}, bidPrice: {}, currentPrice: {}, minimumIncrement: {}]",
-                getAuctionId(),
-                getBidder().getEmail(),
-                getBidPrice(),
-                auction.getCurrentPrice(),
-                auction.getMinimumIncrement());
-        if (getBidPrice() >= auction.getCurrentPrice() + auction.getMinimumIncrement()) {
-            //Lưu các thông tin mới của Auction vào database;
-            auction.setCurrentPrice(getBidPrice());
-            auction.setWinner(getBidder());
-            BidTransaction bidTransaction = new BidTransaction(getBidder().getUsername(), getBidPrice());
-            auction.getBidHistory().add(bidTransaction);
-            ConcurrentHashMap<Integer, Auction> auctionList = AuctionListDatabase.getInstance().getData();
-            AuctionListDatabase.getInstance().saveData(auctionList);
-            LOGGER.info(
-                    "Đã cập nhật auction sau bid thành công [auctionId: {}, winner: {}, currentPrice: {}, bidHistorySize: {}]",
-                    getAuctionId(),
-                    getBidder().getEmail(),
-                    auction.getCurrentPrice(),
-                    auction.getBidHistory().size());
-
-            // Thay đổi Status của Bidder trong Auction tương ứng và lưu vào database
-            ConcurrentHashMap<Integer, AuctionBidderDetail> auctionBidderDetailHashMap = AuctionBidderDetailDatabase.
-                    getInstance().getData();
-            AuctionBidderDetail auctionBidderDetail = auctionBidderDetailHashMap.get(getAuctionId());
-            if (auctionBidderDetail == null) {
-                auctionBidderDetail = new AuctionBidderDetail(null, new HashMap<>());
-                auctionBidderDetailHashMap.put(getAuctionId(), auctionBidderDetail);
-                LOGGER.info("Tạo mới AuctionBidderDetail [auctionId: {}]", getAuctionId());
-            }
-            String currentWinnerEmail = auctionBidderDetail.getCurrentWinnerEmail();
-            if (currentWinnerEmail != null) {
-                auctionBidderDetail.getBidderStatusHashMap()
-                        .put(currentWinnerEmail, BidderStatus.OUTBID);
-                LOGGER.info(
-                        "Cập nhật winner cũ thành OUTBID [auctionId: {}, oldWinner: {}]",
-                        getAuctionId(),
-                        currentWinnerEmail);
-            }
-            auctionBidderDetail.getBidderStatusHashMap().put(getBidder().getEmail(), BidderStatus.CURRENT_WINNER);
-            auctionBidderDetail.setCurrentWinnerEmail(getBidder().getEmail());
-            AuctionBidderDetailDatabase.getInstance().saveData(auctionBidderDetailHashMap);
-            LOGGER.info(
-                    "Đã cập nhật trạng thái bidder [auctionId: {}, currentWinner: {}, bidderCount: {}]",
-                    getAuctionId(),
-                    getBidder().getEmail(),
-                    auctionBidderDetail.getBidderStatusHashMap().size());
-            return new BidProcessResult(BidResponseStatus.ACCEPTED,
-                    new BidUpdateResponse(getAuctionId(),getBidPrice(),getBidder().getEmail(),
-                            getBidder().getUsername(),auction.getBidHistory()));
-        }
-        LOGGER.info(
-                "Từ chối bid vì giá không đạt bước tối thiểu [auctionId: {}, bidder: {}, bidPrice: {}, requiredPrice: {}]",
-                getAuctionId(),
-                getBidder().getEmail(),
-                getBidPrice(),
-                auction.getCurrentPrice() + auction.getMinimumIncrement());
-        return new BidProcessResult(BidResponseStatus.DECLINED, null);
     }
 }
