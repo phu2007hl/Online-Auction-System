@@ -80,7 +80,32 @@ public class AuctionDetailController extends Controller implements Initializable
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    // Khởi tạo mặc định
+    showLoadingState();
+  }
+
+  /**
+   * Trạng thái chờ response để tránh hiển thị nhầm UI bid trước khi có dữ liệu thật.
+   */
+  private void showLoadingState() {
+    auctionTitleLabel.setText("Đang tải chi tiết đấu giá...");
+    auctionStatusBadge.setText("");
+    itemNameLabel.setText("");
+    descriptionLabel.setText("");
+    currentPriceLabel.setText("");
+    bidderStatusLabel.setText("");
+    bidderSubStatusLabel.setText("");
+    minimumBidLabel.setText("");
+    bidResultLabel.setText("");
+    endDateLabel.setText("");
+    totalBidsLabel.setText("");
+    sellerLabel.setText("");
+    winnerLabel.setText("");
+    productImageView.setImage(null);
+    bidHistoryContainer.getChildren().clear();
+
+    hideBidControls();
+    winnerBox.setVisible(false);
+    winnerBox.setManaged(false);
   }
 
   /**
