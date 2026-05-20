@@ -26,7 +26,7 @@ public class BidRequestHandler implements RequestHandler {
                 req.getBidder().getEmail(),
                 req.getBidPrice());
         BidService service = new BidService(req); //Gọi service để thực thi logic
-        BidProcessResult bidProcessResult = service.executeLogic(); //Thực thi logic
+        BidProcessResult bidProcessResult = service.executeLogic(req.getAuctionId()); //Thực thi logic
         //Sau khi thực thi logic thì status của request đã được thay thế, từ đây kiểm tra
         if(bidProcessResult.getBidResponseStatus() == BidResponseStatus.ACCEPTED)
         {
