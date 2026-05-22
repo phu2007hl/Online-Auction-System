@@ -7,13 +7,13 @@ import org.slf4j.LoggerFactory;
 
 import com.auction.server.database.PendingAuctionDatabase;
 import com.auction.server.network.ClientHandler;
-import com.auction.shared.request.Request;
 import com.auction.shared.request.auction.CreateAuctionRequest;
 import com.auction.shared.request.auction.PendingAuctionReviewRequest;
 
 public class SavePendingAuctionService {
  private static final Logger LOGGER = LoggerFactory.getLogger(SavePendingAuctionService.class);
- public static void saveToDatabase(Exception e,ClientHandler clientHandler,Request request){
+ public static void saveToDatabase(
+     Exception e, ClientHandler clientHandler, com.auction.shared.request.Request request) {
     PendingAuctionDatabase database = PendingAuctionDatabase.getInstance();
       String userContext = clientHandler.getUser().getUsername();
       LOGGER.error(
@@ -21,12 +21,12 @@ public class SavePendingAuctionService {
               + "sẽ lưu vào AuctionDatabase [user: {}]",
           userContext,
           e);
-      ConcurrentHashMap<Integer,Request> requestList = database.getData();
+      ConcurrentHashMap<Integer, PendingAuctionReviewRequest> requestList = database.getData();
       CreateAuctionRequest req = (CreateAuctionRequest) request;
       PendingAuctionReviewRequest pendingRequest =
           new PendingAuctionReviewRequest(req, clientHandler.getUser());
-      requestList.put(pendingRequest.getRequest().getId(), pendingRequest);
-      database.saveData(requestList);;
+      requestList.put(pendingRequest.getCreateAuctionRequest().getId(), pendingRequest);
+      database.saveData(requestList);
       LOGGER.info("Auction request đã được lưu vào pending database cho user: {}",
           userContext);    
  }

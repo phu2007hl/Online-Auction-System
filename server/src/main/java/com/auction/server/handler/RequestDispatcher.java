@@ -2,6 +2,7 @@ package com.auction.server.handler;
 
 import com.auction.server.handler.admin.GetCheckedAuctionListHandler;
 import com.auction.server.handler.admin.GetPendingAuctionListHandler;
+import com.auction.server.handler.admin.EditAuctionHandler;
 import com.auction.server.handler.auction.*;
 import com.auction.server.handler.auth.AdminLoginHandler;
 import com.auction.server.handler.auth.LogOutHandler;
@@ -9,6 +10,7 @@ import com.auction.server.handler.auth.LoginRequestHandler;
 import com.auction.server.handler.auth.RegisterRequestHandler;
 import com.auction.shared.request.Request;
 import com.auction.shared.request.admin.GetCheckedAuctionListRequest;
+import com.auction.shared.request.admin.EditAuctionRequest;
 import com.auction.shared.request.admin.GetPendingAuctionListRequest;
 import com.auction.shared.request.auction.*;
 import com.auction.shared.request.auth.AdminLoginRequest;
@@ -18,7 +20,6 @@ import com.auction.shared.request.auth.RegisterRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.auction.shared.response.admin.GetCheckedAuctionListResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ public class RequestDispatcher {
     HANDLER_MAP.put(JoinRoomRequest.class, new JoinRoomRequestHandler());
     HANDLER_MAP.put(GetAuctionDetailRequest.class, new GetAuctionDetailRequestHandler());
     HANDLER_MAP.put(LeaveRoomRequest.class, new LeaveRoomRequestHandler());
+    HANDLER_MAP.put(EditAuctionRequest.class, new EditAuctionHandler());
   }
 
   /**

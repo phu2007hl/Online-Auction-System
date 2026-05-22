@@ -1,25 +1,20 @@
 package com.auction.shared.request.auction;
 
-import com.auction.shared.model.User;
 import com.auction.shared.request.Request;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Objects;
 
 /**
 * Yêu cầu tạo auction do user gửi lên server.
 */
 public class CreateAuctionRequest extends Request {
-  private final byte[] imageContent;
-  private final String category;
+  private byte[] imageContent;
+  private String category;
   private final double startingPrice;
-  private final String description;
+  private String description;
   private final LocalDate endDate;
   private final int id;
-  private User user;
   private String itemName;
-  private double minimumIncrement;
+  private final double minimumIncrement;
 
 
   /**
@@ -78,6 +73,15 @@ public class CreateAuctionRequest extends Request {
   }
 
   /**
+  * Lấy bước giá tối thiểu.
+  *
+  * @return bước giá tối thiểu
+  */
+  public double getMinimumIncrement() {
+    return minimumIncrement;
+  }
+
+  /**
   * Lấy mô tả sản phẩm.
   *
   * @return mô tả sản phẩm
@@ -96,23 +100,6 @@ public class CreateAuctionRequest extends Request {
   }
 
   /**
-  * Gán user tạo auction.
-  *
-  * @param user user tạo auction
-  */
-  public void setUser(User user) {
-    this.user = user;
-  }
-
-  /**
-  * Lấy user tạo auction.
-  *
-  * @return user tạo auction
-  */
-  public User getUser() {
-    return user;
-  }
-  /**
    * Lấy id của Request tạo auction này
    * @return ID request
    */
@@ -127,4 +114,19 @@ public class CreateAuctionRequest extends Request {
     return itemName;
   }
 
+  public void setImageContent(byte[] imageContent) {
+    this.imageContent = imageContent;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public void setItemName(String itemName) {
+    this.itemName = itemName;
+  }
 }

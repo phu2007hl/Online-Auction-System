@@ -36,10 +36,11 @@ public class ToDatabaseHandler implements RequestHandler {
         database.getData();
     ToDatabaseRequest toDatabaseRequest = (ToDatabaseRequest) request;
     PendingAuctionReviewRequest pendingAuctionReviewRequest = toDatabaseRequest.getRequest();
-    adminResponse.put(pendingAuctionReviewRequest.getRequest().getId(), pendingAuctionReviewRequest);
+    adminResponse.put(pendingAuctionReviewRequest.getCreateAuctionRequest().getId(), pendingAuctionReviewRequest);
     database.saveData(adminResponse);
-    RemoveRequestService.removeRequest(pendingAuctionReviewRequest.getRequest().getId());
-    ConcurrentHashMap<Integer,Request> requestList = PendingAuctionDatabase.getInstance().getData();
+    RemoveRequestService.removeRequest(pendingAuctionReviewRequest.getCreateAuctionRequest().getId());
+    ConcurrentHashMap<Integer, PendingAuctionReviewRequest> requestList =
+        PendingAuctionDatabase.getInstance().getData();
     LOGGER.info("Còn lại {} request trong danh sách chờ duyệt", requestList.size());
     return new ToDatabaseResponse(true);
   }
