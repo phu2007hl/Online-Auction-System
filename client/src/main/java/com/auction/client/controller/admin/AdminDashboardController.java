@@ -3,7 +3,6 @@ package com.auction.client.controller.admin;
 import com.auction.client.controller.Controller;
 import com.auction.client.network.SocketClient;
 import com.auction.shared.enums.CreateAuctionStatus;
-import com.auction.shared.request.Request;
 import com.auction.shared.request.admin.GetPendingAuctionListRequest;
 import com.auction.shared.request.auction.AuctionReviewResultRequest;
 import com.auction.shared.request.auction.CreateAuctionRequest;
@@ -36,6 +35,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,12 +137,23 @@ public class AdminDashboardController extends Controller implements Initializabl
         col -> new TableCell<>() {
           private final Button acceptBtn = new Button("Duyệt");
           private final Button declineBtn = new Button("Từ chối");
-          private final HBox box = new HBox(10, acceptBtn, declineBtn);
+          private final Button editBtn = new Button("Chỉnh sửa");
+          private final VBox box = new VBox(6, acceptBtn, declineBtn, editBtn);
 
           {
             box.setAlignment(Pos.CENTER);
-            acceptBtn.getStyleClass().addAll("action-btn", "accept-btn");
-            declineBtn.getStyleClass().addAll("action-btn", "decline-btn");
+            acceptBtn.setPrefWidth(92);
+            declineBtn.setPrefWidth(92);
+            editBtn.setPrefWidth(92);
+            acceptBtn.setStyle(
+                "-fx-background-color: #16a34a; -fx-text-fill: white; "
+                    + "-fx-background-radius: 8; -fx-cursor: hand; -fx-font-weight: bold;");
+            declineBtn.setStyle(
+                "-fx-background-color: #dc2626; -fx-text-fill: white; "
+                    + "-fx-background-radius: 8; -fx-cursor: hand; -fx-font-weight: bold;");
+            editBtn.setStyle(
+                "-fx-background-color: #eab308; -fx-text-fill: white; "
+                    + "-fx-background-radius: 8; -fx-cursor: hand; -fx-font-weight: bold;");
             acceptBtn.setOnAction(
                 e -> {
                   RequestRow row = getTableView().getItems().get(getIndex());
@@ -154,11 +165,18 @@ public class AdminDashboardController extends Controller implements Initializabl
                   RequestRow row = getTableView().getItems().get(getIndex());
                   handleDecline(row);
                 });
+
+            editBtn.setOnAction(
+                e -> {
+                  RequestRow row = getTableView().getItems().get(getIndex());
+                  switchToEditAuction(row, (Node) e.getSource());
+                });
           }
 
           @Override
           protected void updateItem(Void item, boolean empty) {
             super.updateItem(item, empty);
+            setAlignment(Pos.CENTER);
             setGraphic(empty ? null : box);
           }
         });
@@ -172,7 +190,7 @@ public class AdminDashboardController extends Controller implements Initializabl
   private void handleAccept(RequestRow row) {
     PendingAuctionReviewRequest pendingRequest = row.getRequest();
     pendingRequest.setStatus(CreateAuctionStatus.SUCCESS);
-    CreateAuctionRequest req = pendingRequest.getRequest();
+    CreateAuctionRequest req = pendingRequest.getCreateAuctionRequest();
     try {
       socket.sendRequest(new AuctionReviewResultRequest(pendingRequest.getUser(), true, CreateAuctionStatus.SUCCESS));
       socket.sendRequest(new PublishApprovedAuctionRequest(req,pendingRequest.getUser()));
@@ -206,6 +224,24 @@ public class AdminDashboardController extends Controller implements Initializabl
       LOGGER.error("Không thể gửi kết quả từ chối auction", e);
     }
     requestRows.remove(row);
+  }
+
+  private void switchToEditAuction(RequestRow row, Node source) {
+    try {
+      FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/EditAuctionView.fxml"));
+      Parent root = loader.load();
+
+      EditAuctionController controller = loader.getController();
+      controller.setPendingRequest(row.getRequest());
+      controller.setSocketClient(socket);
+
+      Stage stage = (Stage) source.getScene().getWindow();
+      stage.getScene().setRoot(root);
+      stage.setTitle("Chỉnh sửa yêu cầu đấu giá");
+      stage.show();
+    } catch (IOException e) {
+      LOGGER.error("Không thể mở trang chỉnh sửa auction", e);
+    }
   }
 
   /**
@@ -309,19 +345,9 @@ public class AdminDashboardController extends Controller implements Initializabl
       GetPendingAuctionListResponse response = (GetPendingAuctionListResponse) obj;
       LOGGER.info("Đã nhận danh sách request chờ duyệt");
       requestRows.clear();
-      ConcurrentHashMap<Integer,Request> requestList = response.getList();
+      ConcurrentHashMap<Integer, PendingAuctionReviewRequest> requestList = response.getList();
       for (Integer id : requestList.keySet()) {
-        if (requestList.get(id) instanceof PendingAuctionReviewRequest) {
-          addPendingRequest((PendingAuctionReviewRequest) requestList.get(id));
-        } else if (requestList.get(id) instanceof CreateAuctionRequest) {
-          CreateAuctionRequest auctionRequest = (CreateAuctionRequest) requestList.get(id);
-          addPendingRequest(
-              new PendingAuctionReviewRequest(auctionRequest, auctionRequest.getUser()));
-        } else {
-          LOGGER.warn(
-              "Bỏ qua pending request không đúng kiểu: {}",
-              requestList.get(id).getClass().getSimpleName());
-        }
+        addPendingRequest(requestList.get(id));
       }
     }
   }
@@ -332,12 +358,12 @@ public class AdminDashboardController extends Controller implements Initializabl
   * @param pendingRequest request cho admin duyệt
   */
   private void addPendingRequest(PendingAuctionReviewRequest pendingRequest) {
-    if (pendingRequest == null || pendingRequest.getRequest() == null) {
+    if (pendingRequest == null || pendingRequest.getCreateAuctionRequest() == null) {
       LOGGER.warn("Bỏ qua pending auction request rỗng");
       return;
     }
 
-    CreateAuctionRequest auctionRequest = pendingRequest.getRequest();
+    CreateAuctionRequest auctionRequest = pendingRequest.getCreateAuctionRequest();
     byte[] imageContent = auctionRequest.getImageContent();
     if (imageContent == null || imageContent.length == 0) {
       LOGGER.warn("Bỏ qua auction request thiếu ảnh: {}", auctionRequest.getCategory());
