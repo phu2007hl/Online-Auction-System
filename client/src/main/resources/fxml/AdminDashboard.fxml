@@ -18,7 +18,8 @@
             <children>
                 <Label text="Bảng điều khiển admin"
                        style="-fx-font-size: 26px; -fx-font-weight: bold;"/>
-                <Button onAction="#switchToCheckedAuctionHistory" text="Lịch sử"/>
+                <Button onAction="#switchToCheckedAuctionHistory" text="Lịch sử"
+                        style="-fx-cursor: hand;"/>
             </children>
         </HBox>
     </top>

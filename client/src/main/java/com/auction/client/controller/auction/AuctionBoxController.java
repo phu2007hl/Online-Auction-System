@@ -1,6 +1,7 @@
 package com.auction.client.controller.auction;
 
 import com.auction.client.network.SocketClient;
+import com.auction.shared.auction.Auction;
 import com.auction.shared.model.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -25,19 +26,31 @@ public class AuctionBoxController {
   private Label priceLabel;
 
   @FXML
-  private Label categoryLabel;
+  private Label itemNameLabel;
+
+  @FXML
+  private Label sellerLabel;
+
+  @FXML
+  private Label endDateLabel;
 
   /**
    * Gán dữ liệu cho ô sản phẩm.
    *
    * @param image ảnh sản phẩm
-   * @param startingPrice giá khởi điểm
-   * @param category loại sản phẩm
+   * @param auction thông tin auction
    */
-  public void setData(Image image, double startingPrice, String category) {
-    imageView.setImage(image);
-    priceLabel.setText("Giá: $" + startingPrice);
-    categoryLabel.setText("Danh mục: " + category);
+  public void setData(Image image, Auction auction) {
+    if (image != null) {
+      imageView.setImage(image);
+    }
+    itemNameLabel.setText(auction.getItemName());
+    String sellerName = auction.getSeller() == null
+        ? "Không xác định"
+        : auction.getSeller().getUsername();
+    sellerLabel.setText("Người bán: " + sellerName);
+    endDateLabel.setText("Kết thúc: " + auction.getEndTime());
+    priceLabel.setText("$" + String.format("%.2f", auction.getCurrentPrice()));
   }
 
   /**

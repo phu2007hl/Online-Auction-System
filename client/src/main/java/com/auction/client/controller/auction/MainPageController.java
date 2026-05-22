@@ -31,7 +31,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -56,7 +55,7 @@ public class MainPageController extends Controller implements Initializable {
   private Label usernameLabel;
 
   @FXML
-  private FlowPane productContainer;
+  private VBox productContainer;
 
   /**
   * Khởi tạo stage của main page.
@@ -78,7 +77,15 @@ public class MainPageController extends Controller implements Initializable {
     this.socket = socket;
     socket.setController(this);
     socket.startListening(); 
+    requestApprovedAuctionList();
+  }
+
+  /**
+  * Gửi request lấy lại danh sách auction đã duyệt.
+  */
+  private void requestApprovedAuctionList() {
     socket.sendRequest(new GetApprovedAuctionListRequest());
+    LOGGER.info("Đã gửi GetApprovedAuctionListRequest");
   }
 
   /**
@@ -116,12 +123,15 @@ public class MainPageController extends Controller implements Initializable {
     updateMainPageSuccess = true;
     try {
       FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ProductBox.fxml"));
-      VBox productBox = loader.load();
+      Node productBox = loader.load();
 
       AuctionBoxController controller = loader.getController();
-      Image image = new Image(new ByteArrayInputStream(auction.getImageContent()));
+      Image image = null;
+      if (auction.getImageContent() != null && auction.getImageContent().length > 0) {
+        image = new Image(new ByteArrayInputStream(auction.getImageContent()));
+      }
 
-      controller.setData(image, auction.getStartingPrice(), auction.getCategory());
+      controller.setData(image, auction);
       controller.setAuctionId(auctionId);
       controller.setSocketClient(socket);
       controller.setUserInfo(currentUser, currentUserName);
@@ -160,6 +170,14 @@ public class MainPageController extends Controller implements Initializable {
   }
 
   /**
+  * Refresh danh sách auction trên main page.
+  */
+  @FXML
+  private void refreshAuctionList() {
+    requestApprovedAuctionList();
+  }
+
+  /**
   * Đăng xuất khỏi hệ thống.
   */
   @FXML
@@ -176,12 +194,23 @@ public class MainPageController extends Controller implements Initializable {
     if (obj instanceof GetApprovedAuctionListResponse) {
       GetApprovedAuctionListResponse response = (GetApprovedAuctionListResponse) obj;
       ConcurrentHashMap<Integer,Auction> auctionList = response.getAuctionList();
+      LOGGER.info("Nhận danh sách auction đã duyệt [size: {}]", auctionList.size());
 
       productContainer.getChildren().clear();
       displayedAuctionIds.clear();
+      if (auctionList.isEmpty()) {
+        Label emptyLabel = new Label("Chưa có phiên đấu giá nào được duyệt");
+        emptyLabel.setStyle("-fx-text-fill: #6b7280; -fx-font-size: 14;");
+        productContainer.getChildren().add(emptyLabel);
+        return;
+      }
       for (Integer id : auctionList.keySet()) {
         Auction auction = auctionList.get(id);
         if (auction != null) {
+          LOGGER.info(
+              "Hiển thị auction trên main page [auctionId: {}, name: {}]",
+              auction.getId(),
+              auction.getItemName());
           addProductBox(auction.getId(), auction);
         }
       }

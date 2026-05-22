@@ -9,11 +9,16 @@ import com.auction.shared.response.Response;
 import com.auction.shared.response.auction.GetApprovedAuctionListResponse;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
 * Xử lý request lấy danh sách auction đã được duyệt.
 */
 public class GetApprovedAuctionListHandler implements RequestHandler {
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(GetApprovedAuctionListHandler.class);
+
   /**
   * Lấy danh sách auction đã được duyệt.
   *
@@ -24,6 +29,7 @@ public class GetApprovedAuctionListHandler implements RequestHandler {
   @Override
   public Response handle(Request request, ClientHandler clientHandler) {
     ConcurrentHashMap<Integer,Auction> auctionList = AuctionListDatabase.getInstance().getData();
+    LOGGER.info("Trả danh sách auction đã duyệt [size: {}]", auctionList.size());
     return new GetApprovedAuctionListResponse(true, auctionList);
   }
 }

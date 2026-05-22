@@ -18,7 +18,8 @@
       <children>
         <HBox alignment="CENTER_LEFT" spacing="12.0">
           <children>
-            <Button onAction="#switchToAdminDashboard" text="Quay lại duyệt auction" />
+            <Button onAction="#switchToAdminDashboard" text="Quay lại duyệt auction"
+                    style="-fx-cursor: hand;" />
             <Label style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Lịch sử duyệt auction" />
           </children>
         </HBox>

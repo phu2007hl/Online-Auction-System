@@ -1,26 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx"
+<HBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.auction.client.controller.auction.AuctionBoxController"
-      alignment="CENTER"
-      spacing="10"
+      alignment="CENTER_LEFT"
+      spacing="16"
       onMouseClicked="#handleClick"
-      style="-fx-padding: 10; -fx-border-color: black; -fx-border-radius: 5;">
+      prefHeight="120"
+      style="-fx-padding: 12; -fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;">
 
     <ImageView fx:id="imageView"
-               fitWidth="150"
-               fitHeight="120"
+               fitWidth="120"
+               fitHeight="90"
                preserveRatio="true" />
 
-    <Label fx:id="priceLabel"
-           text="Giá"
-           style="-fx-font-weight: bold;" />
+    <VBox spacing="6" HBox.hgrow="ALWAYS">
+        <Label fx:id="itemNameLabel"
+               text="Tên sản phẩm"
+               style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #111827;" />
 
-    <Label fx:id="categoryLabel"
-           text="Danh mục" />
-</VBox>
+        <Label fx:id="sellerLabel"
+               text="Người bán"
+               style="-fx-text-fill: #4b5563; -fx-font-size: 13;" />
+
+        <Label fx:id="endDateLabel"
+               text="Ngày kết thúc"
+               style="-fx-text-fill: #6b7280; -fx-font-size: 13;" />
+    </VBox>
+
+    <Region minWidth="20" HBox.hgrow="ALWAYS" />
+
+    <VBox alignment="CENTER_RIGHT" spacing="6">
+        <Label text="Giá hiện tại"
+               style="-fx-text-fill: #6b7280; -fx-font-size: 12;" />
+
+        <Label fx:id="priceLabel"
+               text="0.00"
+               style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #111827;" />
+    </VBox>
+</HBox>
