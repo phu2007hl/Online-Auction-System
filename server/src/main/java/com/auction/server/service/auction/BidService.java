@@ -62,25 +62,8 @@ public class BidService {
         Auction auction = auctionList.get(getAuctionId());
         return auction;
     }
-
-    /**
-     * Hàm thực sự xử lí logic đặt bid
-     * Nếu đặt thành công thì sẽ thay đổi winner và currentprice bên trong object Auction, set trạng thái
-     * của winner và người bị outbid trong bidderStatus
-     *
-     * @return trả về một object Aucton đại diện cho thông tin của phiên đó sau khi đã cập nhật
-     */
-    public BidProcessResult executeLogic() {
-        Auction auction = fetchData();
-        if (auction == null) {
-            LOGGER.warn(
-                    "Từ chối bid vì không tìm thấy auction [auctionId: {}, bidder: {}, bidPrice: {}]",
-                    getAuctionId(),
-                    getBidder().getEmail(),
-                    getBidPrice());
-            return new BidProcessResult(BidResponseStatus.DECLINED, null);
-        }
-        LOGGER.info(
+    public void changeAuctionDetail(Auction auction){
+      LOGGER.info(
                 "Đang xử lý bid [auctionId: {}, bidder: {}, bidPrice: {}, currentPrice: {}, minimumIncrement: {}]",
                 getAuctionId(),
                 getBidder().getEmail(),
@@ -102,7 +85,9 @@ public class BidService {
                     auction.getCurrentPrice(),
                     auction.getBidHistory().size());
 
-            // Thay đổi Status của Bidder trong Auction tương ứng và lưu vào database
+    }
+    }
+    public void changeBidderStatus(){
             ConcurrentHashMap<Integer, AuctionBidderDetail> auctionBidderDetailHashMap = AuctionBidderDetailDatabase.
                     getInstance().getData();
             AuctionBidderDetail auctionBidderDetail = auctionBidderDetailHashMap.get(getAuctionId());
@@ -128,6 +113,36 @@ public class BidService {
                     getAuctionId(),
                     getBidder().getEmail(),
                     auctionBidderDetail.getBidderStatusHashMap().size());
+    }
+
+    /**
+     * Hàm thực sự xử lí logic đặt bid
+     * Nếu đặt thành công thì sẽ thay đổi winner và currentprice bên trong object Auction, set trạng thái
+     * của winner và người bị outbid trong bidderStatus
+     *
+     * @return trả về một object Aucton đại diện cho thông tin của phiên đó sau khi đã cập nhật
+     */
+    public BidProcessResult executeLogic(int auctionId) {
+        synchronized(LockManager.getLock(auctionId)){
+        Auction auction = fetchData();
+        if (auction == null) {
+            LOGGER.warn(
+                    "Từ chối bid vì không tìm thấy auction [auctionId: {}, bidder: {}, bidPrice: {}]",
+                    getAuctionId(),
+                    getBidder().getEmail(),
+                    getBidPrice());
+            return new BidProcessResult(BidResponseStatus.DECLINED, null);
+        }
+        LOGGER.info(
+                "Đang xử lý bid [auctionId: {}, bidder: {}, bidPrice: {}, currentPrice: {}, minimumIncrement: {}]",
+                getAuctionId(),
+                getBidder().getEmail(),
+                getBidPrice(),
+                auction.getCurrentPrice(),
+                auction.getMinimumIncrement());
+        if (getBidPrice() >= auction.getCurrentPrice() + auction.getMinimumIncrement()) {
+            changeAuctionDetail(auction);
+            changeBidderStatus();
             return new BidProcessResult(BidResponseStatus.ACCEPTED,
                     new BidUpdateResponse(getAuctionId(),getBidPrice(),getBidder().getEmail(),
                             getBidder().getUsername(),auction.getBidHistory()));
@@ -140,4 +155,5 @@ public class BidService {
                 auction.getCurrentPrice() + auction.getMinimumIncrement());
         return new BidProcessResult(BidResponseStatus.DECLINED, null);
     }
-}
+ }
+} 

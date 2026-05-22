@@ -26,11 +26,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Separator;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -83,7 +80,32 @@ public class AuctionDetailController extends Controller implements Initializable
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    // Khởi tạo mặc định, dữ liệu sẽ được set từ setAuctionData
+    showLoadingState();
+  }
+
+  /**
+   * Trạng thái chờ response để tránh hiển thị nhầm UI bid trước khi có dữ liệu thật.
+   */
+  private void showLoadingState() {
+    auctionTitleLabel.setText("Đang tải chi tiết đấu giá...");
+    auctionStatusBadge.setText("");
+    itemNameLabel.setText("");
+    descriptionLabel.setText("");
+    currentPriceLabel.setText("");
+    bidderStatusLabel.setText("");
+    bidderSubStatusLabel.setText("");
+    minimumBidLabel.setText("");
+    bidResultLabel.setText("");
+    endDateLabel.setText("");
+    totalBidsLabel.setText("");
+    sellerLabel.setText("");
+    winnerLabel.setText("");
+    productImageView.setImage(null);
+    bidHistoryContainer.getChildren().clear();
+
+    hideBidControls();
+    winnerBox.setVisible(false);
+    winnerBox.setManaged(false);
   }
 
   /**
@@ -167,8 +189,8 @@ public class AuctionDetailController extends Controller implements Initializable
       productImageView.setImage(image);
     }
 
-    // Lịch sử bid
-    renderBidHistory(auction.getBidHistory());
+    // Lịch sử khi mới vào phòng: render lại toàn bộ từ mảng ban đầu
+    initBidHistoryView(auction.getBidHistory());
 
     // Reset trạng thái
     bidResultLabel.setText("");
@@ -323,11 +345,41 @@ public class AuctionDetailController extends Controller implements Initializable
   }
 
   /**
-   * Render danh sách lịch sử bid.
-   *
-   * @param bidHistory danh sách bid
+   * Hàm trợ giúp tạo UI cho một dòng lịch sử đấu giá độc lập.
    */
-  private void renderBidHistory(ArrayList<BidTransaction> bidHistory) {
+  private HBox createBidRow(BidTransaction bid, boolean isLatest) {
+    HBox bidRow = new HBox(10);
+    bidRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+    Label userLabel = new Label(bid.getBidderUsername());
+    userLabel.setStyle("-fx-text-fill: #065f46; -fx-font-weight: bold;");
+
+    Label separator = new Label(" | ");
+    separator.setStyle("-fx-text-fill: #6ee7b7;");
+
+    Label amountLabel = new Label("$" + String.format("%.2f", bid.getBidAmount()));
+    amountLabel.setStyle("-fx-text-fill: #065f46; -fx-font-weight: bold;");
+
+    bidRow.getChildren().addAll(userLabel, separator, amountLabel);
+
+    if (isLatest) {
+      bidRow.setStyle(
+          "-fx-background-color: #bbf7d0; -fx-padding: 8 12; "
+              + "-fx-background-radius: 6; -fx-border-color: #4ade80; "
+              + "-fx-border-radius: 6;");
+    } else {
+      bidRow.setStyle(
+          "-fx-background-color: #d1fae5; -fx-padding: 8 12; "
+              + "-fx-background-radius: 6; -fx-border-color: #a7f3d0; "
+              + "-fx-border-radius: 6;");
+    }
+    return bidRow;
+  }
+
+  /**
+   * Khởi tạo toàn bộ danh sách lịch sử khi người dùng mới vào phòng.
+   */
+  private void initBidHistoryView(ArrayList<BidTransaction> bidHistory) {
     bidHistoryContainer.getChildren().clear();
     if (bidHistory == null || bidHistory.isEmpty()) {
       Label emptyLabel = new Label("Chưa có bid nào");
@@ -336,37 +388,41 @@ public class AuctionDetailController extends Controller implements Initializable
       return;
     }
 
-    // Hiển thị từ mới nhất đến cũ nhất
     for (int i = bidHistory.size() - 1; i >= 0; i--) {
       BidTransaction bid = bidHistory.get(i);
-      HBox bidRow = new HBox(10);
-      bidRow.setStyle(
-          "-fx-background-color: #d1fae5; -fx-padding: 8 12; "
-              + "-fx-background-radius: 6; -fx-border-color: #a7f3d0; "
-              + "-fx-border-radius: 6;");
-      bidRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-
-      Label userLabel = new Label(bid.getBidderUsername());
-      userLabel.setStyle("-fx-text-fill: #065f46; -fx-font-weight: bold;");
-
-      Label separator = new Label(" | ");
-      separator.setStyle("-fx-text-fill: #6ee7b7;");
-
-      Label amountLabel = new Label(
-          "$" + String.format("%.2f", bid.getBidAmount()));
-      amountLabel.setStyle("-fx-text-fill: #065f46; -fx-font-weight: bold;");
-
-      // Đánh dấu bid mới nhất
-      if (i == bidHistory.size() - 1) {
-        bidRow.setStyle(
-            "-fx-background-color: #bbf7d0; -fx-padding: 8 12; "
-                + "-fx-background-radius: 6; -fx-border-color: #4ade80; "
-                + "-fx-border-radius: 6;");
-      }
-
-      bidRow.getChildren().addAll(userLabel, separator, amountLabel);
+      boolean isLatest = (i == bidHistory.size() - 1);
+      HBox bidRow = createBidRow(bid, isLatest);
       bidHistoryContainer.getChildren().add(bidRow);
     }
+  }
+
+  /**
+   * Render danh sách lịch sử bid.
+   *
+   * @param bidHistory danh sách bid
+   */
+  private void renderBidHistory(ArrayList<BidTransaction> bidHistory) {
+    if (bidHistory == null || bidHistory.isEmpty()) {
+      return;
+    }
+
+    BidTransaction latestBid = bidHistory.get(bidHistory.size() - 1);
+    HBox newBidRow = createBidRow(latestBid, true);
+    if (bidHistoryContainer.getChildren().size() > 0 && !(bidHistoryContainer.getChildren().get(0) instanceof Label)) {
+      Node previousTopRow = bidHistoryContainer.getChildren().get(0);
+      previousTopRow.setStyle(
+          "-fx-background-color: #d1fae5; -fx-padding: 8 12; "
+          + "-fx-background-radius: 6; -fx-border-color: #a7f3d0; "
+          + "-fx-border-radius: 6;"
+      );
+    }
+
+
+    if (!bidHistoryContainer.getChildren().isEmpty() && bidHistoryContainer.getChildren().get(0) instanceof Label) {
+      bidHistoryContainer.getChildren().clear();
+    }
+
+    bidHistoryContainer.getChildren().add(0, newBidRow);
   }
 
   /**
@@ -457,74 +513,73 @@ public class AuctionDetailController extends Controller implements Initializable
 
   @Override
   public void handle(Object obj) {
-    if (obj instanceof GetAuctionDetailResponse) {
-      GetAuctionDetailResponse response = (GetAuctionDetailResponse) obj;
-      LOGGER.info(
-          "Nhận GetAuctionDetailResponse [auctionId: {}, status: {}, bidderStatus: {}]",
-          auctionId,
-          response.getAuctionStatus(),
-          response.getBidderStatus());
-      renderAuctionDetail(response);
+    Platform.runLater(() -> {
+      if (obj instanceof GetAuctionDetailResponse) {
+        GetAuctionDetailResponse response = (GetAuctionDetailResponse) obj;
+        LOGGER.info(
+            "Nhận GetAuctionDetailResponse [auctionId: {}, status: {}, bidderStatus: {}]",
+            auctionId,
+            response.getAuctionStatus(),
+            response.getBidderStatus());
+        renderAuctionDetail(response);
 
-    } else if (obj instanceof BidResultResponse) {
-      BidResultResponse response = (BidResultResponse) obj;
-      LOGGER.info(
-          "Nhận BidResultResponse [status: {}, message: {}]",
-          response.getBidResponseStatus(),
-          response.getMessage());
+      } else if (obj instanceof BidResultResponse) {
+        BidResultResponse response = (BidResultResponse) obj;
+        LOGGER.info(
+            "Nhận BidResultResponse [status: {}, message: {}]",
+            response.getBidResponseStatus(),
+            response.getMessage());
 
-      if (response.getBidResponseStatus() == BidResponseStatus.ACCEPTED) {
-        bidResultLabel.setText("✅ " + response.getMessage());
-        bidResultLabel.setStyle(
-            "-fx-text-fill: #16a34a; -fx-font-weight: bold; -fx-font-size: 13;");
-        bidAmountField.clear();
-      } else {
-        bidResultLabel.setText("❌ " + response.getMessage());
-        bidResultLabel.setStyle(
-            "-fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-font-size: 13;");
+        if (response.getBidResponseStatus() == BidResponseStatus.ACCEPTED) {
+          bidResultLabel.setText("✅ " + response.getMessage());
+          bidResultLabel.setStyle(
+              "-fx-text-fill: #16a34a; -fx-font-weight: bold; -fx-font-size: 13;");
+          bidAmountField.clear();
+        } else {
+          bidResultLabel.setText("❌ " + response.getMessage());
+          bidResultLabel.setStyle(
+              "-fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-font-size: 13;");
+        }
+
+      } else if (obj instanceof BidUpdateResponse) {
+        BidUpdateResponse update = (BidUpdateResponse) obj;
+        LOGGER.info(
+            "Nhận BidUpdateResponse [auctionId: {}, currentPrice: {}, winner: {}]",
+            update.getAuctionId(),
+            update.getCurrentPrice(),
+            update.getCurrentWinnerUsername());
+
+        handleBidUpdate(update);
       }
-
-    } else if (obj instanceof BidUpdateResponse) {
-      BidUpdateResponse update = (BidUpdateResponse) obj;
-      LOGGER.info(
-          "Nhận BidUpdateResponse [auctionId: {}, currentPrice: {}, winner: {}]",
-          update.getAuctionId(),
-          update.getCurrentPrice(),
-          update.getCurrentWinnerUsername());
-
-      handleBidUpdate(update);
-    }
+    });
   }
 
   /**
-   * Cập nhật realtime khi nhận BidUpdateResponse broadcast.
+   * Cập nhật realtime khi nhận gói thầu broadcast về từ socket.
    *
-   * @param update thông tin bid mới
+   * @param update thông tin nâng giá mới
    */
   private void handleBidUpdate(BidUpdateResponse update) {
-    // Cập nhật giá hiện tại
+    // 1. Cập nhật các thông tin giá tiền cơ bản
     currentPriceLabel.setText("Bid hiện tại: $"
         + String.format("%.2f", update.getCurrentPrice()));
 
-    // Cập nhật auction local
     if (currentAuction != null) {
       currentAuction.setCurrentPrice(update.getCurrentPrice());
+  
     }
 
-    // Cập nhật bid tối thiểu
-    double minIncrement = (currentAuction != null)
-        ? currentAuction.getMinimumIncrement() : 0;
+    double minIncrement = (currentAuction != null) ? currentAuction.getMinimumIncrement() : 0;
     double minBid = update.getCurrentPrice() + minIncrement;
     minimumBidLabel.setText("Bid tối thiểu: $" + String.format("%.2f", minBid));
 
-    // Cập nhật lịch sử bid
+    // 2. GỌI LOGIC TỐI ƯU: Chỉ bóc phần tử cuối cùng của mảng truyền vào đẩy lên UI
     renderBidHistory(update.getBidHistory());
     totalBidsLabel.setText("Tổng số bid: " + update.getBidHistory().size());
 
-    // Cập nhật trạng thái bidder dựa trên winner hiện tại
+    // 3. Cập nhật trạng thái người đấu giá
     if (currentUser != null
         && currentUser.getEmail().equals(update.getCurrentWinnerEmail())) {
-      // Mình đang thắng
       currentBidderStatus = BidderStatus.CURRENT_WINNER;
       bidderStatusLabel.setText("✅ Bạn là người đặt bid cao nhất ở hiện tại");
       bidderStatusLabel.setStyle(
@@ -538,7 +593,6 @@ public class AuctionDetailController extends Controller implements Initializable
       showBidInput();
     } else if (currentBidderStatus == BidderStatus.CURRENT_WINNER
         || currentBidderStatus == BidderStatus.OUTBID) {
-      // Mình bị outbid
       currentBidderStatus = BidderStatus.OUTBID;
       bidderStatusLabel.setText("⚠ Bạn đã bị outbid");
       bidderStatusLabel.setStyle(
@@ -546,7 +600,6 @@ public class AuctionDetailController extends Controller implements Initializable
       bidderSubStatusLabel.setText(
           "Bạn vẫn có thể thắng! Hãy đặt bid cao hơn");
 
-      // Quick bid
       quickBid1Value = minBid;
       quickBid2Value = minBid + minIncrement;
       quickBid1Button.setText("Bid $" + String.format("%.0f", quickBid1Value));
@@ -557,6 +610,5 @@ public class AuctionDetailController extends Controller implements Initializable
       orLabel.setManaged(true);
       showBidInput();
     }
-    // VIEWER và VIEWER_ONLY giữ nguyên trạng thái
   }
 }
