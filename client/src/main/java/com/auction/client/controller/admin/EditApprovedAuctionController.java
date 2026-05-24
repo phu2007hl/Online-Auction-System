@@ -278,7 +278,9 @@ public class EditApprovedAuctionController extends Controller implements Initial
       auctionRows.clear();
       ConcurrentHashMap<Integer, Auction> auctionList = response.getAuctionList();
       for (Integer id : auctionList.keySet()) {
-        addAuction(auctionList.get(id));
+        if(auctionList.get(id).getStatus() == AuctionStatus.OPEN){
+          addAuction(auctionList.get(id));
+          }
       }
     }
   }
