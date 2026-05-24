@@ -2,6 +2,7 @@ package com.auction.client.controller.auction;
 
 import com.auction.client.network.SocketClient;
 import com.auction.shared.auction.Auction;
+import com.auction.shared.enums.AuctionStatus;
 import com.auction.shared.model.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -34,6 +35,12 @@ public class AuctionBoxController {
   @FXML
   private Label endDateLabel;
 
+  @FXML
+  private Label categoryLabel;
+
+  @FXML
+  private Label statusLabel;
+
   /**
    * Gán dữ liệu cho ô sản phẩm.
    *
@@ -49,8 +56,32 @@ public class AuctionBoxController {
         ? "Không xác định"
         : auction.getSeller().getUsername();
     sellerLabel.setText("Người bán: " + sellerName);
+    categoryLabel.setText("Danh mục: " + auction.getCategory());
     endDateLabel.setText("Kết thúc: " + auction.getEndTime());
     priceLabel.setText("$" + String.format("%.2f", auction.getCurrentPrice()));
+    renderStatus(auction.getStatus());
+  }
+
+  private void renderStatus(AuctionStatus status) {
+    if (status == AuctionStatus.CLOSED) {
+      statusLabel.setText("ĐÃ KẾT THÚC");
+      statusLabel.setStyle(
+          "-fx-padding: 8 16; -fx-background-radius: 999; "
+              + "-fx-background-color: #fef2f2; -fx-text-fill: #dc2626; "
+              + "-fx-font-weight: bold; -fx-font-size: 14;");
+    } else if (status == AuctionStatus.CANCELLED) {
+      statusLabel.setText("ĐÃ HỦY");
+      statusLabel.setStyle(
+          "-fx-padding: 8 16; -fx-background-radius: 999; "
+              + "-fx-background-color: #f3f4f6; -fx-text-fill: #6b7280; "
+              + "-fx-font-weight: bold; -fx-font-size: 14;");
+    } else {
+      statusLabel.setText("ĐANG MỞ");
+      statusLabel.setStyle(
+          "-fx-padding: 8 16; -fx-background-radius: 999; "
+              + "-fx-background-color: #dcfce7; -fx-text-fill: #16a34a; "
+              + "-fx-font-weight: bold; -fx-font-size: 14;");
+    }
   }
 
   /**
