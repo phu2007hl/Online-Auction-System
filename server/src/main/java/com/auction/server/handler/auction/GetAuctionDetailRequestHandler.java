@@ -5,6 +5,7 @@ import com.auction.server.database.AuctionListDatabase;
 import com.auction.server.handler.RequestHandler;
 import com.auction.server.model.auction.AuctionBidderDetail;
 import com.auction.server.network.ClientHandler;
+import com.auction.server.service.auction.LockManager;
 import com.auction.shared.auction.Auction;
 import com.auction.shared.enums.AuctionStatus;
 import com.auction.shared.enums.BidderStatus;
@@ -31,10 +32,15 @@ public class GetAuctionDetailRequestHandler implements RequestHandler {
         String currentUserEmail = clientHandler.getUser().getEmail();
         AuctionStatus auctionStatus = auction.getStatus();
 
-        if(!auction.getEndTime().isAfter(LocalDate.now())){
-            auctionStatus = AuctionStatus.CLOSED;
-            auction.setStatus(AuctionStatus.CLOSED);
-            AuctionListDatabase.getInstance().saveData(auctionList);
+        synchronized (LockManager.getLock(auction.getId())) {
+            if (auction.getStatus() == AuctionStatus.OPEN
+                    && auction.getEndTime().isBefore(LocalDate.now())) {
+                auctionStatus = AuctionStatus.CLOSED;
+                auction.setStatus(AuctionStatus.CLOSED);
+                AuctionListDatabase.getInstance().saveData(auctionList);
+            } else {
+                auctionStatus = auction.getStatus();
+            }
         }
 
         BidderStatus bidderStatus = getBidderStatus(

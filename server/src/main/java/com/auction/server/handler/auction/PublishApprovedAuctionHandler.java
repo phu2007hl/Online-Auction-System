@@ -36,7 +36,7 @@ public class PublishApprovedAuctionHandler implements RequestHandler {
   @Override
   public Response handle(Request req, ClientHandler clientHandler) {
     PublishApprovedAuctionRequest request = (PublishApprovedAuctionRequest) req;
-    Auction auction = new Auction(request.getRequest().getId(),request.getRequest().getName() ,request.getRequest().getDescription(),request.getUser(),request.getRequest().getStartingPrice() ,5 ,request.getRequest().getEndDate(),request.getRequest().getImageContent(),request.getRequest().getCategory());
+    Auction auction = new Auction(request.getRequest().getId(),request.getRequest().getName() ,request.getRequest().getDescription(),request.getUser(),request.getRequest().getStartingPrice() ,request.getRequest().getMinimumIncrement() ,request.getRequest().getEndDate(),request.getRequest().getImageContent(),request.getRequest().getCategory());
     SaveApprovedAuction.saveToDatabase(auction);
     BroadcastApprovedAuction.broadcast(auction, clientHandler);
     RemoveRequestService.removeRequest(request.getRequest().getId());

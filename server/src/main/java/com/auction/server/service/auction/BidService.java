@@ -134,7 +134,7 @@ public class BidService {
                     getBidPrice());
             return new BidProcessResult(BidResponseStatus.DECLINED, null);
         }
-        if (auction.getStatus() == AuctionStatus.CANCELLED){
+        if (auction.getStatus() != AuctionStatus.OPEN){
             return new BidProcessResult(BidResponseStatus.DECLINED, null);
         }
         LOGGER.info(
