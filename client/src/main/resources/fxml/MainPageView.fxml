@@ -2,8 +2,8 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -36,7 +36,7 @@
                         onAction="#switchToLogin"
                         prefWidth="90"
                         prefHeight="30"
-                        style="-fx-background-color: transparent; -fx-border-color: #ef4444; -fx-text-fill: #ef4444; -fx-background-radius: 6; -fx-border-radius: 6;" />
+                        style="-fx-background-color: transparent; -fx-border-color: #ef4444; -fx-text-fill: #ef4444; -fx-background-radius: 6; -fx-border-radius: 6; -fx-cursor: hand;" />
             </children>
         </HBox>
     </top>
@@ -57,7 +57,7 @@
                         onAction="#switchToCreateAuction"
                         prefWidth="160"
                         prefHeight="40"
-                        style="-fx-background-color: #4f46e5; -fx-text-fill: white; -fx-background-radius: 8;" />
+                        style="-fx-background-color: #4f46e5; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;" />
             </children>
         </VBox>
     </left>
@@ -77,12 +77,30 @@
                 <Label text="Chào mừng đến với hệ thống đấu giá"
                        style="-fx-text-fill: #6b7280;" />
 
+                <HBox alignment="CENTER_RIGHT"
+                      maxWidth="Infinity"
+                      style="-fx-padding: 0 10 0 10;">
+                    <children>
+                        <Button text="Refresh"
+                                onAction="#refreshAuctionList"
+                                prefWidth="110"
+                                prefHeight="34"
+                                style="-fx-background-color: transparent; -fx-border-color: #4f46e5; -fx-text-fill: #4f46e5; -fx-background-radius: 8; -fx-border-radius: 8; -fx-cursor: hand;" />
+                    </children>
+                </HBox>
+
                 <!-- Vùng hiển thị các sản phẩm đấu giá -->
-                <FlowPane fx:id="productContainer"
-                          hgap="15"
-                          vgap="15"
-                          prefWrapLength="600"
-                          style="-fx-padding: 10;" />
+                <ScrollPane fitToWidth="true"
+                            prefHeight="420"
+                            style="-fx-background: transparent; -fx-background-color: transparent;"
+                            VBox.vgrow="ALWAYS">
+                    <content>
+                        <VBox fx:id="productContainer"
+                              spacing="12"
+                              fillWidth="true"
+                              style="-fx-padding: 10;" />
+                    </content>
+                </ScrollPane>
             </children>
         </VBox>
     </center>

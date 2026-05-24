@@ -18,6 +18,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -119,10 +120,15 @@ public class CheckedAuctionHistoryController extends Controller implements Initi
             }
 
             setText(status);
+            setAlignment(Pos.CENTER);
             if ("CHẤP NHẬN".equals(status)) {
-              setStyle("-fx-text-fill: #15803d; -fx-font-weight: bold;");
+              setStyle(
+                  "-fx-text-fill: #15803d; -fx-font-weight: bold; "
+                      + "-fx-background-color: #f0fdf4;");
             } else if ("TỪ CHỐI".equals(status)) {
-              setStyle("-fx-text-fill: #dc2626; -fx-font-weight: bold;");
+              setStyle(
+                  "-fx-text-fill: #dc2626; -fx-font-weight: bold; "
+                      + "-fx-background-color: #fef2f2;");
             } else {
               setStyle("");
             }
@@ -152,12 +158,12 @@ public class CheckedAuctionHistoryController extends Controller implements Initi
   }
 
   private void addCheckedRequest(PendingAuctionReviewRequest pendingRequest) {
-    if (pendingRequest == null || pendingRequest.getRequest() == null) {
+    if (pendingRequest == null || pendingRequest.getCreateAuctionRequest() == null) {
       LOGGER.warn("Bỏ qua checked auction request rỗng");
       return;
     }
 
-    CreateAuctionRequest auctionRequest = pendingRequest.getRequest();
+    CreateAuctionRequest auctionRequest = pendingRequest.getCreateAuctionRequest();
     byte[] imageContent = auctionRequest.getImageContent();
     Image image = null;
     if (imageContent != null && imageContent.length > 0) {

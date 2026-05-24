@@ -1,13 +1,21 @@
 package com.auction.server.database;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+
+import com.auction.shared.model.User;
+
+import ch.qos.logback.classic.Logger;
 
 public abstract class Database<K> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(Database.class);
+  private static final Logger LOGGER = (Logger) LoggerFactory.getLogger(Database.class);
   private K data;
   private String path;
   public abstract K createEmptyData();
@@ -16,14 +24,10 @@ public abstract class Database<K> {
   }
 
   private K loadData(){
-    File file = new File(path);
-    if(!file.exists() || file.length()==0){
-      return createEmptyData();
-    }
     try {
       ObjectInputStream in =
       new ObjectInputStream(
-      new BufferedInputStream(new FileInputStream(file)));
+      new BufferedInputStream(new FileInputStream(path)));
       K loadedUserData =
       (K) in.readObject();
       in.close();
@@ -34,24 +38,17 @@ public abstract class Database<K> {
     }
   }
   public void saveData(K dat){
-    File tempFile = new File(path + ".tmp");
     try {
+
+      data = dat;
       ObjectOutputStream out =
       new ObjectOutputStream(
-      new BufferedOutputStream(new FileOutputStream(tempFile)));
-      out.writeObject(dat);
+      new BufferedOutputStream(new FileOutputStream(path)));
+      out.writeObject(data);
       out.close();
-      Files.move(
-          tempFile.toPath(),
-          new File(path).toPath(),
-          StandardCopyOption.REPLACE_EXISTING);
-      data = dat;
       LOGGER.info("Đã lưu dữ liệu");
     } catch (Exception e) {
       LOGGER.error("Không thể lưu dữ liệu", e);
-      if (tempFile.exists() && !tempFile.delete()) {
-        LOGGER.warn("Không thể xóa file tạm {}", tempFile.getName());
-      }
     }
   }
 

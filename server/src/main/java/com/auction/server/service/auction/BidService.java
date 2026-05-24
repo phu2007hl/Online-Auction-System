@@ -9,6 +9,7 @@ import com.auction.server.model.auction.AuctionBidderDetail;
 import com.auction.server.model.auction.BidProcessResult;
 import com.auction.shared.auction.Auction;
 import com.auction.shared.auction.BidTransaction;
+import com.auction.shared.enums.AuctionStatus;
 import com.auction.shared.enums.BidResponseStatus;
 import com.auction.shared.enums.BidderStatus;
 import com.auction.shared.model.User;
@@ -131,6 +132,9 @@ public class BidService {
                     getAuctionId(),
                     getBidder().getEmail(),
                     getBidPrice());
+            return new BidProcessResult(BidResponseStatus.DECLINED, null);
+        }
+        if (auction.getStatus() == AuctionStatus.CANCELLED){
             return new BidProcessResult(BidResponseStatus.DECLINED, null);
         }
         LOGGER.info(

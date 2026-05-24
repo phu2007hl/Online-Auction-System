@@ -14,6 +14,8 @@ import com.auction.shared.request.auction.LeaveRoomRequest;
 import com.auction.shared.response.auction.BidResultResponse;
 import com.auction.shared.response.auction.BidUpdateResponse;
 import com.auction.shared.response.auction.GetAuctionDetailResponse;
+import com.auction.shared.response.auction.UpdateAuctionResponse;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -152,6 +154,62 @@ public class AuctionDetailController extends Controller implements Initializable
   public void setCurrentUser(User currentUser) {
     this.currentUser = currentUser;
   }
+  /**
+ * Cập nhật giao diện khi auction được chỉnh sửa.
+ *
+ * @param update dữ liệu auction mới
+ */
+private void updateAuction(UpdateAuctionResponse update) {
+
+  // Update item name
+  itemNameLabel.setText(update.getUpdatedAuction().getItemName());
+
+  // Update description
+  descriptionLabel.setText(update.getUpdatedAuction().getDescription());
+
+  // Update category if bạn có label category
+  // categoryLabel.setText(update.getCategory());
+
+  // Update image
+  if (update.getUpdatedAuction().getImageContent() != null
+      && update.getUpdatedAuction().getImageContent().length > 0) {
+
+    Image image =
+        new Image(new ByteArrayInputStream(update.getUpdatedAuction().getImageContent()));
+
+    productImageView.setImage(image);
+  }
+  if (AuctionStatus.CANCELLED.equals(update.getUpdatedAuction().getAuctionStatus())){
+    if (currentAuction != null) {
+      currentAuction.setStatus(AuctionStatus.CANCELLED);
+    }
+    auctionStatusBadge.setText("ĐÃ BỊ HUỶ");
+    auctionStatusBadge.setStyle(
+        "-fx-padding: 4 12; -fx-background-radius: 12; "
+            + "-fx-background-color: #868383; -fx-text-fill: #c5bcbc; "
+            + "-fx-font-weight: bold; -fx-font-size: 12;");
+            hideBidControls();
+  }
+
+  // Update local auction object
+  if (currentAuction != null) {
+    currentAuction.setItemName(update.getUpdatedAuction().getItemName());
+    currentAuction.setDescription(update.getUpdatedAuction().getDescription());
+    currentAuction.setCategory(update.getUpdatedAuction().getCategory());
+    currentAuction.setImageContent(update.getUpdatedAuction().getImageContent());
+    currentAuction.setStatus(update.getUpdatedAuction().getAuctionStatus());
+    currentAuction.setImageContent(update.getUpdatedAuction().getImageContent());
+
+
+    // Nếu Auction có category
+    // currentAuction.setCategory(update.getCategory());
+
+  }
+
+  LOGGER.info(
+      "Phiên đấu giá đã được cập nhật [auctionId: {}]",
+      update.getUpdatedAuction().getId());
+}
 
   /**
    * Render giao diện dựa trên response chi tiết auction.
@@ -199,7 +257,10 @@ public class AuctionDetailController extends Controller implements Initializable
     // Xử lý theo trạng thái
     if (auctionStatus == AuctionStatus.CLOSED) {
       renderClosedAuction(auction);
-    } else {
+    } else if (auctionStatus == AuctionStatus.CANCELLED) {
+      renderCancelledAuction(auction);
+    }
+    else{
       renderOpenAuction(auction, bidderStatus);
     }
   }
@@ -227,6 +288,24 @@ public class AuctionDetailController extends Controller implements Initializable
       winnerBox.setManaged(true);
       winnerLabel.setText(auction.getWinner().getUsername());
     }
+
+    // Ẩn tất cả controls bid
+    hideBidControls();
+  }
+  private void renderCancelledAuction(Auction auction){
+      auctionStatusBadge.setText("ĐÃ BỊ HUỶ");
+    auctionStatusBadge.setStyle(
+        "-fx-padding: 4 12; -fx-background-radius: 12; "
+            + "-fx-background-color: #868383; -fx-text-fill: #c5bcbc; "
+            + "-fx-font-weight: bold; -fx-font-size: 12;");
+
+    currentPriceLabel.setStyle("-fx-text-fill: #6b7280;");
+
+    bidderStatusLabel.setText("Phiên đấu giá đã bị huỷ");
+    bidderStatusLabel.setStyle(
+        "-fx-text-fill: #c71e1e; -fx-font-weight: bold; -fx-font-size: 14;");
+    bidderSubStatusLabel.setText("Chỉ có thể xem lịch sử đặt bid");
+
 
     // Ẩn tất cả controls bid
     hideBidControls();
@@ -550,6 +629,11 @@ public class AuctionDetailController extends Controller implements Initializable
             update.getCurrentWinnerUsername());
 
         handleBidUpdate(update);
+      }
+      else if (obj instanceof UpdateAuctionResponse){
+        UpdateAuctionResponse update = (UpdateAuctionResponse) obj;
+        updateAuction(update);
+
       }
     });
   }

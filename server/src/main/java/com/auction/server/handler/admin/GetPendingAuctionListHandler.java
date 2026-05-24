@@ -4,9 +4,9 @@ import com.auction.server.database.PendingAuctionDatabase;
 import com.auction.server.handler.RequestHandler;
 import com.auction.server.network.ClientHandler;
 import com.auction.shared.request.Request;
+import com.auction.shared.request.auction.PendingAuctionReviewRequest;
 import com.auction.shared.response.Response;
 import com.auction.shared.response.admin.GetPendingAuctionListResponse;
-import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -22,7 +22,8 @@ public class GetPendingAuctionListHandler implements RequestHandler {
   */
   @Override
   public Response handle(Request request, ClientHandler clienthandler) {
-    ConcurrentHashMap<Integer,Request> requestList = PendingAuctionDatabase.getInstance().getData();
+    ConcurrentHashMap<Integer, PendingAuctionReviewRequest> requestList =
+        PendingAuctionDatabase.getInstance().getData();
     return new GetPendingAuctionListResponse(true, requestList);
   }
 }

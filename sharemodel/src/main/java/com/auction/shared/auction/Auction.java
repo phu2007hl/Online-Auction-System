@@ -122,6 +122,15 @@ public class Auction extends Entity {
   public void setCurrentPrice(double currentPrice){
     this.currentPrice = currentPrice;
   }
+  public void setCategory(String category){
+    this.category = category;
+  }
+  public void setDescription(String description){
+    this.description = description;
+  }
+  public void setImageContent(byte[] imageContent){
+    this.imageContent = imageContent;
+  }
   
 
   

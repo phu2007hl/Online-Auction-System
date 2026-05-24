@@ -1,6 +1,6 @@
 package com.auction.server.service.auction;
 import com.auction.server.network.ClientHandler;
-import com.auction.shared.response.auction.BidUpdateResponse;
+import com.auction.shared.response.Response;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -47,7 +47,7 @@ public class AuctionRoomManager {
         return removed;
     }
 
-    public static void broadcast(int auctionId, BidUpdateResponse bidUpdateResponse){
+    public static void broadcast(int auctionId, Response response){
         Set<ClientHandler> auctionRoom = auctionRooms.get(auctionId);
         if (auctionRoom == null || auctionRoom.isEmpty()) {
             LOGGER.info("Bỏ qua broadcast vì auction room rỗng [auctionId: {}]", auctionId);
@@ -56,12 +56,16 @@ public class AuctionRoomManager {
         Set<ClientHandler> failedClients = new HashSet<>();
         for(ClientHandler clientHandler : auctionRoom){
             try {
-                clientHandler.getOutputStream().writeObject(bidUpdateResponse);
+                clientHandler.getOutputStream().writeObject(response);
                 clientHandler.getOutputStream().flush();
                 clientHandler.getOutputStream().reset();
             } catch (IOException e) {
                 failedClients.add(clientHandler);
-                LOGGER.warn("Không thể broadcast bid update tới một client [auctionId: {}]", auctionId, e);
+                LOGGER.warn(
+                    "Không thể broadcast response tới một client [auctionId: {}, response: {}]",
+                    auctionId,
+                    response.getClass().getSimpleName(),
+                    e);
             }
         }
         auctionRoom.removeAll(failedClients);
@@ -69,8 +73,9 @@ public class AuctionRoomManager {
             auctionRooms.remove(auctionId, auctionRoom);
         }
         LOGGER.info(
-                "Đã broadcast bid update [auctionId: {}, successCount: {}, failedCount: {}]",
+                "Đã broadcast response [auctionId: {}, response: {}, successCount: {}, failedCount: {}]",
                 auctionId,
+                response.getClass().getSimpleName(),
                 auctionRoom.size(),
                 failedClients.size());
     }

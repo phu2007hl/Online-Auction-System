@@ -29,7 +29,7 @@ public class PendingAuctionReviewRequest extends Request {
   *
   * @return request tạo auction
   */
-  public CreateAuctionRequest getRequest() {
+  public CreateAuctionRequest getCreateAuctionRequest() {
     return request;
   }
 
