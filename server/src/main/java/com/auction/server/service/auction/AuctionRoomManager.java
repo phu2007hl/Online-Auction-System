@@ -1,5 +1,6 @@
 package com.auction.server.service.auction;
 import com.auction.server.network.ClientHandler;
+import com.auction.shared.response.Response;
 import com.auction.shared.response.auction.BidUpdateResponse;
 
 import java.io.IOException;
@@ -47,7 +48,7 @@ public class AuctionRoomManager {
         return removed;
     }
 
-    public static void broadcast(int auctionId, BidUpdateResponse bidUpdateResponse){
+    public static void broadcast(int auctionId, Response response){
         Set<ClientHandler> auctionRoom = auctionRooms.get(auctionId);
         if (auctionRoom == null || auctionRoom.isEmpty()) {
             LOGGER.info("Bỏ qua broadcast vì auction room rỗng [auctionId: {}]", auctionId);
@@ -56,7 +57,7 @@ public class AuctionRoomManager {
         Set<ClientHandler> failedClients = new HashSet<>();
         for(ClientHandler clientHandler : auctionRoom){
             try {
-                clientHandler.getOutputStream().writeObject(bidUpdateResponse);
+                clientHandler.getOutputStream().writeObject(response);
                 clientHandler.getOutputStream().flush();
                 clientHandler.getOutputStream().reset();
             } catch (IOException e) {

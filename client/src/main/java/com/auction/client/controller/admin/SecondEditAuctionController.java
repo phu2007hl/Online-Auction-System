@@ -32,11 +32,11 @@ import org.slf4j.LoggerFactory;
 /**
 * Controller cho màn hình admin chỉnh sửa request tạo auction đang chờ duyệt.
 */
-public class EditAuctionController extends Controller {
-  private static final Logger LOGGER = LoggerFactory.getLogger(EditAuctionController.class);
+public class SecondEditAuctionController extends Controller {
+  private static final Logger LOGGER = LoggerFactory.getLogger(SecondEditAuctionController.class);
 
   private SocketClient socket;
-  private PendingAuctionReviewRequest pendingRequest;
+  private Auction auction;
   private byte[] imageContent;
 
   @FXML
@@ -78,27 +78,26 @@ public class EditAuctionController extends Controller {
     socket.startListening();
   }
 
-  public void setPendingRequest(PendingAuctionReviewRequest pendingRequest) {
-    this.pendingRequest = pendingRequest;
+  public void setAuction(Auction auction) {
+    this.auction = auction;
     fillForm();
   }
 
   private void fillForm() {
-    if (pendingRequest == null || pendingRequest.getCreateAuctionRequest() == null) {
+    if (auction == null) {
       return;
     }
 
-    CreateAuctionRequest request = pendingRequest.getCreateAuctionRequest();
-    imageContent = request.getImageContent();
+    imageContent = auction.getImageContent();
 
-    requestIdField.setText(String.valueOf(request.getId()));
-    ownerField.setText(pendingRequest.getUser().getUsername());
-    productNameField.setText(request.getName());
-    categoryComboBox.setValue(request.getCategory());
-    startingPriceField.setText(String.format("%.2f", request.getStartingPrice()));
-    minimumIncrementField.setText(String.format("%.2f", request.getMinimumIncrement()));
-    endDatePicker.setValue(request.getEndDate());
-    descriptionArea.setText(request.getDescription());
+    requestIdField.setText(String.valueOf(auction.getId()));
+    ownerField.setText(auction.getSeller().getUsername());
+    productNameField.setText(auction.getItemName());
+    categoryComboBox.setValue(auction.getCategory());
+    startingPriceField.setText(String.format("%.2f", auction.getStartingPrice()));
+    minimumIncrementField.setText(String.format("%.2f", auction.getMinimumIncrement()));
+    endDatePicker.setValue(auction.getEndTime());
+    descriptionArea.setText(auction.getDescription());
 
     if (imageContent != null && imageContent.length > 0) {
       previewImageView.setImage(new Image(new ByteArrayInputStream(imageContent)));
@@ -132,8 +131,8 @@ public class EditAuctionController extends Controller {
 
   @FXML
   private void handleSaveEdit(ActionEvent event) {
-    if (pendingRequest == null || pendingRequest.getCreateAuctionRequest() == null) {
-      showError("Không tìm thấy request cần chỉnh sửa");
+    if (auction == null) {
+      showError("Không tìm thấy auction cần chỉnh sửa");
       return;
     }
 
@@ -149,7 +148,7 @@ public class EditAuctionController extends Controller {
       return;
     }
 
-    int requestId = pendingRequest.getCreateAuctionRequest().getId();
+    int requestId = auction.getId();
     EditAuctionRequest editRequest =
         new EditAuctionRequest(
             imageContent,
@@ -157,11 +156,11 @@ public class EditAuctionController extends Controller {
             category,
             description,
             itemName,
-            CreateAuctionStatus.PENDING);
+            CreateAuctionStatus.SUCCESS);
     socket.sendRequest(editRequest);
     messageLabel.setStyle("-fx-text-fill: #16a34a; -fx-font-weight: bold;");
     messageLabel.setText("Đang lưu chỉnh sửa...");
-    LOGGER.info("Đã gửi request chỉnh sửa pending auction [requestId: {}]", requestId);
+    LOGGER.info("Đã gửi request chỉnh sửa success auction [requestId: {}]", requestId);
   }
 
   @Override
@@ -170,7 +169,7 @@ public class EditAuctionController extends Controller {
       if (response.getResponse()) {
         messageLabel.setStyle("-fx-text-fill: #16a34a; -fx-font-weight: bold;");
         messageLabel.setText("Đã lưu chỉnh sửa");
-        switchToAdminDashboard();
+        switchToEditApprovedAuction();
       } else {
         showError("Không thể lưu chỉnh sửa");
       }
@@ -178,24 +177,24 @@ public class EditAuctionController extends Controller {
   }
 
   @FXML
-  private void switchToAdminDashboard(ActionEvent event) {
-    switchToAdminDashboard();
+  private void switchToEditApprovedAuction(ActionEvent event) {
+    switchToEditApprovedAuction();
   }
 
-  private void switchToAdminDashboard() {
+  private void switchToEditApprovedAuction() {
     try {
-      FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AdminDashboard.fxml"));
+      FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/EditApprovedAuctionView.fxml"));
       Parent root = loader.load();
 
-      AdminDashboardController controller = loader.getController();
+      EditApprovedAuctionController controller = loader.getController();
       controller.setSocketClient(socket);
 
       Stage stage = (Stage) messageLabel.getScene().getWindow();
       stage.getScene().setRoot(root);
-      stage.setTitle("Bảng điều khiển admin");
+      stage.setTitle("Bảng điều chỉnh sửa auction");
       stage.show();
     } catch (IOException e) {
-      LOGGER.error("Không thể quay lại dashboard admin sau khi chỉnh sửa", e);
+      LOGGER.error("Không thể quay lại bảng chỉnh sửa sau khi chỉnh sửa", e);
     }
   }
 
@@ -204,3 +203,4 @@ public class EditAuctionController extends Controller {
     messageLabel.setText(message);
   }
 }
+

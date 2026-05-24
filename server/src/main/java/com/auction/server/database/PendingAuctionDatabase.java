@@ -9,6 +9,7 @@ public class PendingAuctionDatabase extends Database<ConcurrentHashMap<Integer, 
   private PendingAuctionDatabase(){
     super("PendingAuction.ser");
   }
+
   public static PendingAuctionDatabase getInstance(){
     if (instance == null){
       instance = new PendingAuctionDatabase();
