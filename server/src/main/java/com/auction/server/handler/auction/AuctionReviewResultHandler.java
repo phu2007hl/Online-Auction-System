@@ -2,12 +2,11 @@ package com.auction.server.handler.auction;
 
 import com.auction.server.handler.RequestHandler;
 import com.auction.server.network.ClientHandler;
-import com.auction.shared.model.User;
 import com.auction.shared.request.Request;
 import com.auction.shared.request.auction.AuctionReviewResultRequest;
 import com.auction.shared.response.Response;
 import com.auction.shared.response.auction.UpdateUserResponse;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,13 +26,21 @@ public class AuctionReviewResultHandler implements RequestHandler {
   */
   @Override
   public Response handle(Request request, ClientHandler clienthandler) {
-    HashMap<String, ClientHandler> auctionRequestSenders =
+    ConcurrentHashMap<String, ClientHandler> auctionRequestSenders =
         ClientHandler.getAuctionRequestSenders();
     AuctionReviewResultRequest req = (AuctionReviewResultRequest) request;
+    ClientHandler sender = auctionRequestSenders.get(req.getUser().getEmail());
+    if (sender == null) {
+      LOGGER.warn(
+          "Không tìm thấy client để gửi kết quả duyệt [email: {}]",
+          req.getUser().getEmail());
+      return new UpdateUserResponse(false);
+    }
     try {
-      auctionRequestSenders.get(req.getUser().getEmail()).getOutputStream().writeObject(req);
+      sender.sendObject(req);
     } catch (Exception e) {
-          LOGGER.error("Không thể gửi kết quả duyệt về user", e);
+      LOGGER.error("Không thể gửi kết quả duyệt về user", e);
+      return new UpdateUserResponse(false);
     }
     return new UpdateUserResponse(true);
   }

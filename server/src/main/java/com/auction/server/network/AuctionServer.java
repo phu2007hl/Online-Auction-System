@@ -5,6 +5,7 @@ import com.auction.server.database.AuctionBidderDetailDatabase;
 import com.auction.server.database.AuctionListDatabase;
 import com.auction.server.database.PendingAuctionDatabase;
 import com.auction.server.database.UserDatabase;
+import com.auction.server.service.auction.AuctionClosingScheduler;
 import java.net.ServerSocket;
 import java.net.Socket;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ public class AuctionServer {
       AuctionListDatabase auctionListDatabase = AuctionListDatabase.getInstance();
       PendingAuctionDatabase pendingAuctionDatabase = PendingAuctionDatabase.getInstance();
       UserDatabase userDatabase = UserDatabase.getInstance();
+      AuctionClosingScheduler.start();
 
       ServerSocket server = new ServerSocket(4100);
       LOGGER.info("Server đã khởi động ở cổng 4100");

@@ -11,10 +11,7 @@ import com.auction.shared.model.User;
 import com.auction.shared.request.auction.BidRequest;
 import com.auction.shared.request.auction.GetAuctionDetailRequest;
 import com.auction.shared.request.auction.LeaveRoomRequest;
-import com.auction.shared.response.auction.BidResultResponse;
-import com.auction.shared.response.auction.BidUpdateResponse;
-import com.auction.shared.response.auction.GetAuctionDetailResponse;
-import com.auction.shared.response.auction.UpdateAuctionResponse;
+import com.auction.shared.response.auction.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -634,6 +631,17 @@ private void updateAuction(UpdateAuctionResponse update) {
         UpdateAuctionResponse update = (UpdateAuctionResponse) obj;
         updateAuction(update);
 
+      }
+      else if(obj instanceof AuctionAutoCloseResponse){
+        AuctionAutoCloseResponse response = (AuctionAutoCloseResponse) obj;
+        if (response.getResponse() && currentAuction != null) {
+          LOGGER.info("Nhận AuctionAutoCloseResponse [auctionId: {}]", currentAuction.getId());
+          currentAuction.setStatus(AuctionStatus.CLOSED);
+          renderClosedAuction(currentAuction);
+          bidResultLabel.setText("Phiên đấu giá đã tự động kết thúc");
+          bidResultLabel.setStyle(
+              "-fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-font-size: 13;");
+        }
       }
     });
   }

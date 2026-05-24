@@ -5,11 +5,12 @@ import com.auction.server.handler.RequestHandler;
 import com.auction.shared.model.User;
 import com.auction.shared.request.Request;
 import com.auction.shared.response.Response;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,10 +24,11 @@ public class ClientHandler implements Runnable {
   private ObjectOutputStream out;
   private ObjectInputStream in;
   private RequestDispatcher dispatcher = new RequestDispatcher();
-  private static AdminHandler adminHandler;
+  private static volatile AdminHandler adminHandler;
   private User user;
-  private static HashMap<String, ClientHandler> auctionRequestSenders;
-  private static ArrayList<ClientHandler> onlineUser = new ArrayList<>();
+  private static final ConcurrentHashMap<String, ClientHandler> auctionRequestSenders =
+      new ConcurrentHashMap<>();
+  private static final Set<ClientHandler> onlineUser = ConcurrentHashMap.newKeySet();
 
   /**
   * Tạo client handler mới.
@@ -70,9 +72,7 @@ public class ClientHandler implements Runnable {
         RequestHandler handler = dispatcher.getHandler(request);
         Response response = handler.handle(request, this);
 
-        out.writeObject(response);
-        out.flush();
-        out.reset();
+        sendObject(response);
       }
     } catch (Exception e) {
       String userContext = (user != null) ? user.getUsername() : "unknown";
@@ -87,6 +87,23 @@ public class ClientHandler implements Runnable {
   */
   public ObjectOutputStream getOutputStream() {
     return out;
+  }
+
+  /**
+  * Gửi object qua output stream của client theo cách tuần tự.
+  *
+  * @param object object cần gửi
+  * @throws IOException nếu không thể ghi dữ liệu
+  */
+  public void sendObject(Object object) throws IOException {
+    if (out == null) {
+      throw new IOException("Output stream chưa được khởi tạo");
+    }
+    synchronized (out) {
+      out.writeObject(object);
+      out.flush();
+      out.reset();
+    }
   }
 
   /**
@@ -166,7 +183,7 @@ public class ClientHandler implements Runnable {
   *
   * @return danh sách client online
   */
-  public static ArrayList<ClientHandler> getOnlineUser() {
+  public static Set<ClientHandler> getOnlineUser() {
     return onlineUser;
   }
 
@@ -177,8 +194,9 @@ public class ClientHandler implements Runnable {
   * @param clientHandler client handler tương ứng
   */
   public static void rememberAuctionRequestSender(User user, ClientHandler clientHandler) {
-    if (auctionRequestSenders == null) {
-      auctionRequestSenders = new HashMap<>();
+    if (user == null || user.getEmail() == null || clientHandler == null) {
+      LOGGER.warn("Không thể ghi nhớ auction request sender vì thiếu dữ liệu");
+      return;
     }
     auctionRequestSenders.put(user.getEmail(), clientHandler);
   }
@@ -189,7 +207,7 @@ public class ClientHandler implements Runnable {
   * @param user user cần xóa mapping
   */
   public static void removeAuctionRequestSender(User user) {
-    if (auctionRequestSenders != null) {
+    if (user != null && user.getEmail() != null) {
       auctionRequestSenders.remove(user.getEmail());
     }
   }
@@ -199,10 +217,7 @@ public class ClientHandler implements Runnable {
   *
   * @return map user-client
   */
-  public static HashMap<String, ClientHandler> getAuctionRequestSenders() {
-    if (auctionRequestSenders == null) {
-      auctionRequestSenders = new HashMap<>();
-    }
+  public static ConcurrentHashMap<String, ClientHandler> getAuctionRequestSenders() {
     return auctionRequestSenders;
   }
 }

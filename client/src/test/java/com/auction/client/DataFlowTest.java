@@ -28,6 +28,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -60,9 +61,9 @@ public class DataFlowTest {
         controller3 = new MainPageController();
         controller4 = new CreateAuctionPageController();
         controller5 = new RegisterController();
-      AuctionListDatabase auctionListDatabase = AuctionListDatabase.getInstance();
-      PendingAuctionDatabase pendingAuctionDatabase = PendingAuctionDatabase.getInstance();
-      UserDatabase userDatabase = UserDatabase.getInstance();       
+      AuctionListDatabase auctionListDatabase = new AuctionListDatabase(new File("data-test/AuctionList.ser"));
+      PendingAuctionDatabase pendingAuctionDatabase = new PendingAuctionDatabase(new File("data-test/PendingAuction.ser"));
+      UserDatabase userDatabase = new UserDatabase(new File("data-test/User.ser"));       
         new Thread(() -> {
             try (ServerSocket server = new ServerSocket(4556)) {
                 server.setSoTimeout(5000);

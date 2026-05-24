@@ -13,7 +13,6 @@ import com.auction.shared.request.auction.CreateAuctionRequest;
 import com.auction.shared.request.auction.GetApprovedAuctionListRequest;
 import com.auction.shared.request.auction.PendingAuctionReviewRequest;
 import com.auction.shared.request.auction.PublishApprovedAuctionRequest;
-import com.auction.shared.request.auction.ToDatabaseRequest;
 import com.auction.shared.response.admin.GetPendingAuctionListResponse;
 import com.auction.shared.response.auction.GetApprovedAuctionListResponse;
 

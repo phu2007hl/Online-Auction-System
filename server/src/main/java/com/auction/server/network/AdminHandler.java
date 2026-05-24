@@ -3,8 +3,6 @@ package com.auction.server.network;
 import com.auction.shared.request.Request;
 import com.auction.shared.response.Response;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,9 +12,8 @@ import org.slf4j.LoggerFactory;
 public class AdminHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(AdminHandler.class);
 
-  private final Socket connection;
+  private final ClientHandler adminClientHandler;
   private final ObjectInputStream in;
-  private final ObjectOutputStream out;
 
   /**
   * Tạo admin handler từ connection hiện có.
@@ -24,9 +21,8 @@ public class AdminHandler {
   * @param clienthandler client handler của admin
   */
   public AdminHandler(ClientHandler clienthandler) {
-    this.connection = clienthandler.getConnection();
+    this.adminClientHandler = clienthandler;
     this.in = clienthandler.getInputStream();
-    this.out = clienthandler.getOutputStream();
   }
 
   /**
@@ -41,7 +37,7 @@ public class AdminHandler {
           (clientHandler.getUser() != null)
               ? clientHandler.getUser().getUsername()
               : "unknown";
-      out.writeObject(request);
+      adminClientHandler.sendObject(request);
       LOGGER.info(
           "Đã chuyển request {} tới admin [user: {}]",
           request.getClass().getSimpleName(),
