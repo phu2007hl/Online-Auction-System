@@ -1,5 +1,6 @@
 package com.auction.server.database;
 
+import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.auction.server.model.auction.AuctionBidderDetail;
@@ -8,6 +9,9 @@ public class AuctionBidderDetailDatabase extends Database<ConcurrentHashMap<Inte
   private static AuctionBidderDetailDatabase instance;
   private AuctionBidderDetailDatabase(){
     super("AuctionDetail.ser");
+  }
+  public AuctionBidderDetailDatabase(File dataFile){
+    super(dataFile);
   }
   public static AuctionBidderDetailDatabase getInstance(){
     if (instance == null){
