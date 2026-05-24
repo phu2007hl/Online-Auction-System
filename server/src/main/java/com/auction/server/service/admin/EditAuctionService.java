@@ -27,7 +27,9 @@ public class EditAuctionService {
         auction.setDescription(editAuctionRequest.getDescription());
         auction.setImageContent(editAuctionRequest.getImageContent());
         auction.setItemName(editAuctionRequest.getItemName());
-        auction.setStatus(editAuctionRequest.getAuctionStatus());
+        if (editAuctionRequest.getAuctionStatus() != null) {
+            auction.setStatus(editAuctionRequest.getAuctionStatus());
+        }
     }
     // Sửa thông tin trong Dashboard trước khi duyệt/từ chối
     public static boolean editBeforeApprove(EditAuctionRequest editAuctionRequest){
@@ -58,15 +60,17 @@ public class EditAuctionService {
     public static boolean editAfterApprove(EditAuctionRequest editAuctionRequest){
         synchronized(LockManager.getLock(editAuctionRequest.getId())){
         ConcurrentHashMap<Integer,Auction> approvedAuctionList = AuctionListDatabase.getInstance().getData();
-        if (editAuctionRequest.getAuctionStatus() == AuctionStatus.CANCELLED){
-            approvedAuctionList.remove(editAuctionRequest.getId());
-            AuctionListDatabase.getInstance().saveData(approvedAuctionList);
-            return true;
-        }
         Auction auction = approvedAuctionList.get(editAuctionRequest.getId());
         if (auction == null){
-            LOGGER.warn("Không tìm thấy auction để chỉnh sửa [auctionId: {}]",auction.getId());
+            LOGGER.warn("Không tìm thấy auction để chỉnh sửa [auctionId: {}]", editAuctionRequest.getId());
             return false;
+        }
+        if (editAuctionRequest.getAuctionStatus() == AuctionStatus.CANCELLED){
+            auction.setStatus(AuctionStatus.CANCELLED);
+            approvedAuctionList.put(auction.getId(), auction);
+            AuctionListDatabase.getInstance().saveData(approvedAuctionList);
+            LOGGER.info("Đã hủy auction [auctionId: {}]", editAuctionRequest.getId());
+            return true;
         }
         updateAuction(auction, editAuctionRequest);
         approvedAuctionList.put(auction.getId(), auction);

@@ -179,7 +179,10 @@ private void updateAuction(UpdateAuctionResponse update) {
 
     productImageView.setImage(image);
   }
-  if (update.getUpdatedAuction().getAuctionStatus().equals(AuctionStatus.CANCELLED)){
+  if (AuctionStatus.CANCELLED.equals(update.getUpdatedAuction().getAuctionStatus())){
+    if (currentAuction != null) {
+      currentAuction.setStatus(AuctionStatus.CANCELLED);
+    }
     auctionStatusBadge.setText("ĐÃ BỊ HUỶ");
     auctionStatusBadge.setStyle(
         "-fx-padding: 4 12; -fx-background-radius: 12; "

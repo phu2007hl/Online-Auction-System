@@ -1,7 +1,6 @@
 package com.auction.server.service.auction;
 import com.auction.server.network.ClientHandler;
 import com.auction.shared.response.Response;
-import com.auction.shared.response.auction.BidUpdateResponse;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -62,7 +61,11 @@ public class AuctionRoomManager {
                 clientHandler.getOutputStream().reset();
             } catch (IOException e) {
                 failedClients.add(clientHandler);
-                LOGGER.warn("Không thể broadcast bid update tới một client [auctionId: {}]", auctionId, e);
+                LOGGER.warn(
+                    "Không thể broadcast response tới một client [auctionId: {}, response: {}]",
+                    auctionId,
+                    response.getClass().getSimpleName(),
+                    e);
             }
         }
         auctionRoom.removeAll(failedClients);
@@ -70,8 +73,9 @@ public class AuctionRoomManager {
             auctionRooms.remove(auctionId, auctionRoom);
         }
         LOGGER.info(
-                "Đã broadcast bid update [auctionId: {}, successCount: {}, failedCount: {}]",
+                "Đã broadcast response [auctionId: {}, response: {}, successCount: {}, failedCount: {}]",
                 auctionId,
+                response.getClass().getSimpleName(),
                 auctionRoom.size(),
                 failedClients.size());
     }

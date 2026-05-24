@@ -21,10 +21,12 @@ public class EditAuctionHandler implements RequestHandler {
         }
         if(editAuctionRequest.getCreateAuctionStatus() == CreateAuctionStatus.SUCCESS){
             boolean success = EditAuctionService.editAfterApprove(editAuctionRequest);
-            AuctionRoomManager.broadcast(editAuctionRequest.getId(),new UpdateAuctionResponse(editAuctionRequest) );
+            if (success) {
+                AuctionRoomManager.broadcast(
+                    editAuctionRequest.getId(),
+                    new UpdateAuctionResponse(editAuctionRequest));
+            }
             return new EditAuctionResponse(success);
-            
-            
         }
         return new EditAuctionResponse(false);
     }
