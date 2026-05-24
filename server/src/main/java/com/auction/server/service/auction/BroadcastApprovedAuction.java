@@ -11,7 +11,7 @@ public class BroadcastApprovedAuction {
     public static void broadcast(Auction auction,ClientHandler clientHandler){
       for (ClientHandler user : ClientHandler.getOnlineUser()) {
       try {
-        user.getOutputStream().writeObject(auction);
+        user.sendObject(auction);
       } catch (Exception e) {
         LOGGER.error("Không thể đẩy auction đã duyệt tới client online", e);
         continue;

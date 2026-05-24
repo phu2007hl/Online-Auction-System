@@ -2,7 +2,6 @@ package com.auction.server.service.auction;
 import com.auction.server.network.ClientHandler;
 import com.auction.shared.response.Response;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -56,10 +55,8 @@ public class AuctionRoomManager {
         Set<ClientHandler> failedClients = new HashSet<>();
         for(ClientHandler clientHandler : auctionRoom){
             try {
-                clientHandler.getOutputStream().writeObject(response);
-                clientHandler.getOutputStream().flush();
-                clientHandler.getOutputStream().reset();
-            } catch (IOException e) {
+                clientHandler.sendObject(response);
+            } catch (Exception e) {
                 failedClients.add(clientHandler);
                 LOGGER.warn(
                     "Không thể broadcast response tới một client [auctionId: {}, response: {}]",
