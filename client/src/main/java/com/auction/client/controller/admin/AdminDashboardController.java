@@ -8,7 +8,7 @@ import com.auction.shared.request.auction.AuctionReviewResultRequest;
 import com.auction.shared.request.auction.CreateAuctionRequest;
 import com.auction.shared.request.auction.PendingAuctionReviewRequest;
 import com.auction.shared.request.auction.PublishApprovedAuctionRequest;
-import com.auction.shared.request.auction.ToDatabaseRequest;
+import com.auction.shared.request.auction.SaveAuctionReviewResultRequest;
 import com.auction.shared.response.admin.GetPendingAuctionListResponse;
 
 import java.io.ByteArrayInputStream;
@@ -196,7 +196,7 @@ public class AdminDashboardController extends Controller implements Initializabl
       socket.sendRequest(new PublishApprovedAuctionRequest(req,pendingRequest.getUser()));
       LOGGER.info("ADMIN: Đã gửi request chấp nhận auction đến client tương ứng và broadcast đến tất cả user");
 
-      ToDatabaseRequest request = new ToDatabaseRequest(pendingRequest);
+      SaveAuctionReviewResultRequest request = new SaveAuctionReviewResultRequest(pendingRequest);
       socket.sendRequest(request);
       LOGGER.info("Đã gửi request lưu auction SUCCESS vào database");
     } catch (Exception e) {
@@ -217,7 +217,7 @@ public class AdminDashboardController extends Controller implements Initializabl
       socket.sendRequest(new AuctionReviewResultRequest(pendingRequest.getUser(), false, CreateAuctionStatus.DECLINED));
       LOGGER.info("ADMIN: Đã gửi request từ chối auction đến client tương ứng");
 
-      ToDatabaseRequest request = new ToDatabaseRequest(pendingRequest);
+      SaveAuctionReviewResultRequest request = new SaveAuctionReviewResultRequest(pendingRequest);
       socket.sendRequest(request);
       LOGGER.info("Đã gửi request lưu auction DECLINED vào database");
     } catch (Exception e) {

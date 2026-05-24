@@ -3,17 +3,17 @@ package com.auction.shared.response.auction;
 import com.auction.shared.response.Response;
 
 /**
-* Kết quả lưu request trung gian xuống database file.
+* Kết quả lưu lịch sử duyệt auction của admin.
 */
-public class ToDatabaseResponse extends Response {
+public class SaveAuctionReviewResultResponse extends Response {
   private final boolean valid;
 
   /**
-  * Tạo response lưu database.
+  * Tạo response lưu lịch sử duyệt auction.
   *
   * @param valid true nếu lưu thành công
   */
-  public ToDatabaseResponse(boolean valid) {
+  public SaveAuctionReviewResultResponse(boolean valid) {
     this.valid = valid;
   }
 

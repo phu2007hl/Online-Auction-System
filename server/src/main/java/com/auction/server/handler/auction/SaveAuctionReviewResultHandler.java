@@ -7,9 +7,9 @@ import com.auction.server.network.ClientHandler;
 import com.auction.server.service.auction.RemoveRequestService;
 import com.auction.shared.request.Request;
 import com.auction.shared.request.auction.PendingAuctionReviewRequest;
-import com.auction.shared.request.auction.ToDatabaseRequest;
+import com.auction.shared.request.auction.SaveAuctionReviewResultRequest;
 import com.auction.shared.response.Response;
-import com.auction.shared.response.auction.ToDatabaseResponse;
+import com.auction.shared.response.auction.SaveAuctionReviewResultResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,31 +17,31 @@ import java.util.LinkedHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
-* Xử lý request lưu các dữ liệu duyệt auction xuống database file.
+* Xử lý request lưu lịch sử duyệt auction của admin.
 */
-public class ToDatabaseHandler implements RequestHandler {
+public class SaveAuctionReviewResultHandler implements RequestHandler {
   private static final Logger LOGGER =
-          LoggerFactory.getLogger(ToDatabaseHandler.class);
+          LoggerFactory.getLogger(SaveAuctionReviewResultHandler.class);
   /**
-  * Lưu request trung gian xuống database file.
+  * Lưu kết quả duyệt xuống database file.
   *
   * @param request request cần lưu
   * @param clientHandler client connection hiện tại
-  * @return response lưu database
+  * @return response lưu lịch sử duyệt
   */
   @Override
   public Response handle(Request request, ClientHandler clientHandler) {
     AdminResponseDatabase database = AdminResponseDatabase.getInstance();
     LinkedHashMap<Integer, PendingAuctionReviewRequest> adminResponse =
         database.getData();
-    ToDatabaseRequest toDatabaseRequest = (ToDatabaseRequest) request;
-    PendingAuctionReviewRequest pendingAuctionReviewRequest = toDatabaseRequest.getRequest();
+    SaveAuctionReviewResultRequest saveRequest = (SaveAuctionReviewResultRequest) request;
+    PendingAuctionReviewRequest pendingAuctionReviewRequest = saveRequest.getRequest();
     adminResponse.put(pendingAuctionReviewRequest.getCreateAuctionRequest().getId(), pendingAuctionReviewRequest);
     database.saveData(adminResponse);
     RemoveRequestService.removeRequest(pendingAuctionReviewRequest.getCreateAuctionRequest().getId());
     ConcurrentHashMap<Integer, PendingAuctionReviewRequest> requestList =
         PendingAuctionDatabase.getInstance().getData();
     LOGGER.info("Còn lại {} request trong danh sách chờ duyệt", requestList.size());
-    return new ToDatabaseResponse(true);
+    return new SaveAuctionReviewResultResponse(true);
   }
 }
