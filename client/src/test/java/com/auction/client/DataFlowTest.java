@@ -2,6 +2,8 @@
 package com.auction.client;
 
 import com.auction.client.controller.admin.AdminDashboardController;
+import com.auction.client.controller.admin.EditApprovedAuctionController;
+import com.auction.client.controller.auction.AuctionDetailController;
 import com.auction.client.controller.auction.CreateAuctionPageController;
 import com.auction.client.controller.auction.MainPageController;
 import com.auction.client.controller.auth.LoginController;
@@ -11,7 +13,12 @@ import com.auction.server.database.AuctionListDatabase;
 import com.auction.server.database.PendingAuctionDatabase;
 import com.auction.server.database.UserDatabase;
 import com.auction.server.network.ClientHandler;
+import com.auction.shared.auction.Auction;
+import com.auction.shared.enums.AuctionStatus;
+import com.auction.shared.enums.CreateAuctionStatus;
 import com.auction.shared.model.User;
+import com.auction.shared.request.admin.EditAuctionRequest;
+import com.auction.shared.request.auction.BidRequest;
 import com.auction.shared.request.auction.CreateAuctionRequest;
 import com.auction.shared.request.auction.PublishApprovedAuctionRequest;
 import com.auction.shared.request.auth.AdminLoginRequest;
@@ -34,6 +41,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDate;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CyclicBarrier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -48,6 +57,8 @@ public class DataFlowTest {
     private static MainPageController controller3;
     private static CreateAuctionPageController controller4;
     private static RegisterController controller5;
+    private static AuctionDetailController controller6;
+    private static EditApprovedAuctionController controller7;
 
     @BeforeAll
     public static void setUp() {
@@ -61,9 +72,15 @@ public class DataFlowTest {
         controller3 = new MainPageController();
         controller4 = new CreateAuctionPageController();
         controller5 = new RegisterController();
-      AuctionListDatabase auctionListDatabase = new AuctionListDatabase(new File("data-test/AuctionList.ser"));
-      PendingAuctionDatabase pendingAuctionDatabase = new PendingAuctionDatabase(new File("data-test/PendingAuction.ser"));
-      UserDatabase userDatabase = new UserDatabase(new File("data-test/User.ser"));       
+        controller6 = new AuctionDetailController();
+        controller7 = new EditApprovedAuctionController();
+      AuctionListDatabase auctionListDatabase = new AuctionListDatabase(new File("data/AuctionList.ser"));
+      PendingAuctionDatabase pendingAuctionDatabase = new PendingAuctionDatabase(new File("data/PendingAuction.ser"));
+      UserDatabase userDatabase = new UserDatabase(new File("data/User.ser")); 
+      ConcurrentHashMap<Integer,Auction> auctionListTest = new ConcurrentHashMap<>();
+      auctionListTest.put(12345678, new Auction(12345678, "Yuri", "None", new User("Nigger7@gmail.com", "Nigger", "Nigger"), 0, 0, null, null, null));
+      auctionListDatabase.saveData(auctionListTest); 
+
         new Thread(() -> {
             try (ServerSocket server = new ServerSocket(4556)) {
                 server.setSoTimeout(5000);
@@ -213,18 +230,58 @@ public class DataFlowTest {
             // Interruption expected in test
         }
     }
+    @Test
+    @Order(7)
+    public void conccurencyTest(){
+        controller6.setSocketClient(con);
+        controller7.setSocketClient(con);
+        final CyclicBarrier gate = new CyclicBarrier(3);
+        Thread t1 = new Thread(){
+            public void run(){
+                try{
+                gate.await();
+                con.sendRequest(new BidRequest(12345678,1500 ,new User("Miro@gmail.com", "aosdjiou", "Miro")));                    
+                }
+                catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        };
+        Thread t2 = new Thread(){
+            public void run(){
+                try{
+                    gate.await();
+                    con.sendRequest(new EditAuctionRequest(null, 12345678, getName(), getName(), getName(), CreateAuctionStatus.SUCCESS, AuctionStatus.CANCELLED));
+
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }            }
+        };
+        t1.start();
+        t2.start();
+        try{
+            gate.await();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+
+    }
 
     @AfterAll
     public static void clearResource() {
         try {
             FileOutputStream out1 =
-                new FileOutputStream("User.ser");
+                new FileOutputStream(new File("data/AuctionList.ser"));
             FileOutputStream out2 =
-                new FileOutputStream("AuctionList.ser");
+                new FileOutputStream(new File("data/PendingAuction.ser"));
             ClientHandler.getOnlineUser().clear();
 
             FileOutputStream out3 =
-                new FileOutputStream("PendingAuction.ser");
+                new FileOutputStream(new File("data/User.ser"));
 
         } catch (Exception e) {
             LOGGER.error("Không thể dọn tài nguyên kiểm thử", e);
