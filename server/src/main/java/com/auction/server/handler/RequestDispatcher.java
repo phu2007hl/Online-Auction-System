@@ -19,6 +19,7 @@ import com.auction.shared.request.auth.LoginRequest;
 import com.auction.shared.request.auth.RegisterRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,7 @@ public class RequestDispatcher {
     HANDLER_MAP.put(GetAuctionDetailRequest.class, new GetAuctionDetailRequestHandler());
     HANDLER_MAP.put(LeaveRoomRequest.class, new LeaveRoomRequestHandler());
     HANDLER_MAP.put(EditAuctionRequest.class, new EditAuctionHandler());
+    HANDLER_MAP.put(SendMessageRequest.class, new SendMessageHandler());
   }
 
   /**

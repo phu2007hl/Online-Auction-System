@@ -11,6 +11,7 @@ import com.auction.shared.model.User;
 import com.auction.shared.request.auction.BidRequest;
 import com.auction.shared.request.auction.GetAuctionDetailRequest;
 import com.auction.shared.request.auction.LeaveRoomRequest;
+import com.auction.shared.request.auction.SendMessageRequest;
 import com.auction.shared.response.auction.*;
 
 import java.io.ByteArrayInputStream;
@@ -35,6 +36,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -103,6 +105,11 @@ public class AuctionDetailController extends Controller implements Initializable
   @FXML private LineChart<String, Number> priceChart;
   @FXML private CategoryAxis timeAxis;
   @FXML private NumberAxis priceAxis;
+  @FXML private VBox boxchat;
+  @FXML private ScrollPane chatScrollPane;
+  @FXML private VBox messageContainer;
+  @FXML private TextField messageInput;
+  @FXML private Button sendButton;
   private XYChart.Series<String, Number> chartSeries;
   private XYChart.Data<String, Number> activeHoverPoint;
 
@@ -110,7 +117,34 @@ public class AuctionDetailController extends Controller implements Initializable
   public void initialize(URL location, ResourceBundle resources) {
     configureBidChart();
     showLoadingState();
-  }
+  if (messageContainer != null && chatScrollPane != null) {
+            messageContainer.heightProperty().addListener((observable, oldValue, newValue) -> {
+                chatScrollPane.setVvalue(1.0);
+            });
+        }
+    }
+  @FXML
+    void sendMessage(ActionEvent event) {
+        String userMessage = messageInput.getText();
+
+        // Không gửi nếu tin nhắn trống
+        if (userMessage == null || userMessage.trim().isEmpty()) {
+            return;
+        }
+
+        // Gửi request qua socket lên Server
+        if (socket != null && currentAuction != null && currentUser != null) {
+            socket.sendRequest(new SendMessageRequest(userMessage.trim(), currentAuction.getId(), currentUser));
+        }
+
+        // Xóa sạch ô nhập và giữ con trỏ tại ô chat để gõ tiếp
+        messageInput.clear();
+        messageInput.requestFocus();
+    }
+
+    /**
+     * HÀM HANDLE NHẬN PHẢN HỒI TỪ SERVER TRUYỀN XUỐNG
+     */
 
   /**
    * Cấu hình biểu đồ giá realtime.
@@ -1233,6 +1267,17 @@ private void updateAuction(UpdateAuctionResponse update) {
               "-fx-text-fill: #dc2626; -fx-font-weight: bold; -fx-font-size: 13;");
         }
       }
+      else if(obj instanceof SendMessageResponse){
+        SendMessageResponse response = (SendMessageResponse) obj;
+        String username = response.getRequest().getSender().getUsername();
+        String messageText = response.getRequest().getMessage();
+        String formattedMessage = "[" + username + "]: " + messageText;
+        Label messageLabel = new Label(formattedMessage);
+        messageLabel.setWrapText(true);
+        messageLabel.setStyle("-fx-font-family: 'Segoe UI'; -fx-font-size: 13px; -fx-text-fill: #333333;");
+        messageContainer.getChildren().add(messageLabel);
+      }
+
     });
   }
 
