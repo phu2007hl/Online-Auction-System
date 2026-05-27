@@ -16,6 +16,8 @@ import com.auction.shared.response.auction.*;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
@@ -23,13 +25,21 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -42,6 +52,13 @@ import org.slf4j.LoggerFactory;
 public class AuctionDetailController extends Controller implements Initializable {
   private static final Logger LOGGER =
       LoggerFactory.getLogger(AuctionDetailController.class);
+  private static final DateTimeFormatter BID_TIME_FORMATTER =
+      DateTimeFormatter.ofPattern("HH:mm:ss");
+  private static final int MAX_CHART_POINTS = 8;
+  private static final double CHART_POINT_HOVER_THRESHOLD = 60;
+  private static final double CHART_LINE_HOVER_THRESHOLD = 42;
+  private static final double MAIN_PAGE_WIDTH = 1100;
+  private static final double MAIN_PAGE_HEIGHT = 720;
 
   private SocketClient socket;
   private int auctionId;
@@ -76,10 +93,76 @@ public class AuctionDetailController extends Controller implements Initializable
   @FXML private Label winnerLabel;
   @FXML private ImageView productImageView;
   @FXML private VBox bidHistoryContainer;
+  @FXML private Label chartLatestPriceLabel;
+  @FXML private Label chartPointCountLabel;
+  @FXML private AnchorPane chartPlotPane;
+  @FXML private VBox chartInfoPopup;
+  @FXML private Label chartInfoUserLabel;
+  @FXML private Label chartInfoBidLabel;
+  @FXML private Label chartInfoTimeLabel;
+  @FXML private LineChart<String, Number> priceChart;
+  @FXML private CategoryAxis timeAxis;
+  @FXML private NumberAxis priceAxis;
+  private XYChart.Series<String, Number> chartSeries;
+  private XYChart.Data<String, Number> activeHoverPoint;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
+    configureBidChart();
     showLoadingState();
+  }
+
+  /**
+   * Cấu hình biểu đồ giá realtime.
+   */
+  private void configureBidChart() {
+    if (priceChart == null) {
+      return;
+    }
+    priceChart.setAnimated(false);
+    priceChart.setCreateSymbols(true);
+    priceChart.setLegendVisible(false);
+    priceChart.setHorizontalGridLinesVisible(true);
+    priceChart.setVerticalGridLinesVisible(true);
+    priceChart.setStyle(
+        "-fx-background-color: white; "
+            + "-fx-font-size: 12; "
+            + "-fx-text-fill: #374151;");
+    priceChart.addEventFilter(MouseEvent.MOUSE_MOVED, this::showNearestBidTooltip);
+    if (chartPlotPane != null) {
+      chartPlotPane.setPickOnBounds(true);
+      chartPlotPane.addEventFilter(MouseEvent.MOUSE_MOVED, this::showNearestBidTooltip);
+      chartPlotPane.setOnMouseExited(this::hideChartHoverTooltipIfOutsidePlot);
+    }
+
+    timeAxis.setLabel("Thời gian");
+    timeAxis.setTickLabelFill(javafx.scene.paint.Color.web("#374151"));
+    timeAxis.setTickLabelRotation(0);
+    timeAxis.setStyle(
+        "-fx-tick-label-fill: #374151; "
+            + "-fx-font-size: 11;");
+
+    priceAxis.setLabel("Giá ($)");
+    priceAxis.setForceZeroInRange(false);
+    priceAxis.setAutoRanging(true);
+    priceAxis.setTickLabelFill(javafx.scene.paint.Color.web("#374151"));
+    priceAxis.setTickLabelFormatter(
+        new NumberAxis.DefaultFormatter(priceAxis) {
+          @Override
+          public String toString(Number value) {
+            double amount = value.doubleValue();
+            if (Math.abs(amount) >= 1000000) {
+              return String.format("%.1fM", amount / 1000000);
+            }
+            if (Math.abs(amount) >= 1000) {
+              return String.format("%.0fK", amount / 1000);
+            }
+            return String.format("%.0f", amount);
+          }
+        });
+    priceAxis.setStyle(
+        "-fx-tick-label-fill: #374151; "
+            + "-fx-font-size: 11;");
   }
 
   /**
@@ -101,6 +184,7 @@ public class AuctionDetailController extends Controller implements Initializable
     winnerLabel.setText("");
     productImageView.setImage(null);
     bidHistoryContainer.getChildren().clear();
+    clearBidChart();
 
     hideBidControls();
     winnerBox.setVisible(false);
@@ -246,6 +330,7 @@ private void updateAuction(UpdateAuctionResponse update) {
 
     // Lịch sử khi mới vào phòng: render lại toàn bộ từ mảng ban đầu
     initBidHistoryView(auction.getBidHistory());
+    renderBidChart(auction.getBidHistory());
 
     // Reset trạng thái
     bidResultLabel.setText("");
@@ -473,6 +558,508 @@ private void updateAuction(UpdateAuctionResponse update) {
   }
 
   /**
+   * Xóa dữ liệu biểu đồ giá.
+   */
+  private void clearBidChart() {
+    if (priceChart != null) {
+      priceChart.getData().clear();
+    }
+    if (chartLatestPriceLabel != null) {
+      chartLatestPriceLabel.setText("");
+    }
+    if (chartPointCountLabel != null) {
+      chartPointCountLabel.setText("");
+    }
+    chartSeries = null;
+    hideChartHoverTooltip();
+  }
+
+  /**
+   * Render biểu đồ giá theo thời gian từ bid history.
+   * Chỉ hiển thị tối đa {@code MAX_CHART_POINTS} bid gần nhất.
+   *
+   * @param bidHistory danh sách bid
+   */
+  private void renderBidChart(ArrayList<BidTransaction> bidHistory) {
+    if (priceChart == null) {
+      return;
+    }
+    priceChart.getData().clear();
+    chartSeries = null;
+
+    if (bidHistory == null || bidHistory.isEmpty()) {
+      return;
+    }
+
+    chartSeries = new XYChart.Series<>();
+    chartSeries.setName("Giá đấu");
+
+    int start = Math.max(0, bidHistory.size() - MAX_CHART_POINTS);
+    for (int i = start; i < bidHistory.size(); i++) {
+      BidTransaction bid = bidHistory.get(i);
+      LocalDateTime bidTime = bid.getBidTime();
+      String timeLabel;
+      if (bidTime == null) {
+        timeLabel = "Bid " + (i + 1);
+      } else {
+        timeLabel = bidTime.format(BID_TIME_FORMATTER);
+      }
+      chartSeries.getData().add(createBidChartPoint(timeLabel, bid, false));
+    }
+
+    priceChart.getData().add(chartSeries);
+    updateChartSummary(bidHistory, chartSeries.getData().size());
+    updatePriceAxisRange();
+    Platform.runLater(this::styleBidChart);
+  }
+
+  /**
+   * Thêm bid mới nhất vào biểu đồ mà không vẽ lại toàn bộ.
+   *
+   * @param bidHistory danh sách bid đầy đủ
+   */
+  private void addLatestBidToChart(ArrayList<BidTransaction> bidHistory) {
+    if (priceChart == null || bidHistory == null || bidHistory.isEmpty()) {
+      return;
+    }
+
+    if (chartSeries == null) {
+      renderBidChart(bidHistory);
+      return;
+    }
+
+    BidTransaction latestBid = bidHistory.get(bidHistory.size() - 1);
+    LocalDateTime bidTime = latestBid.getBidTime();
+    String timeLabel;
+    if (bidTime == null) {
+      timeLabel = "Bid " + bidHistory.size();
+    } else {
+      timeLabel = bidTime.format(BID_TIME_FORMATTER);
+    }
+    chartSeries.getData().add(createBidChartPoint(timeLabel, latestBid, true));
+
+    if (chartSeries.getData().size() > MAX_CHART_POINTS) {
+      chartSeries.getData().remove(0);
+    }
+
+    updateChartSummary(bidHistory, chartSeries.getData().size());
+    updatePriceAxisRange();
+    Platform.runLater(this::styleBidChart);
+  }
+
+  /**
+   * Tạo một điểm trên chart và gắn tooltip cho điểm đó.
+   *
+   * @param timeLabel nhãn thời gian trên trục X
+   * @param bid dữ liệu bid
+   * @param latest true nếu là bid mới nhất
+   * @return data point của line chart
+   */
+  private XYChart.Data<String, Number> createBidChartPoint(
+      String timeLabel, BidTransaction bid, boolean latest) {
+    XYChart.Data<String, Number> point =
+        new XYChart.Data<>(timeLabel, bid.getBidAmount());
+    point.setExtraValue(bid);
+    return point;
+  }
+
+  /**
+   * Style node symbol sau khi JavaFX render xong data point.
+   *
+   * @param point data point trên chart
+   * @param latest true nếu là bid mới nhất
+   */
+  private void styleBidPoint(XYChart.Data<String, Number> point, boolean latest) {
+    Node node = point.getNode();
+    if (node == null) {
+      return;
+    }
+    node.setStyle(createChartSymbolStyle(latest));
+  }
+
+  /**
+   * Cập nhật thông tin tóm tắt ngay trên biểu đồ.
+   *
+   * @param bidHistory danh sách bid đầy đủ
+   * @param displayedPointCount số điểm đang hiển thị trên chart
+   */
+  private void updateChartSummary(
+      ArrayList<BidTransaction> bidHistory, int displayedPointCount) {
+    if (bidHistory == null || bidHistory.isEmpty()) {
+      return;
+    }
+    BidTransaction latestBid = bidHistory.get(bidHistory.size() - 1);
+    if (chartLatestPriceLabel != null) {
+      chartLatestPriceLabel.setText(
+          "Giá mới nhất: $" + String.format("%.2f", latestBid.getBidAmount()));
+    }
+    if (chartPointCountLabel != null) {
+      chartPointCountLabel.setText(
+          "Đang hiển thị " + displayedPointCount
+              + " bid gần nhất · rê chuột trên biểu đồ để xem chi tiết");
+    }
+  }
+
+  /**
+   * Hiển thị tooltip của điểm bid gần nhất theo trục X khi rê chuột trong vùng chart.
+   *
+   * @param event sự kiện rê chuột trong biểu đồ
+   */
+  private void showNearestBidTooltip(MouseEvent event) {
+    if (chartSeries == null || chartSeries.getData().isEmpty()) {
+      hideChartHoverTooltip();
+      return;
+    }
+
+    Node plotBackground = priceChart.lookup(".chart-plot-background");
+    if (plotBackground == null) {
+      hideChartHoverTooltip();
+      return;
+    }
+
+    Bounds plotBounds = plotBackground.localToScene(plotBackground.getBoundsInLocal());
+    if (!plotBounds.contains(event.getSceneX(), event.getSceneY())) {
+      hideChartHoverTooltip();
+      return;
+    }
+
+    XYChart.Data<String, Number> nearestPoint = findNearestChartPoint(event);
+    if (nearestPoint == null) {
+      hideChartHoverTooltip();
+      return;
+    }
+
+    Object extraValue = nearestPoint.getExtraValue();
+    if (!(extraValue instanceof BidTransaction bid)) {
+      hideChartHoverTooltip();
+      return;
+    }
+
+    LocalDateTime bidTime = bid.getBidTime();
+    String timeText;
+    if (bidTime == null) {
+      timeText = nearestPoint.getXValue();
+    } else {
+      timeText = bidTime.format(BID_TIME_FORMATTER);
+    }
+    if (activeHoverPoint != nearestPoint) {
+      updateChartInfoPopupText(bid, timeText);
+      activeHoverPoint = nearestPoint;
+    }
+
+    Node pointNode = nearestPoint.getNode();
+    if (pointNode == null) {
+      hideChartHoverTooltip();
+      return;
+    }
+    showChartInfoPopup(pointNode);
+  }
+
+  /**
+   * Cập nhật nội dung bảng thông tin bid trên chart.
+   *
+   * @param bid dữ liệu bid
+   * @param timeText thời gian hiển thị
+   */
+  private void updateChartInfoPopupText(BidTransaction bid, String timeText) {
+    chartInfoUserLabel.setText("User: " + bid.getBidderUsername());
+    chartInfoBidLabel.setText("Bid: $" + String.format("%.2f", bid.getBidAmount()));
+    chartInfoTimeLabel.setText("Thời gian: " + timeText);
+  }
+
+  /**
+   * Hiển thị bảng thông tin gần điểm bid trên line. Bảng này mouseTransparent nên
+   * không chặn sự kiện rê chuột của chart.
+   *
+   * @param pointNode node của điểm bid trên line chart
+   */
+  private void showChartInfoPopup(Node pointNode) {
+    if (chartPlotPane == null || chartInfoPopup == null) {
+      return;
+    }
+
+    Bounds pointBounds = pointNode.localToScene(pointNode.getBoundsInLocal());
+    double pointCenterX = pointBounds.getMinX() + pointBounds.getWidth() / 2;
+    double pointTopY = pointBounds.getMinY();
+    Point2D localPoint = chartPlotPane.sceneToLocal(pointCenterX, pointTopY);
+
+    double popupWidth = chartInfoPopup.getPrefWidth();
+    double popupHeight = 78;
+    chartInfoPopup.resize(popupWidth, popupHeight);
+    double x = localPoint.getX() + 16;
+    double y = localPoint.getY() - popupHeight - 10;
+
+    if (x + popupWidth > chartPlotPane.getWidth() - 8) {
+      x = localPoint.getX() - popupWidth - 16;
+    }
+    if (x < 8) {
+      x = 8;
+    }
+    if (y < 8) {
+      y = localPoint.getY() + 18;
+    }
+    if (y + popupHeight > chartPlotPane.getHeight() - 8) {
+      y = chartPlotPane.getHeight() - popupHeight - 8;
+    }
+
+    chartInfoPopup.setLayoutX(x);
+    chartInfoPopup.setLayoutY(y);
+    chartInfoPopup.setVisible(true);
+    chartInfoPopup.toFront();
+  }
+
+  /**
+   * Tìm điểm bid gần chuột nhất nếu chuột đang nằm gần điểm hoặc gần đường line.
+   *
+   * @param event sự kiện rê chuột trong chart
+   * @return điểm gần nhất nếu nằm trong ngưỡng hover
+   */
+  private XYChart.Data<String, Number> findNearestChartPoint(MouseEvent event) {
+    ArrayList<XYChart.Data<String, Number>> points = new ArrayList<>();
+    ArrayList<double[]> centers = new ArrayList<>();
+
+    for (XYChart.Data<String, Number> point : chartSeries.getData()) {
+      Node pointNode = point.getNode();
+      if (pointNode == null) {
+        continue;
+      }
+      Bounds pointBounds = pointNode.localToScene(pointNode.getBoundsInLocal());
+      double pointCenterX = pointBounds.getMinX() + pointBounds.getWidth() / 2;
+      double pointCenterY = pointBounds.getMinY() + pointBounds.getHeight() / 2;
+      points.add(point);
+      centers.add(new double[] {pointCenterX, pointCenterY});
+    }
+
+    XYChart.Data<String, Number> nearestPoint = findNearestRenderedPoint(
+        event.getSceneX(), event.getSceneY(), points, centers);
+    if (nearestPoint != null) {
+      return nearestPoint;
+    }
+
+    return findNearestPointOnLine(event.getSceneX(), event.getSceneY(), points, centers);
+  }
+
+  /**
+   * Tìm điểm bid gần nhất nếu chuột đang gần trực tiếp một node point.
+   *
+   * @param mouseX tọa độ X của chuột theo scene
+   * @param mouseY tọa độ Y của chuột theo scene
+   * @param points danh sách data point
+   * @param centers tọa độ center của node point
+   * @return data point gần nhất hoặc null
+   */
+  private XYChart.Data<String, Number> findNearestRenderedPoint(
+      double mouseX,
+      double mouseY,
+      ArrayList<XYChart.Data<String, Number>> points,
+      ArrayList<double[]> centers) {
+    XYChart.Data<String, Number> nearestPoint = null;
+    double nearestDistance = Double.MAX_VALUE;
+
+    for (int i = 0; i < centers.size(); i++) {
+      double[] center = centers.get(i);
+      double distance = distance(mouseX, mouseY, center[0], center[1]);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestPoint = points.get(i);
+      }
+    }
+
+    if (nearestDistance <= CHART_POINT_HOVER_THRESHOLD) {
+      return nearestPoint;
+    }
+    return null;
+  }
+
+  /**
+   * Tìm điểm bid đại diện nếu chuột đang gần một đoạn line nối giữa hai bid.
+   *
+   * @param mouseX tọa độ X của chuột theo scene
+   * @param mouseY tọa độ Y của chuột theo scene
+   * @param points danh sách data point
+   * @param centers tọa độ center của node point
+   * @return data point đại diện gần nhất hoặc null
+   */
+  private XYChart.Data<String, Number> findNearestPointOnLine(
+      double mouseX,
+      double mouseY,
+      ArrayList<XYChart.Data<String, Number>> points,
+      ArrayList<double[]> centers) {
+    if (centers.size() < 2) {
+      return null;
+    }
+
+    XYChart.Data<String, Number> nearestPoint = null;
+    double nearestDistance = Double.MAX_VALUE;
+
+    for (int i = 0; i < centers.size() - 1; i++) {
+      double[] start = centers.get(i);
+      double[] end = centers.get(i + 1);
+      double t = projectionFactor(mouseX, mouseY, start[0], start[1], end[0], end[1]);
+      if (t < 0 || t > 1) {
+        continue;
+      }
+      double projectedX = start[0] + t * (end[0] - start[0]);
+      double projectedY = start[1] + t * (end[1] - start[1]);
+      double distance = distance(mouseX, mouseY, projectedX, projectedY);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        if (t < 0.5) {
+          nearestPoint = points.get(i);
+        } else {
+          nearestPoint = points.get(i + 1);
+        }
+      }
+    }
+
+    if (nearestDistance <= CHART_LINE_HOVER_THRESHOLD) {
+      return nearestPoint;
+    }
+    return null;
+  }
+
+  /**
+   * Tính vị trí chiếu của điểm chuột lên đoạn AB. Giá trị 0 là A, 1 là B.
+   */
+  private double projectionFactor(
+      double px, double py, double ax, double ay, double bx, double by) {
+    double dx = bx - ax;
+    double dy = by - ay;
+    double lengthSquared = dx * dx + dy * dy;
+    if (lengthSquared == 0) {
+      return -1;
+    }
+    return ((px - ax) * dx + (py - ay) * dy) / lengthSquared;
+  }
+
+  /**
+   * Tính khoảng cách giữa hai điểm.
+   */
+  private double distance(double ax, double ay, double bx, double by) {
+    double dx = ax - bx;
+    double dy = ay - by;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  /**
+   * Chỉ ẩn tooltip khi chuột thực sự ra khỏi vùng plot. Nếu tooltip popup vừa xuất hiện
+   * và gây mouseExited giả trên chart thì vẫn giữ tooltip.
+   *
+   * @param event sự kiện chuột rời chart
+   */
+  private void hideChartHoverTooltipIfOutsidePlot(MouseEvent event) {
+    Node plotBackground = priceChart.lookup(".chart-plot-background");
+    if (plotBackground == null) {
+      hideChartHoverTooltip();
+      return;
+    }
+    Bounds plotBounds = plotBackground.localToScreen(plotBackground.getBoundsInLocal());
+    if (plotBounds.contains(event.getScreenX(), event.getScreenY())) {
+      return;
+    }
+    hideChartHoverTooltip();
+  }
+
+  /**
+   * Ẩn tooltip khi chuột rời khỏi vùng gần điểm bid.
+   */
+  private void hideChartHoverTooltip() {
+    activeHoverPoint = null;
+    if (chartInfoPopup != null) {
+      chartInfoPopup.setVisible(false);
+    }
+  }
+
+  /**
+   * Cập nhật range trục Y dựa trên các điểm đang hiển thị, thêm padding 15%.
+   */
+  private void updatePriceAxisRange() {
+    if (chartSeries == null || chartSeries.getData().isEmpty()) {
+      priceAxis.setAutoRanging(true);
+      return;
+    }
+    priceAxis.setAutoRanging(false);
+
+    double min = chartSeries.getData().stream()
+        .mapToDouble(data -> data.getYValue().doubleValue())
+        .min()
+        .orElse(0);
+    double max = chartSeries.getData().stream()
+        .mapToDouble(data -> data.getYValue().doubleValue())
+        .max()
+        .orElse(0);
+
+    double padding = (max - min) * 0.15;
+    if (padding == 0) {
+      padding = max * 0.1;
+    }
+
+    priceAxis.setLowerBound(Math.max(0, Math.floor(min - padding)));
+    priceAxis.setUpperBound(Math.ceil(max + padding));
+    double range = (max - min) + 2 * padding;
+    priceAxis.setTickUnit(Math.max(1, Math.ceil(range / 5)));
+  }
+
+  /**
+   * Làm rõ đường biểu đồ và các đường trục sau khi JavaFX tạo node chart.
+   * Symbol tự động thu nhỏ khi có nhiều điểm dữ liệu.
+   */
+  private void styleBidChart() {
+    if (priceChart == null) {
+      return;
+    }
+    Node line = priceChart.lookup(".chart-series-line");
+    if (line != null) {
+      line.setStyle("-fx-stroke: #2563eb; -fx-stroke-width: 3px;");
+    }
+
+    if (chartSeries != null) {
+      int latestIndex = chartSeries.getData().size() - 1;
+      for (int i = 0; i < chartSeries.getData().size(); i++) {
+        XYChart.Data<String, Number> point = chartSeries.getData().get(i);
+        styleBidPoint(point, i == latestIndex);
+      }
+    }
+
+    Node plotBackground = priceChart.lookup(".chart-plot-background");
+    if (plotBackground != null) {
+      plotBackground.setStyle("-fx-background-color: #f8fafc;");
+    }
+    for (Node gridLine : priceChart.lookupAll(".chart-horizontal-grid-lines")) {
+      gridLine.setStyle("-fx-stroke: #cbd5e1; -fx-stroke-width: 1.2px;");
+    }
+    for (Node gridLine : priceChart.lookupAll(".chart-vertical-grid-lines")) {
+      gridLine.setStyle("-fx-stroke: #dbe4ef; -fx-stroke-width: 1px;");
+    }
+
+    Node horizontalZeroLine = priceChart.lookup(".chart-horizontal-zero-line");
+    if (horizontalZeroLine != null) {
+      horizontalZeroLine.setStyle("-fx-stroke: #374151;");
+    }
+    Node verticalZeroLine = priceChart.lookup(".chart-vertical-zero-line");
+    if (verticalZeroLine != null) {
+      verticalZeroLine.setStyle("-fx-stroke: #374151;");
+    }
+  }
+
+  /**
+   * Style điểm bid trên chart.
+   *
+   * @param latest true nếu là bid mới nhất
+   * @return CSS cho symbol
+   */
+  private String createChartSymbolStyle(boolean latest) {
+    if (latest) {
+      return "-fx-background-color: white, #f97316; "
+          + "-fx-background-radius: 7px; "
+          + "-fx-padding: 7px;";
+    }
+    return "-fx-background-color: white, #2563eb; "
+        + "-fx-background-radius: 5px; "
+        + "-fx-padding: 5px;";
+  }
+
+  /**
    * Render danh sách lịch sử bid.
    *
    * @param bidHistory danh sách bid
@@ -581,6 +1168,9 @@ private void updateAuction(UpdateAuctionResponse update) {
       Stage stage = (Stage) backButton.getScene().getWindow();
       stage.getScene().setRoot(root);
       stage.setTitle("Hệ thống đấu giá");
+      stage.setWidth(MAIN_PAGE_WIDTH);
+      stage.setHeight(MAIN_PAGE_HEIGHT);
+      stage.centerOnScreen();
       stage.show();
     } catch (IOException e) {
       LOGGER.error("Không thể quay về trang chính", e);
@@ -661,12 +1251,16 @@ private void updateAuction(UpdateAuctionResponse update) {
   
     }
 
-    double minIncrement = (currentAuction != null) ? currentAuction.getMinimumIncrement() : 0;
+    double minIncrement = 0;
+    if (currentAuction != null) {
+      minIncrement = currentAuction.getMinimumIncrement();
+    }
     double minBid = update.getCurrentPrice() + minIncrement;
     minimumBidLabel.setText("Bid tối thiểu: $" + String.format("%.2f", minBid));
 
     // 2. GỌI LOGIC TỐI ƯU: Chỉ bóc phần tử cuối cùng của mảng truyền vào đẩy lên UI
     renderBidHistory(update.getBidHistory());
+    addLatestBidToChart(update.getBidHistory());
     totalBidsLabel.setText("Tổng số bid: " + update.getBidHistory().size());
 
     // 3. Cập nhật trạng thái người đấu giá

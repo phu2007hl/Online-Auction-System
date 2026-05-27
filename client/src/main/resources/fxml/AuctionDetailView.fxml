@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<BorderPane prefHeight="700.0" prefWidth="1000.0"
+<BorderPane prefHeight="760.0" prefWidth="1400.0"
             style="-fx-background-color: #f3f4f6;"
             xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -39,10 +40,13 @@
     </top>
 
     <center>
-        <HBox spacing="20" style="-fx-padding: 20;" alignment="TOP_CENTER">
-            <children>
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background: transparent; -fx-background-color: transparent;">
+            <content>
+                <HBox spacing="28" style="-fx-padding: 24;" alignment="TOP_CENTER">
+                    <children>
                 <!-- ===== CỘT TRÁI: Thông tin bid ===== -->
-                <VBox spacing="12" prefWidth="550"
+                <VBox spacing="12" minWidth="700" prefWidth="760"
                       style="-fx-background-color: white; -fx-padding: 25; -fx-background-radius: 12; -fx-border-color: #e5e7eb; -fx-border-radius: 12;">
                     <children>
                         <!-- Tên sản phẩm -->
@@ -137,6 +141,80 @@
                                wrapText="true"
                                style="-fx-font-size: 13;"/>
 
+                        <!-- Biểu đồ giá realtime -->
+                        <VBox spacing="8"
+                              style="-fx-background-color: #ffffff; -fx-padding: 16; -fx-background-radius: 12; -fx-border-color: #e5e7eb; -fx-border-radius: 12;">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <children>
+                                        <Label text="Biểu đồ giá realtime"
+                                               style="-fx-text-fill: #111827;">
+                                            <font>
+                                                <Font name="System Bold" size="15"/>
+                                            </font>
+                                        </Label>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Label fx:id="chartLatestPriceLabel"
+                                               text=""
+                                               style="-fx-text-fill: #2563eb; -fx-font-weight: bold; -fx-font-size: 13;"/>
+                                    </children>
+                                </HBox>
+                                <Label fx:id="chartPointCountLabel"
+                                       text=""
+                                       style="-fx-text-fill: #6b7280; -fx-font-size: 11;"/>
+                                <AnchorPane fx:id="chartPlotPane" prefHeight="360">
+                                    <children>
+                                        <LineChart fx:id="priceChart"
+                                                   animated="false"
+                                                   createSymbols="true"
+                                                   legendVisible="false"
+                                                   horizontalGridLinesVisible="true"
+                                                   verticalGridLinesVisible="true"
+                                                   style="-fx-background-color: white;"
+                                                   AnchorPane.bottomAnchor="0.0"
+                                                   AnchorPane.leftAnchor="0.0"
+                                                   AnchorPane.rightAnchor="0.0"
+                                                   AnchorPane.topAnchor="0.0">
+                                            <xAxis>
+                                                <CategoryAxis fx:id="timeAxis"
+                                                              label="Thời gian"
+                                                              tickLabelFill="#374151"
+                                                              tickLabelRotation="0"
+                                                              style="-fx-tick-label-fill: #374151;"/>
+                                            </xAxis>
+                                            <yAxis>
+                                                <NumberAxis fx:id="priceAxis"
+                                                            forceZeroInRange="false"
+                                                            label="Giá ($)"
+                                                            tickLabelFill="#374151"
+                                                            style="-fx-tick-label-fill: #374151;"/>
+                                            </yAxis>
+                                        </LineChart>
+                                        <VBox fx:id="chartInfoPopup"
+                                              managed="false"
+                                              mouseTransparent="true"
+                                              prefHeight="78"
+                                              prefWidth="210"
+                                              spacing="3"
+                                              visible="false"
+                                              style="-fx-background-color: rgba(17, 24, 39, 0.88); -fx-background-radius: 8; -fx-padding: 10 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.28), 12, 0.3, 0, 4);">
+                                            <children>
+                                                <Label fx:id="chartInfoUserLabel"
+                                                       textFill="WHITE"
+                                                       style="-fx-font-size: 12; -fx-font-weight: bold;"/>
+                                                <Label fx:id="chartInfoBidLabel"
+                                                       textFill="WHITE"
+                                                       style="-fx-font-size: 12; -fx-font-weight: bold;"/>
+                                                <Label fx:id="chartInfoTimeLabel"
+                                                       textFill="WHITE"
+                                                       style="-fx-font-size: 12; -fx-font-weight: bold;"/>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </AnchorPane>
+                            </children>
+                        </VBox>
+
                         <Separator/>
 
                         <!-- Thông tin bổ sung -->
@@ -178,14 +256,14 @@
                 </VBox>
 
                 <!-- ===== CỘT PHẢI: Ảnh + Lịch sử bid ===== -->
-                <VBox spacing="15" prefWidth="380">
+                <VBox spacing="15" minWidth="440" prefWidth="480">
                     <children>
                         <!-- Ảnh sản phẩm -->
                         <VBox alignment="CENTER"
                               style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 12; -fx-border-color: #e5e7eb; -fx-border-radius: 12;">
                             <children>
                                 <ImageView fx:id="productImageView"
-                                           fitWidth="340" fitHeight="240"
+                                           fitWidth="430" fitHeight="260"
                                            preserveRatio="true"/>
                             </children>
                         </VBox>
@@ -210,7 +288,9 @@
                         </VBox>
                     </children>
                 </VBox>
-            </children>
-        </HBox>
+                    </children>
+                </HBox>
+            </content>
+        </ScrollPane>
     </center>
 </BorderPane>
