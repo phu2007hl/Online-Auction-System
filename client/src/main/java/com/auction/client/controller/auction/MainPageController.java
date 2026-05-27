@@ -41,6 +41,10 @@ import org.slf4j.LoggerFactory;
 */
 public class MainPageController extends Controller implements Initializable {
   private static final Logger LOGGER = LoggerFactory.getLogger(MainPageController.class);
+  private static final double LOGIN_PAGE_WIDTH = 924;
+  private static final double LOGIN_PAGE_HEIGHT = 500;
+  private static final double AUCTION_DETAIL_WIDTH = 1440;
+  private static final double AUCTION_DETAIL_HEIGHT = 820;
   private static boolean updateMainPageSuccess;
   private static boolean logOutSuccess;
 
@@ -237,6 +241,10 @@ public class MainPageController extends Controller implements Initializable {
           controller.setSocketClient(socket);
 
           currentStage.setScene(new Scene(root));
+          currentStage.setTitle("Đăng nhập");
+          currentStage.setWidth(LOGIN_PAGE_WIDTH);
+          currentStage.setHeight(LOGIN_PAGE_HEIGHT);
+          currentStage.centerOnScreen();
           currentStage.show();
         } catch (IOException e) {
           LOGGER.error("Không thể quay về trang đăng nhập", e);
@@ -292,6 +300,9 @@ public class MainPageController extends Controller implements Initializable {
       Stage stage = (Stage) usernameLabel.getScene().getWindow();
       stage.getScene().setRoot(root);
       stage.setTitle("Chi tiết đấu giá");
+      stage.setWidth(AUCTION_DETAIL_WIDTH);
+      stage.setHeight(AUCTION_DETAIL_HEIGHT);
+      stage.centerOnScreen();
       stage.show();
     } catch (IOException e) {
       LOGGER.error("Không thể mở màn chi tiết auction", e);

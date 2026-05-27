@@ -11,8 +11,8 @@
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.auction.client.controller.auction.MainPageController"
-            prefWidth="900.0"
-            prefHeight="600.0"
+            prefWidth="1100.0"
+            prefHeight="720.0"
             style="-fx-background-color: #f3f4f6;">
 
     <!-- Thanh trên cùng -->

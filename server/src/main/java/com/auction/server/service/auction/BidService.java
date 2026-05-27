@@ -1,5 +1,6 @@
 package com.auction.server.service.auction;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -75,7 +76,8 @@ public class BidService {
             //Lưu các thông tin mới của Auction vào database;
             auction.setCurrentPrice(getBidPrice());
             auction.setWinner(getBidder());
-            BidTransaction bidTransaction = new BidTransaction(getBidder().getUsername(), getBidPrice());
+            BidTransaction bidTransaction =
+                    new BidTransaction(getBidder().getUsername(), getBidPrice(), LocalDateTime.now());
             auction.getBidHistory().add(bidTransaction);
             ConcurrentHashMap<Integer, Auction> auctionList = AuctionListDatabase.getInstance().getData();
             AuctionListDatabase.getInstance().saveData(auctionList);

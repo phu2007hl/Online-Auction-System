@@ -30,6 +30,10 @@ import org.slf4j.LoggerFactory;
 */
 public class RegisterController extends Controller implements Initializable {
   private static final Logger LOGGER = LoggerFactory.getLogger(RegisterController.class);
+  private static final double LOGIN_PAGE_WIDTH = 924;
+  private static final double LOGIN_PAGE_HEIGHT = 500;
+  private static final double MAIN_PAGE_WIDTH = 1100;
+  private static final double MAIN_PAGE_HEIGHT = 720;
   private static boolean switchToMainSuccess;
 
   private SocketClient socket;
@@ -126,6 +130,9 @@ public class RegisterController extends Controller implements Initializable {
 
       currentStage.getScene().setRoot(root);
       currentStage.setTitle("Đăng nhập");
+      currentStage.setWidth(LOGIN_PAGE_WIDTH);
+      currentStage.setHeight(LOGIN_PAGE_HEIGHT);
+      currentStage.centerOnScreen();
       currentStage.show();
     } catch (IOException e) {
       LOGGER.error("Không thể mở trang đăng nhập", e);
@@ -151,6 +158,9 @@ public class RegisterController extends Controller implements Initializable {
 
       currentStage.setScene(new Scene(root));
       currentStage.setTitle("Hệ thống đấu giá");
+      currentStage.setWidth(MAIN_PAGE_WIDTH);
+      currentStage.setHeight(MAIN_PAGE_HEIGHT);
+      currentStage.centerOnScreen();
       currentStage.show();
     } catch (IOException e) {
       LOGGER.error("Không thể mở trang chính", e);
