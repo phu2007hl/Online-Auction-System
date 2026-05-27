@@ -5,8 +5,8 @@ import com.auction.shared.enums.AuctionStatus;
 import com.auction.shared.model.User;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
 * Thông tin một phiên đấu giá.
@@ -18,8 +18,9 @@ public class Auction extends Entity {
   private double startingPrice;
   private double currentPrice;
   private double minimumIncrement;
+  private boolean antiSnippingEnabled;
   private LocalDate startTime;
-  private LocalDate endTime;
+  private LocalDateTime endTime;
   private AuctionStatus status;
   private User winner;
   private ArrayList<BidTransaction> bidHistory;
@@ -44,7 +45,7 @@ public class Auction extends Entity {
       User seller,
       double startingPrice,
       double minimumIncrement,
-      LocalDate endTime,
+      LocalDateTime endTime,
       byte[] imageContent,
       String category) {
     super(id);
@@ -79,7 +80,7 @@ public class Auction extends Entity {
   public double getMinimumIncrement(){
     return minimumIncrement;
   }
-  public LocalDate getEndTime(){
+  public LocalDateTime getEndTime(){
     return endTime;
   }
   public LocalDate getStartTime(){
@@ -105,6 +106,15 @@ public class Auction extends Entity {
     this.id = id;
 
   }
+
+  public boolean isAntiSnippingEnabled() {
+    return antiSnippingEnabled;
+  }
+
+  public void setAntiSnippingEnabled(boolean antiSnippingEnabled) {
+    this.antiSnippingEnabled = antiSnippingEnabled;
+  }
+
   public double getCurrentPrice(){
     return currentPrice;
   }
@@ -116,9 +126,12 @@ public class Auction extends Entity {
   }
   public void setStatus(AuctionStatus status){
     this.status = status;
-
-
   }
+
+  public void setEndTime(LocalDateTime endTime) {
+    this.endTime = endTime;
+  }
+
   public void setCurrentPrice(double currentPrice){
     this.currentPrice = currentPrice;
   }
