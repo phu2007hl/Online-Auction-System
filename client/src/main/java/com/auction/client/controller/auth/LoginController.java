@@ -92,7 +92,7 @@ public class LoginController extends Controller implements Initializable {
     String password = passwordField.getText();
 
     if (email.isEmpty() || password.isEmpty()) {
-      messageLabel.setText("Vui lòng nhập email và mật khẩu.");
+      showError("Vui lòng nhập email và mật khẩu.");
       return;
     }
 
@@ -108,14 +108,14 @@ public class LoginController extends Controller implements Initializable {
       Request request = service.createAuthRequest();
 
       if (request == null) {
-        messageLabel.setText(service.getErrorMessage());
+        showError(service.getErrorMessage());
         return;
       }
 
       socket.sendRequest(request);
     } catch (Exception e) {
       LOGGER.error("Không thể gửi yêu cầu đăng nhập", e);
-      messageLabel.setText("Không thể kết nối tới server.");
+      showError("Không thể kết nối tới server.");
     }
   }
 
@@ -143,7 +143,7 @@ public class LoginController extends Controller implements Initializable {
       currentStage.show();
     } catch (IOException e) {
       LOGGER.error("Không thể mở trang đăng ký", e);
-      messageLabel.setText("Không thể mở trang đăng ký.");
+      showError("Không thể mở trang đăng ký.");
     }
   }
 
@@ -171,7 +171,7 @@ public class LoginController extends Controller implements Initializable {
       currentStage.show();
     } catch (IOException e) {
       LOGGER.error("Không thể mở trang chính", e);
-      messageLabel.setText("Không thể mở trang chính.");
+      showError("Không thể mở trang chính.");
     }
   }
 
@@ -194,7 +194,7 @@ public class LoginController extends Controller implements Initializable {
       currentStage.show();
     } catch (Exception e) {
       LOGGER.error("Không thể mở trang admin", e);
-      messageLabel.setText("Không thể mở trang admin.");
+      showError("Không thể mở trang admin.");
     }
   }
 
@@ -233,6 +233,7 @@ public class LoginController extends Controller implements Initializable {
         switchToAdminDashboard(true);
       } else {
         switchToAdminSuccess = false;
+        showError("Đăng nhập admin thất bại");
       }
     } else if (obj instanceof LoginResponse) {
       LoginResponse response = (LoginResponse) obj;
@@ -240,14 +241,19 @@ public class LoginController extends Controller implements Initializable {
         switchToMain(response.getCurrentUser(), true);
       } else {
         if (response.getStatus() == LoginResponseStatus.INVALID_PASSWORD) {
-          messageLabel.setText("Mật khẩu không hợp lệ");
+          showError("Mật khẩu không hợp lệ");
         }
         if (response.getStatus() == LoginResponseStatus.EMAIL_NOT_FOUND) {
-          messageLabel.setText("Email không tồn tại");
+          showError("Email không tồn tại");
         }
         switchToMainSuccess = false;
       }
     }
+  }
+
+  private void showError(String message) {
+    messageLabel.setStyle("-fx-text-fill: #dc2626; -fx-font-weight: bold;");
+    messageLabel.setText(message);
   }
 
   /**

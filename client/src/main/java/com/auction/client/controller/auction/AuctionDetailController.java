@@ -20,6 +20,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -54,6 +56,8 @@ public class AuctionDetailController extends Controller implements Initializable
       LoggerFactory.getLogger(AuctionDetailController.class);
   private static final DateTimeFormatter BID_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("HH:mm:ss");
+  private static final DateTimeFormatter END_TIME_FORMATTER =
+      DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
   private static final int MAX_CHART_POINTS = 8;
   private static final double CHART_POINT_HOVER_THRESHOLD = 60;
   private static final double CHART_LINE_HOVER_THRESHOLD = 42;
@@ -87,6 +91,7 @@ public class AuctionDetailController extends Controller implements Initializable
   @FXML private Button placeBidButton;
   @FXML private Label bidResultLabel;
   @FXML private Label endDateLabel;
+  @FXML private Label remainingTimeLabel;
   @FXML private Label totalBidsLabel;
   @FXML private Label sellerLabel;
   @FXML private HBox winnerBox;
@@ -105,6 +110,7 @@ public class AuctionDetailController extends Controller implements Initializable
   @FXML private NumberAxis priceAxis;
   private XYChart.Series<String, Number> chartSeries;
   private XYChart.Data<String, Number> activeHoverPoint;
+  private Timeline countdownTimeline;
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
@@ -169,6 +175,7 @@ public class AuctionDetailController extends Controller implements Initializable
    * Trạng thái chờ response để tránh hiển thị nhầm UI bid trước khi có dữ liệu thật.
    */
   private void showLoadingState() {
+    stopCountdown();
     auctionTitleLabel.setText("Đang tải chi tiết đấu giá...");
     auctionStatusBadge.setText("");
     itemNameLabel.setText("");
@@ -179,6 +186,7 @@ public class AuctionDetailController extends Controller implements Initializable
     minimumBidLabel.setText("");
     bidResultLabel.setText("");
     endDateLabel.setText("");
+    remainingTimeLabel.setText("");
     totalBidsLabel.setText("");
     sellerLabel.setText("");
     winnerLabel.setText("");
@@ -278,13 +286,15 @@ private void updateAuction(UpdateAuctionResponse update) {
     currentAuction.setDescription(update.getUpdatedAuction().getDescription());
     currentAuction.setCategory(update.getUpdatedAuction().getCategory());
     currentAuction.setImageContent(update.getUpdatedAuction().getImageContent());
-    currentAuction.setStatus(update.getUpdatedAuction().getAuctionStatus());
-    currentAuction.setImageContent(update.getUpdatedAuction().getImageContent());
-
-
-    // Nếu Auction có category
-    // currentAuction.setCategory(update.getCategory());
-
+    currentAuction.setAntiSnippingEnabled(update.getUpdatedAuction().isAntiSnippingEnabled());
+    if (update.getUpdatedAuction().getEndTime() != null) {
+      currentAuction.setEndTime(update.getUpdatedAuction().getEndTime());
+      updateEndTimeView(update.getUpdatedAuction().getEndTime());
+      startCountdown(currentAuction);
+    }
+    if (update.getUpdatedAuction().getAuctionStatus() != null) {
+      currentAuction.setStatus(update.getUpdatedAuction().getAuctionStatus());
+    }
   }
 
   LOGGER.info(
@@ -316,7 +326,8 @@ private void updateAuction(UpdateAuctionResponse update) {
     currentPriceLabel.setText("Bid hiện tại: $"
         + String.format("%.2f", auction.getCurrentPrice()));
     sellerLabel.setText(auction.getSeller().getUsername());
-    endDateLabel.setText("Kết thúc: " + auction.getEndTime().toString());
+    updateEndTimeView(auction.getEndTime());
+    startCountdown(auction);
     totalBidsLabel.setText("Tổng số bid: " + auction.getBidHistory().size());
 
     double minBid = auction.getCurrentPrice() + auction.getMinimumIncrement();
@@ -347,10 +358,84 @@ private void updateAuction(UpdateAuctionResponse update) {
     }
   }
 
+  private void updateEndTimeView(LocalDateTime endTime) {
+    if (endTime != null) {
+      endDateLabel.setText("Kết thúc: " + endTime.format(END_TIME_FORMATTER));
+    } else {
+      endDateLabel.setText("Kết thúc: chưa xác định");
+      remainingTimeLabel.setText("");
+    }
+  }
+
+  private void startCountdown(Auction auction) {
+    stopCountdown();
+    if (auction == null || auction.getEndTime() == null) {
+      remainingTimeLabel.setText("");
+      return;
+    }
+    updateRemainingTime(auction);
+    if (auction.getStatus() != AuctionStatus.OPEN) {
+      return;
+    }
+    countdownTimeline =
+        new Timeline(
+            new KeyFrame(
+                javafx.util.Duration.seconds(1),
+                event -> updateRemainingTime(auction)));
+    countdownTimeline.setCycleCount(Timeline.INDEFINITE);
+    countdownTimeline.play();
+  }
+
+  private void stopCountdown() {
+    if (countdownTimeline != null) {
+      countdownTimeline.stop();
+      countdownTimeline = null;
+    }
+  }
+
+  private void updateRemainingTime(Auction auction) {
+    if (auction == null || auction.getEndTime() == null) {
+      remainingTimeLabel.setText("");
+      return;
+    }
+
+    java.time.Duration remaining =
+        java.time.Duration.between(LocalDateTime.now(), auction.getEndTime());
+    if (remaining.isZero() || remaining.isNegative()) {
+      remainingTimeLabel.setText("Còn lại: 00:00:00");
+      remainingTimeLabel.setStyle(
+          "-fx-text-fill: #dc2626; -fx-font-size: 13; -fx-font-weight: bold;");
+      stopCountdown();
+      if (auction.getStatus() == AuctionStatus.OPEN) {
+        auction.setStatus(AuctionStatus.CLOSED);
+        renderClosedAuction(auction);
+      }
+      return;
+    }
+
+    long totalSeconds = remaining.getSeconds();
+    long days = totalSeconds / 86400;
+    long hours = (totalSeconds % 86400) / 3600;
+    long minutes = (totalSeconds % 3600) / 60;
+    long seconds = totalSeconds % 60;
+
+    if (days > 0) {
+      remainingTimeLabel.setText(
+          String.format("Còn lại: %d ngày %02d:%02d:%02d", days, hours, minutes, seconds));
+    } else {
+      remainingTimeLabel.setText(
+          String.format("Còn lại: %02d:%02d:%02d", hours, minutes, seconds));
+    }
+    remainingTimeLabel.setStyle(
+        "-fx-text-fill: #2563eb; -fx-font-size: 13; -fx-font-weight: bold;");
+  }
+
   /**
    * Render khi auction đã kết thúc.
    */
   private void renderClosedAuction(Auction auction) {
+    stopCountdown();
+    remainingTimeLabel.setText("Còn lại: 00:00:00");
     auctionStatusBadge.setText("ĐÃ KẾT THÚC");
     auctionStatusBadge.setStyle(
         "-fx-padding: 4 12; -fx-background-radius: 12; "
@@ -375,6 +460,8 @@ private void updateAuction(UpdateAuctionResponse update) {
     hideBidControls();
   }
   private void renderCancelledAuction(Auction auction){
+      stopCountdown();
+      remainingTimeLabel.setText("Đã hủy");
       auctionStatusBadge.setText("ĐÃ BỊ HUỶ");
     auctionStatusBadge.setStyle(
         "-fx-padding: 4 12; -fx-background-radius: 12; "
@@ -397,6 +484,7 @@ private void updateAuction(UpdateAuctionResponse update) {
    * Render khi auction đang mở, dựa theo BidderStatus.
    */
   private void renderOpenAuction(Auction auction, BidderStatus bidderStatus) {
+    startCountdown(auction);
     auctionStatusBadge.setText("ĐANG MỞ");
     auctionStatusBadge.setStyle(
         "-fx-padding: 4 12; -fx-background-radius: 12; "
@@ -1248,7 +1336,11 @@ private void updateAuction(UpdateAuctionResponse update) {
 
     if (currentAuction != null) {
       currentAuction.setCurrentPrice(update.getCurrentPrice());
-  
+      if (update.getEndTime() != null) {
+        currentAuction.setEndTime(update.getEndTime());
+        updateEndTimeView(update.getEndTime());
+        startCountdown(currentAuction);
+      }
     }
 
     double minIncrement = 0;
