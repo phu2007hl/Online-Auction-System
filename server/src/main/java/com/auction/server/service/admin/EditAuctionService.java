@@ -21,12 +21,20 @@ public class EditAuctionService {
         createAuctionRequest.setDescription(editAuctionRequest.getDescription());
         createAuctionRequest.setImageContent(editAuctionRequest.getImageContent());
         createAuctionRequest.setItemName(editAuctionRequest.getItemName());
+        if (editAuctionRequest.getEndTime() != null) {
+            createAuctionRequest.setEndTime(editAuctionRequest.getEndTime());
+        }
+        createAuctionRequest.setAntiSnippingEnabled(editAuctionRequest.isAntiSnippingEnabled());
     }
     private static void updateAuction(Auction auction,EditAuctionRequest editAuctionRequest){
         auction.setCategory(editAuctionRequest.getCategory());
         auction.setDescription(editAuctionRequest.getDescription());
         auction.setImageContent(editAuctionRequest.getImageContent());
         auction.setItemName(editAuctionRequest.getItemName());
+        if (editAuctionRequest.getEndTime() != null) {
+            auction.setEndTime(editAuctionRequest.getEndTime());
+        }
+        auction.setAntiSnippingEnabled(editAuctionRequest.isAntiSnippingEnabled());
         if (editAuctionRequest.getAuctionStatus() != null) {
             auction.setStatus(editAuctionRequest.getAuctionStatus());
         }

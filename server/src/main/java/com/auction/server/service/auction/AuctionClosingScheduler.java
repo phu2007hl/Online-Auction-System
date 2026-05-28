@@ -4,7 +4,7 @@ import com.auction.server.database.AuctionListDatabase;
 import com.auction.shared.auction.Auction;
 import com.auction.shared.enums.AuctionStatus;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -43,7 +43,7 @@ public class AuctionClosingScheduler {
     private static void closeExpiredAuctions(){
         ConcurrentHashMap<Integer, Auction> auctionList = AuctionListDatabase.getInstance().getData();
         boolean changed = false;
-        LocalDate today = LocalDate.now();
+        LocalDateTime now = LocalDateTime.now();
 
         for (Integer auctionId : auctionList.keySet()){
             Auction auction = auctionList.get(auctionId);
@@ -55,7 +55,10 @@ public class AuctionClosingScheduler {
                 if (auction.getStatus() != AuctionStatus.OPEN) {
                     continue;
                 }
-                if (!auction.getEndTime().isBefore(today)) {
+                if (auction.getEndTime() == null) {
+                    continue;
+                }
+                if (auction.getEndTime().isAfter(now)) {
                     continue;
                 }
 

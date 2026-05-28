@@ -2,6 +2,7 @@ package com.auction.shared.request.auction;
 
 import com.auction.shared.request.Request;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
 * Yêu cầu tạo auction do user gửi lên server.
@@ -11,10 +12,11 @@ public class CreateAuctionRequest extends Request {
   private String category;
   private final double startingPrice;
   private String description;
-  private final LocalDate endDate;
+  private LocalDateTime endTime;
   private final int id;
   private String itemName;
   private final double minimumIncrement;
+  private boolean antiSnippingEnabled;
 
 
   /**
@@ -24,25 +26,48 @@ public class CreateAuctionRequest extends Request {
   * @param category loại sản phẩm
   * @param startingPrice giá khởi điểm
   * @param description mô tả sản phẩm
-  * @param endDate ngày kết thúc đấu giá
+  * @param endTime thời điểm kết thúc đấu giá
   */
   public CreateAuctionRequest(
       byte[] imageContent,
       String category,
       double startingPrice,
       String description,
-      LocalDate endDate,
+      LocalDateTime endTime,
       int id,
       String name,
       double minimumIncrement) {
+    this(
+        imageContent,
+        category,
+        startingPrice,
+        description,
+        endTime,
+        id,
+        name,
+        minimumIncrement,
+        false);
+  }
+
+  public CreateAuctionRequest(
+      byte[] imageContent,
+      String category,
+      double startingPrice,
+      String description,
+      LocalDateTime endTime,
+      int id,
+      String name,
+      double minimumIncrement,
+      boolean antiSnippingEnabled) {
     this.imageContent = imageContent;
     this.category = category;
     this.startingPrice = startingPrice;
     this.description = description;
-    this.endDate = endDate;
+    this.endTime = endTime;
     this.id = id;
     this.itemName = name;
     this.minimumIncrement = minimumIncrement;
+    this.antiSnippingEnabled = antiSnippingEnabled;
   }
 
   /**
@@ -81,6 +106,10 @@ public class CreateAuctionRequest extends Request {
     return minimumIncrement;
   }
 
+  public boolean isAntiSnippingEnabled() {
+    return antiSnippingEnabled;
+  }
+
   /**
   * Lấy mô tả sản phẩm.
   *
@@ -91,12 +120,21 @@ public class CreateAuctionRequest extends Request {
   }
 
   /**
-  * Lấy ngày kết thúc đấu giá.
+  * Lấy thời điểm kết thúc đấu giá.
+  *
+  * @return thời điểm kết thúc
+  */
+  public LocalDateTime getEndTime() {
+    return endTime;
+  }
+
+  /**
+  * Lấy riêng ngày kết thúc đấu giá.
   *
   * @return ngày kết thúc
   */
   public LocalDate getEndDate() {
-    return endDate;
+    return endTime.toLocalDate();
   }
 
   /**
@@ -128,5 +166,13 @@ public class CreateAuctionRequest extends Request {
 
   public void setItemName(String itemName) {
     this.itemName = itemName;
+  }
+
+  public void setEndTime(LocalDateTime endTime) {
+    this.endTime = endTime;
+  }
+
+  public void setAntiSnippingEnabled(boolean antiSnippingEnabled) {
+    this.antiSnippingEnabled = antiSnippingEnabled;
   }
 }

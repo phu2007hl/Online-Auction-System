@@ -40,7 +40,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
 
@@ -184,7 +184,7 @@ public class DataFlowTest {
                 "Electronic",
                 1000,
                 "desc",
-                LocalDate.now().plusDays(4),
+                LocalDateTime.now().plusDays(4),
                 888888888,
                 "Laptop",
                 100);
@@ -211,7 +211,7 @@ public class DataFlowTest {
                 "Electronic",
                 1000,
                 "desc",
-                LocalDate.now().plusDays(4),
+                LocalDateTime.now().plusDays(4),
                 888888888,
                 "Laptop",
                 100);
