@@ -24,7 +24,6 @@ public class SendToAdminService {
     requestList.put(pendingRequest.getCreateAuctionRequest().getId(), pendingRequest);
     database.saveData(requestList);
 
-    ClientHandler.rememberAuctionRequestSender(clientHandler.getUser(), clientHandler);
     LOGGER.info(
         "Đã lưu auction request vào pending database [user: {}, category: {}]",
         userContext,

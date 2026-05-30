@@ -8,7 +8,6 @@ import com.auction.shared.enums.AuctionStatus;
 import com.auction.shared.enums.CreateAuctionStatus;
 import com.auction.shared.request.admin.EditAuctionRequest;
 import com.auction.shared.request.admin.GetPendingAuctionListRequest;
-import com.auction.shared.request.auction.AuctionReviewResultRequest;
 import com.auction.shared.request.auction.CreateAuctionRequest;
 import com.auction.shared.request.auction.GetApprovedAuctionListRequest;
 import com.auction.shared.request.auction.PendingAuctionReviewRequest;

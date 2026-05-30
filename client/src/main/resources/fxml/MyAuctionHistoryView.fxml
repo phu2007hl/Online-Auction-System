@@ -10,12 +10,11 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.auction.client.controller.auction.MainPageController"
+            fx:controller="com.auction.client.controller.auction.MyAuctionHistoryController"
             prefWidth="1100.0"
             prefHeight="720.0"
             style="-fx-background-color: #f3f4f6;">
 
-    <!-- Thanh trên cùng -->
     <top>
         <HBox alignment="CENTER_RIGHT"
               spacing="15"
@@ -31,17 +30,10 @@
                         <Font name="System Bold" size="13" />
                     </font>
                 </Label>
-
-                <Button text="Đăng xuất"
-                        onAction="#switchToLogin"
-                        prefWidth="90"
-                        prefHeight="30"
-                        style="-fx-background-color: transparent; -fx-border-color: #ef4444; -fx-text-fill: #ef4444; -fx-background-radius: 6; -fx-border-radius: 6; -fx-cursor: hand;" />
             </children>
         </HBox>
     </top>
 
-    <!-- Thanh menu bên trái -->
     <left>
         <VBox spacing="15"
               prefWidth="200"
@@ -53,14 +45,8 @@
                     </font>
                 </Label>
 
-                <Button text="Tạo đấu giá"
-                        onAction="#switchToCreateAuction"
-                        prefWidth="160"
-                        prefHeight="40"
-                        style="-fx-background-color: #4f46e5; -fx-text-fill: white; -fx-background-radius: 8; -fx-cursor: hand;" />
-
-                <Button text="Lịch sử"
-                        onAction="#switchToMyAuctionHistory"
+                <Button text="Quay lại"
+                        onAction="#switchToMainPage"
                         prefWidth="160"
                         prefHeight="40"
                         style="-fx-background-color: transparent; -fx-border-color: #4f46e5; -fx-text-fill: #4f46e5; -fx-background-radius: 8; -fx-border-radius: 8; -fx-cursor: hand;" />
@@ -68,19 +54,18 @@
         </VBox>
     </left>
 
-    <!-- Nội dung chính -->
     <center>
         <VBox spacing="15"
               alignment="TOP_CENTER"
               style="-fx-padding: 20;">
             <children>
-                <Label text="Trang chính">
+                <Label text="Lịch sử auction">
                     <font>
                         <Font size="24" />
                     </font>
                 </Label>
 
-                <Label text="Chào mừng đến với hệ thống đấu giá"
+                <Label text="Danh sách các auction của bạn đã được admin chấp nhận hoặc từ chối"
                        style="-fx-text-fill: #6b7280;" />
 
                 <HBox alignment="CENTER_RIGHT"
@@ -88,20 +73,19 @@
                       style="-fx-padding: 0 10 0 10;">
                     <children>
                         <Button text="Refresh"
-                                onAction="#refreshAuctionList"
+                                onAction="#refreshHistory"
                                 prefWidth="110"
                                 prefHeight="34"
                                 style="-fx-background-color: transparent; -fx-border-color: #4f46e5; -fx-text-fill: #4f46e5; -fx-background-radius: 8; -fx-border-radius: 8; -fx-cursor: hand;" />
                     </children>
                 </HBox>
 
-                <!-- Vùng hiển thị các sản phẩm đấu giá -->
                 <ScrollPane fitToWidth="true"
-                            prefHeight="420"
+                            prefHeight="500"
                             style="-fx-background: transparent; -fx-background-color: transparent;"
                             VBox.vgrow="ALWAYS">
                     <content>
-                        <VBox fx:id="productContainer"
+                        <VBox fx:id="historyContainer"
                               spacing="12"
                               fillWidth="true"
                               style="-fx-padding: 10;" />

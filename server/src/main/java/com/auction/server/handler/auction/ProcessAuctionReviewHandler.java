@@ -9,7 +9,6 @@ import com.auction.server.service.auction.BroadcastApprovedAuction;
 import com.auction.shared.auction.Auction;
 import com.auction.shared.enums.CreateAuctionStatus;
 import com.auction.shared.request.Request;
-import com.auction.shared.request.auction.AuctionReviewResultRequest;
 import com.auction.shared.request.auction.CreateAuctionRequest;
 import com.auction.shared.request.auction.PendingAuctionReviewRequest;
 import com.auction.shared.request.auction.ProcessAuctionReviewRequest;
@@ -51,8 +50,6 @@ public class ProcessAuctionReviewHandler implements RequestHandler {
 
       removePendingRequest(pendingRequest);
     }
-
-    sendReviewResultToUser(pendingRequest, status);
 
     if (auction != null) {
       BroadcastApprovedAuction.broadcast(auction, clientHandler);
@@ -107,29 +104,6 @@ public class ProcessAuctionReviewHandler implements RequestHandler {
       requestList.remove(requestId);
       database.saveData(requestList);
       LOGGER.info("Còn lại {} request trong danh sách chờ duyệt", requestList.size());
-    }
-  }
-
-  private void sendReviewResultToUser(
-      PendingAuctionReviewRequest pendingRequest,
-      CreateAuctionStatus status) {
-    ConcurrentHashMap<String, ClientHandler> auctionRequestSenders =
-        ClientHandler.getAuctionRequestSenders();
-    ClientHandler sender = auctionRequestSenders.get(pendingRequest.getUser().getEmail());
-    if (sender == null) {
-      LOGGER.warn(
-          "Không tìm thấy client để gửi kết quả duyệt [email: {}]",
-          pendingRequest.getUser().getEmail());
-      return;
-    }
-
-    boolean accepted = status == CreateAuctionStatus.SUCCESS;
-    AuctionReviewResultRequest resultRequest =
-        new AuctionReviewResultRequest(pendingRequest.getUser(), accepted, status);
-    try {
-      sender.sendObject(resultRequest);
-    } catch (Exception e) {
-      LOGGER.error("Không thể gửi kết quả duyệt về user", e);
     }
   }
 }

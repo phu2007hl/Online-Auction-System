@@ -26,8 +26,6 @@ public class ClientHandler implements Runnable {
   private RequestDispatcher dispatcher = new RequestDispatcher();
   private static volatile AdminHandler adminHandler;
   private User user;
-  private static final ConcurrentHashMap<String, ClientHandler> auctionRequestSenders =
-      new ConcurrentHashMap<>();
   private static final Set<ClientHandler> onlineUser = ConcurrentHashMap.newKeySet();
 
   /**
@@ -187,37 +185,4 @@ public class ClientHandler implements Runnable {
     return onlineUser;
   }
 
-  /**
-  * Ghi nhớ connection của user đã gửi auction request để trả kết quả duyệt.
-  *
-  * @param user user cần mapping
-  * @param clientHandler client handler tương ứng
-  */
-  public static void rememberAuctionRequestSender(User user, ClientHandler clientHandler) {
-    if (user == null || user.getEmail() == null || clientHandler == null) {
-      LOGGER.warn("Không thể ghi nhớ auction request sender vì thiếu dữ liệu");
-      return;
-    }
-    auctionRequestSenders.put(user.getEmail(), clientHandler);
-  }
-
-  /**
-  * Xóa connection đã lưu của user gửi auction request.
-  *
-  * @param user user cần xóa mapping
-  */
-  public static void removeAuctionRequestSender(User user) {
-    if (user != null && user.getEmail() != null) {
-      auctionRequestSenders.remove(user.getEmail());
-    }
-  }
-
-  /**
-  * Lấy mapping user tạo auction request -> client handler.
-  *
-  * @return map user-client
-  */
-  public static ConcurrentHashMap<String, ClientHandler> getAuctionRequestSenders() {
-    return auctionRequestSenders;
-  }
 }
