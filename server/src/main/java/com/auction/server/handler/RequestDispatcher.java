@@ -42,6 +42,7 @@ public class RequestDispatcher {
     HANDLER_MAP.put(GetApprovedAuctionListRequest.class, new GetApprovedAuctionListHandler());
     HANDLER_MAP.put(LogOutRequest.class, new LogOutHandler());
     HANDLER_MAP.put(SaveAuctionReviewResultRequest.class, new SaveAuctionReviewResultHandler());
+    HANDLER_MAP.put(ProcessAuctionReviewRequest.class, new ProcessAuctionReviewHandler());
     HANDLER_MAP.put(
         PublishApprovedAuctionRequest.class,
         new PublishApprovedAuctionHandler());
