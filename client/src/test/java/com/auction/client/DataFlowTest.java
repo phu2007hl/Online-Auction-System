@@ -20,7 +20,8 @@ import com.auction.shared.model.User;
 import com.auction.shared.request.admin.EditAuctionRequest;
 import com.auction.shared.request.auction.BidRequest;
 import com.auction.shared.request.auction.CreateAuctionRequest;
-import com.auction.shared.request.auction.PublishApprovedAuctionRequest;
+import com.auction.shared.request.auction.PendingAuctionReviewRequest;
+import com.auction.shared.request.auction.ProcessAuctionReviewRequest;
 import com.auction.shared.request.auth.AdminLoginRequest;
 import com.auction.shared.request.auth.LoginRequest;
 import com.auction.shared.request.auth.LogOutRequest;
@@ -215,8 +216,12 @@ public class DataFlowTest {
                 888888888,
                 "Laptop",
                 100);
-        PublishApprovedAuctionRequest req =
-            new PublishApprovedAuctionRequest(request, new User("MaroMoro@gmail.com", "l888888888", "Miro"));
+        PendingAuctionReviewRequest pendingRequest =
+            new PendingAuctionReviewRequest(
+                request,
+                new User("MaroMoro@gmail.com", "l888888888", "Miro"));
+        ProcessAuctionReviewRequest req =
+            new ProcessAuctionReviewRequest(pendingRequest, CreateAuctionStatus.SUCCESS);
 
         con.sendRequest(req);
         waitForResponse();

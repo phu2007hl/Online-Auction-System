@@ -13,7 +13,7 @@ import com.auction.shared.request.auction.CreateAuctionRequest;
 import com.auction.shared.request.auction.PendingAuctionReviewRequest;
 import com.auction.shared.request.auction.ProcessAuctionReviewRequest;
 import com.auction.shared.response.Response;
-import com.auction.shared.response.auction.SaveAuctionReviewResultResponse;
+import com.auction.shared.response.auction.ProcessAuctionReviewResponse;
 import java.util.LinkedHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
@@ -59,7 +59,7 @@ public class ProcessAuctionReviewHandler implements RequestHandler {
         "Đã xử lý kết quả duyệt auction [requestId: {}, status: {}]",
         pendingRequest.getCreateAuctionRequest().getId(),
         status);
-    return new SaveAuctionReviewResultResponse(true);
+    return new ProcessAuctionReviewResponse(true);
   }
 
   private void saveReviewHistory(PendingAuctionReviewRequest pendingRequest) {
