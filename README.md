@@ -25,7 +25,7 @@
 
 - **JDK 25** trở lên (đã cài đặt và cấu hình `JAVA_HOME`)
 - **Apache Maven 3.8+**
-- **JavaFX SDK 21** (nếu build thủ công, không dùng Maven plugin)
+- Không cần cài JavaFX SDK riêng nếu chạy bằng file fat JAR được build bằng Maven
 
 ---
 
@@ -81,8 +81,13 @@ Online-Auction-System/
 
 | Module | Đường dẫn JAR |
 |---|---|
-| Server (fat JAR) | `server/target/server.jar` |
-| Client (fat JAR) | `client/target/client.jar` |
+| Server (fat JAR) | `server.jar` |
+| Client (fat JAR) | `client.jar` |
+
+Ngoài ra Maven vẫn tạo file JAR trong từng module:
+
+- `server/target/server.jar`
+- `client/target/client.jar`
 
 ---
 
@@ -93,6 +98,8 @@ Build toàn bộ project từ thư mục gốc:
 mvn clean package -DskipTests
 ```
 
+Sau khi build xong, `server.jar` và `client.jar` sẽ được tạo ở thư mục gốc của project.
+
 ---
 
 ## Hướng dẫn chạy Server và Client theo thứ tự cụ thể
@@ -100,7 +107,7 @@ mvn clean package -DskipTests
 ### Bước 1: Chạy Server
 
 ```bash
-java -jar server/target/server.jar
+java -jar server.jar
 ```
 
 Server sẽ khởi động và lắng nghe kết nối tại **cổng 4100**. Khi thấy log `"Server đã khởi động ở cổng 4100"` thì server đã sẵn sàng.
@@ -108,7 +115,7 @@ Server sẽ khởi động và lắng nghe kết nối tại **cổng 4100**. Kh
 ### Bước 2: Chạy Client
 
 ```bash
-java -jar client/target/client.jar
+java -jar client.jar
 ```
 
 > **Lưu ý:** Server phải được khởi động **trước** khi mở Client. Client kết nối tới `localhost:4100`.
@@ -116,6 +123,21 @@ java -jar client/target/client.jar
 ### Chạy thêm client (nhiều người dùng)
 
 Mở thêm terminal và chạy lại lệnh client ở bước 2. Mỗi lần chạy là một phiên client độc lập.
+
+### Bước 3: Sử dụng hệ thống
+
+**Người dùng thông thường:**
+1. Đăng ký tài khoản hoặc đăng nhập.
+2. Xem danh sách phiên đấu giá đang mở.
+3. Tạo phiên đấu giá mới (chờ Admin duyệt).
+4. Vào phòng đấu giá, đặt giá thầu và nhận cập nhật realtime.
+5. Xem lịch sử các auction đã tạo và kết quả duyệt của Admin.
+
+**Admin:**
+1. Đăng nhập bằng tài khoản Admin.
+2. Vào Admin Dashboard để duyệt/chỉnh sửa/từ chối phiên đấu giá.
+3. Publish phiên đấu giá đã duyệt lên hệ thống.
+4. Xem lịch sử các auction đã duyệt.
 
 
 ## Danh sách chức năng đã hoàn thành
@@ -135,6 +157,9 @@ Mở thêm terminal và chạy lại lệnh client ở bước 2. Mỗi lần ch
 - [x] Đặt giá trong phiên đấu giá (`PlaceBid`) — xử lý đồng thời với `LockManager`
 - [x] Nhắn tin trong phòng đấu giá (`SendMessage`)
 - [x] Nhận kết quả đấu giá tự động khi hết giờ (`AuctionAutoClose`)
+- [x] Xem lịch sử auction đã tạo và trạng thái duyệt/từ chối
+- [x] Theo dõi biểu đồ giá realtime theo lịch sử bid
+- [x] Anti-snipping: tự gia hạn thời gian khi có bid sát giờ kết thúc
 - [x] Cập nhật thông tin người dùng và danh sách auction theo thời gian thực
 
 ### Chức năng Admin
@@ -142,7 +167,9 @@ Mở thêm terminal và chạy lại lệnh client ở bước 2. Mỗi lần ch
 - [x] Xem lịch sử phiên đấu giá đã duyệt (`GetCheckedAuctionList`)
 - [x] Duyệt / từ chối phiên đấu giá (`SaveAuctionReviewResult`)
 - [x] Chỉnh sửa thông tin phiên đấu giá đã duyệt (`EditAuction`)
+- [x] Chỉnh sửa thông tin auction trước khi duyệt
 - [x] Phát hành phiên đấu giá đã duyệt (`PublishApprovedAuction`)
+- [x] Hủy auction và broadcast trạng thái realtime tới người dùng trong phòng
 
 ### Kiến trúc & Kỹ thuật
 - [x] Kiến trúc Client-Server với Java Socket (TCP)
@@ -154,21 +181,15 @@ Mở thêm terminal và chạy lại lệnh client ở bước 2. Mỗi lần ch
 - [x] Xử lý đồng thời bid với `LockManager`
 - [x] Lưu trữ dữ liệu bằng file `.ser` (Java Serialization)
 - [x] Logging với SLF4J + Logback
+- [x] Build fat JAR cho server và client bằng Maven
+- [x] CI/CD cơ bản với GitHub Actions và JUnit
 
 ---
 
-### Bước 3: Sử dụng hệ thống
+## Báo cáo và video demo
 
-**Người dùng thông thường:**
-1. Đăng ký tài khoản hoặc đăng nhập.
-2. Xem danh sách phiên đấu giá đang mở.
-3. Tạo phiên đấu giá mới (chờ Admin duyệt).
-4. Vào phòng đấu giá, đặt giá thầu và nhận thông báo realtime.
-
-**Admin:**
-1. Đăng nhập bằng tài khoản Admin.
-2. Vào Admin Dashboard để duyệt/chỉnh sửa phiên đấu giá.
-3. Publish phiên đấu giá đã duyệt lên hệ thống.
+- Báo cáo PDF: Cập nhật sau
+- Video demo: Cập nhật sau
 
 ---
 
@@ -182,4 +203,3 @@ Mở thêm terminal và chạy lại lệnh client ở bước 2. Mỗi lần ch
 | Phong | Model & Service | Phối hợp cùng Quân: chuẩn hóa các lớp dữ liệu, bổ sung enum (`AuctionStatus`, `ItemCondition`, `BidResponseStatus`, ...), entity, service xử lý nghiệp vụ và hoàn thiện logic backend cho các tính năng đấu giá. |
 
 ---
-
