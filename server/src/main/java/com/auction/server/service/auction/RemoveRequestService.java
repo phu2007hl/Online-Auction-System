@@ -14,9 +14,11 @@ public class RemoveRequestService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RemoveRequestService.class);
     public static void removeRequest(int id){
         PendingAuctionDatabase database = PendingAuctionDatabase.getInstance();
-        ConcurrentHashMap<Integer, PendingAuctionReviewRequest> requestList = database.getData();
-        requestList.remove(id);
-        LOGGER.debug("Đã xoá request với id - {} ra khỏi danh sách chờ duyệt", id);
-        database.saveData(requestList);
+        synchronized (database) {
+            ConcurrentHashMap<Integer, PendingAuctionReviewRequest> requestList = database.getData();
+            requestList.remove(id);
+            LOGGER.debug("Đã xoá request với id - {} ra khỏi danh sách chờ duyệt", id);
+            database.saveData(requestList);
+        }
     }
 }

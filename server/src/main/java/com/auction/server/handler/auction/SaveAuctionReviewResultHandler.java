@@ -32,12 +32,16 @@ public class SaveAuctionReviewResultHandler implements RequestHandler {
   @Override
   public Response handle(Request request, ClientHandler clientHandler) {
     AdminResponseDatabase database = AdminResponseDatabase.getInstance();
-    LinkedHashMap<Integer, PendingAuctionReviewRequest> adminResponse =
-        database.getData();
     SaveAuctionReviewResultRequest saveRequest = (SaveAuctionReviewResultRequest) request;
     PendingAuctionReviewRequest pendingAuctionReviewRequest = saveRequest.getRequest();
-    adminResponse.put(pendingAuctionReviewRequest.getCreateAuctionRequest().getId(), pendingAuctionReviewRequest);
-    database.saveData(adminResponse);
+    synchronized (database) {
+      LinkedHashMap<Integer, PendingAuctionReviewRequest> adminResponse =
+          database.getData();
+      adminResponse.put(
+          pendingAuctionReviewRequest.getCreateAuctionRequest().getId(),
+          pendingAuctionReviewRequest);
+      database.saveData(adminResponse);
+    }
     RemoveRequestService.removeRequest(pendingAuctionReviewRequest.getCreateAuctionRequest().getId());
     ConcurrentHashMap<Integer, PendingAuctionReviewRequest> requestList =
         PendingAuctionDatabase.getInstance().getData();

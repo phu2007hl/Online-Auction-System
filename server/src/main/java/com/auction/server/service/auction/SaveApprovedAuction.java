@@ -8,9 +8,11 @@ import com.auction.shared.auction.Auction;
 public class SaveApprovedAuction {
   public static void saveToDatabase(Auction auction){
     AuctionListDatabase database = AuctionListDatabase.getInstance();
-    ConcurrentHashMap<Integer,Auction> auctionList = database.getData();
-    auctionList.put(auction.getId(),auction);
-    database.saveData(auctionList);
+    synchronized (database) {
+      ConcurrentHashMap<Integer,Auction> auctionList = database.getData();
+      auctionList.put(auction.getId(),auction);
+      database.saveData(auctionList);
+    }
 
   }
 }

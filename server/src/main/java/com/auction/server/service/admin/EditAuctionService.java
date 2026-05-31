@@ -41,8 +41,10 @@ public class EditAuctionService {
     }
     // Sửa thông tin trong Dashboard trước khi duyệt/từ chối
     public static boolean editBeforeApprove(EditAuctionRequest editAuctionRequest){
+        PendingAuctionDatabase database = PendingAuctionDatabase.getInstance();
+        synchronized (database) {
         ConcurrentHashMap<Integer, PendingAuctionReviewRequest> pendingAuctionReviewList
-                = PendingAuctionDatabase.getInstance().getData();
+                = database.getData();
         PendingAuctionReviewRequest pendingAuctionReviewRequest
                 = pendingAuctionReviewList.get(editAuctionRequest.getId());
         if (pendingAuctionReviewRequest == null) {
@@ -60,9 +62,10 @@ public class EditAuctionService {
             return false;
         }
         updateAuction(createAuctionRequest, editAuctionRequest);
-        PendingAuctionDatabase.getInstance().saveData(pendingAuctionReviewList);
+        database.saveData(pendingAuctionReviewList);
         LOGGER.info("Đã chỉnh sửa pending auction [requestId: {}]", editAuctionRequest.getId());
         return true;
+        }
     }
     //Sửa thông tin sau khi approve
     public static boolean editAfterApprove(EditAuctionRequest editAuctionRequest){

@@ -35,8 +35,11 @@ public class GetMyAuctionHistoryHandler implements RequestHandler {
       return new GetMyAuctionHistoryResponse(false, myAuctionHistory);
     }
 
-    LinkedHashMap<Integer, PendingAuctionReviewRequest> checkedRequestList =
-        AdminResponseDatabase.getInstance().getData();
+    AdminResponseDatabase database = AdminResponseDatabase.getInstance();
+    LinkedHashMap<Integer, PendingAuctionReviewRequest> checkedRequestList;
+    synchronized (database) {
+      checkedRequestList = new LinkedHashMap<>(database.getData());
+    }
 
     for (Integer requestId : checkedRequestList.keySet()) {
       PendingAuctionReviewRequest pendingRequest = checkedRequestList.get(requestId);

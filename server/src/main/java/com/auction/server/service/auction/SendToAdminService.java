@@ -20,9 +20,11 @@ public class SendToAdminService {
         new PendingAuctionReviewRequest(req, clientHandler.getUser());
 
     PendingAuctionDatabase database = PendingAuctionDatabase.getInstance();
-    ConcurrentHashMap<Integer, PendingAuctionReviewRequest> requestList = database.getData();
-    requestList.put(pendingRequest.getCreateAuctionRequest().getId(), pendingRequest);
-    database.saveData(requestList);
+    synchronized (database) {
+      ConcurrentHashMap<Integer, PendingAuctionReviewRequest> requestList = database.getData();
+      requestList.put(pendingRequest.getCreateAuctionRequest().getId(), pendingRequest);
+      database.saveData(requestList);
+    }
 
     LOGGER.info(
         "Đã lưu auction request vào pending database [user: {}, category: {}]",

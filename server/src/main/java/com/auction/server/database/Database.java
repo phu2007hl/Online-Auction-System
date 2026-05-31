@@ -55,7 +55,7 @@ public abstract class Database<K> {
     }
   }
 
-  public void saveData(K dataToSave) {
+  public synchronized void saveData(K dataToSave) {
     try {
       File parentDirectory = dataFile.getParentFile();
       if (parentDirectory != null && !parentDirectory.exists()) {
@@ -73,7 +73,7 @@ public abstract class Database<K> {
     }
   }
 
-  public K getData() {
+  public synchronized K getData() {
     if (data == null) {
       data = loadData();
     }
