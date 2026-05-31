@@ -51,6 +51,7 @@
                     <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                     <includeScope>runtime</includeScope>
                     <excludeTransitive>false</excludeTransitive>
+                    <excludes>module-info.class,META-INF/versions/**/module-info.class</excludes>
                 </configuration>
                 <executions>
                     <execution>
@@ -73,6 +74,32 @@
                         </manifest>
                     </archive>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.4.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-server-jar-to-root</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${session.executionRootDirectory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>${project.build.finalName}.jar</include>
+                                    </includes>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

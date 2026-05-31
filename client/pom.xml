@@ -75,6 +75,7 @@
                     <outputDirectory>${project.build.outputDirectory}</outputDirectory>
                     <includeScope>runtime</includeScope>
                     <excludeTransitive>false</excludeTransitive>
+                    <excludes>module-info.class,META-INF/versions/**/module-info.class</excludes>
                 </configuration>
                 <executions>
                     <execution>
@@ -93,7 +94,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.auction.client.MainApp</mainClass>
+                            <mainClass>com.auction.client.ClientLauncher</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -105,6 +106,32 @@
                 <configuration>
                     <mainClass>com.auction.client.MainApp</mainClass>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.4.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-client-jar-to-root</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${session.executionRootDirectory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>${project.build.finalName}.jar</include>
+                                    </includes>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

@@ -11,8 +11,13 @@
     <children>
         <HBox alignment="CENTER" maxHeight="500.0" maxWidth="924.0" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 18, 0, 0, 4);" StackPane.alignment="CENTER">
             <children>
-                <VBox alignment="CENTER" prefWidth="424.0" spacing="18.0" style="-fx-background-color: white;">
+                <VBox alignment="CENTER" prefHeight="500.0" prefWidth="424.0" spacing="14.0" style="-fx-background-color: white;">
                     <children>
+                        <ImageView fitHeight="88.0" fitWidth="88.0" preserveRatio="true">
+                            <image>
+                                <Image url="@../images/Logo-DH-Cong-Nghe-UET.png" />
+                            </image>
+                        </ImageView>
                         <Label text="Đăng nhập">
                             <font>
                                 <Font name="System Bold" size="28.0" />
@@ -40,7 +45,7 @@
                     <children>
                         <ImageView fitHeight="500.0" fitWidth="500.0" preserveRatio="false">
                             <image>
-                                <Image url="@../images/humph.gif" />
+                                <Image url="@../images/cyberpunk.gif" />
                             </image>
                         </ImageView>
                         <Rectangle fill="#00000088" height="500.0" width="500.0" />

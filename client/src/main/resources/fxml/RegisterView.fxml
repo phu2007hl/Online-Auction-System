@@ -2,15 +2,21 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<StackPane style="-fx-background-color: #f3f4f6;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.auth.RegisterController">
+<StackPane alignment="CENTER" prefHeight="550.0" prefWidth="850.0" style="-fx-background-color: #f3f4f6;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.auth.RegisterController">
     <children>
-        <HBox alignment="CENTER" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 0);" StackPane.alignment="CENTER">
+        <HBox alignment="CENTER" maxHeight="550.0" maxWidth="850.0" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 18, 0, 0, 4);" StackPane.alignment="CENTER">
             <children>
-                <VBox alignment="CENTER" prefHeight="550.0" prefWidth="470.0" spacing="12.0" style="-fx-background-color: #ffffff;">
+                <VBox alignment="CENTER" prefHeight="550.0" prefWidth="470.0" spacing="10.0" style="-fx-background-color: #ffffff;">
                     <children>
+                        <ImageView fitHeight="72.0" fitWidth="72.0" preserveRatio="true">
+                            <image>
+                                <Image url="@../images/Logo-DH-Cong-Nghe-UET.png" />
+                            </image>
+                        </ImageView>
                         <Label text="Tạo tài khoản">
                             <font>
                                 <Font name="System Bold" size="28.0" />
