@@ -181,6 +181,26 @@ public class MainPageController extends Controller implements Initializable {
     requestApprovedAuctionList();
   }
 
+  @FXML
+  private void switchToMyAuctionHistory(ActionEvent event) {
+    try {
+      FXMLLoader loader =
+          new FXMLLoader(getClass().getResource("/fxml/MyAuctionHistoryView.fxml"));
+      Parent root = loader.load();
+
+      MyAuctionHistoryController controller = loader.getController();
+      controller.setCurrentUser(currentUser);
+      controller.setSocketClient(socket);
+
+      Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+      stage.getScene().setRoot(root);
+      stage.setTitle("Lịch sử auction đã duyệt");
+      stage.show();
+    } catch (IOException e) {
+      LOGGER.error("Không thể mở lịch sử auction của user", e);
+    }
+  }
+
   /**
   * Đăng xuất khỏi hệ thống.
   */

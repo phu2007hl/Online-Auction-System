@@ -12,7 +12,8 @@ import org.slf4j.LoggerFactory;
 
 public abstract class Database<K> {
   private static final Logger LOGGER = LoggerFactory.getLogger(Database.class);
-  private static final File DEFAULT_DATA_DIR = new File("data");
+  private static final String DATA_PATH_PROPERTY = "dataPath";
+  private static final String DEFAULT_DATA_PATH = "data";
   private K data;
   private final File dataFile;
 
@@ -33,7 +34,15 @@ public abstract class Database<K> {
    * @param filename tên file (vd: "User.ser")
    */
   public Database(String filename) {
-    this.dataFile = new File(DEFAULT_DATA_DIR, filename);
+    this.dataFile = new File(getDataDirectory(), filename);
+  }
+
+  private File getDataDirectory() {
+    String dataPath = System.getProperty(DATA_PATH_PROPERTY);
+    if (dataPath == null || dataPath.isBlank()) {
+      dataPath = DEFAULT_DATA_PATH;
+    }
+    return new File(dataPath);
   }
 
   @SuppressWarnings("unchecked")
@@ -55,7 +64,7 @@ public abstract class Database<K> {
     }
   }
 
-  public void saveData(K dataToSave) {
+  public synchronized void saveData(K dataToSave) {
     try {
       File parentDirectory = dataFile.getParentFile();
       if (parentDirectory != null && !parentDirectory.exists()) {
@@ -73,7 +82,7 @@ public abstract class Database<K> {
     }
   }
 
-  public K getData() {
+  public synchronized K getData() {
     if (data == null) {
       data = loadData();
     }

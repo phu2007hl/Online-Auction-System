@@ -3,7 +3,6 @@ package com.auction.server.handler.auction;
 import com.auction.server.handler.RequestHandler;
 import com.auction.server.network.ClientHandler;
 import com.auction.server.service.auction.AuctionRoomManager;
-import com.auction.server.singleton.AuctionManager;
 import com.auction.shared.request.Request;
 import com.auction.shared.request.auction.SendMessageRequest;
 import com.auction.shared.response.Response;

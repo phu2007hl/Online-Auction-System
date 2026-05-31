@@ -20,7 +20,8 @@ import com.auction.shared.model.User;
 import com.auction.shared.request.admin.EditAuctionRequest;
 import com.auction.shared.request.auction.BidRequest;
 import com.auction.shared.request.auction.CreateAuctionRequest;
-import com.auction.shared.request.auction.PublishApprovedAuctionRequest;
+import com.auction.shared.request.auction.PendingAuctionReviewRequest;
+import com.auction.shared.request.auction.ProcessAuctionReviewRequest;
 import com.auction.shared.request.auth.AdminLoginRequest;
 import com.auction.shared.request.auth.LoginRequest;
 import com.auction.shared.request.auth.LogOutRequest;
@@ -28,6 +29,7 @@ import com.auction.shared.request.auth.RegisterRequest;
 import javafx.application.Platform;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -35,8 +37,6 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -49,6 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Disabled("Test này cần JavaFX display, hiện chỉ dùng để chạy thủ công khi cần test full client-server")
 public class DataFlowTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataFlowTest.class);
     private static SocketClient con;
@@ -62,6 +63,7 @@ public class DataFlowTest {
 
     @BeforeAll
     public static void setUp() {
+        System.setProperty("dataPath", "../data-test/client-flow");
         try {
             Platform.startup(() -> {});
         } catch (IllegalStateException e) {
@@ -74,12 +76,22 @@ public class DataFlowTest {
         controller5 = new RegisterController();
         controller6 = new AuctionDetailController();
         controller7 = new EditApprovedAuctionController();
-      AuctionListDatabase auctionListDatabase = new AuctionListDatabase(new File("data/AuctionList.ser"));
-      PendingAuctionDatabase pendingAuctionDatabase = new PendingAuctionDatabase(new File("data/PendingAuction.ser"));
-      UserDatabase userDatabase = new UserDatabase(new File("data/User.ser")); 
       ConcurrentHashMap<Integer,Auction> auctionListTest = new ConcurrentHashMap<>();
-      auctionListTest.put(12345678, new Auction(12345678, "Yuri", "None", new User("Nigger7@gmail.com", "Nigger", "Nigger"), 0, 0, null, null, null));
-      auctionListDatabase.saveData(auctionListTest); 
+      auctionListTest.put(
+          12345678,
+          new Auction(
+              12345678,
+              "Yuri",
+              "None",
+              new User("seller@example.com", "Seller", "Seller"),
+              0,
+              0,
+              null,
+              null,
+              null));
+      AuctionListDatabase.getInstance().saveData(auctionListTest);
+      PendingAuctionDatabase.getInstance().saveData(new ConcurrentHashMap<>());
+      UserDatabase.getInstance().saveData(new ConcurrentHashMap<>());
 
         new Thread(() -> {
             try (ServerSocket server = new ServerSocket(4556)) {
@@ -215,8 +227,12 @@ public class DataFlowTest {
                 888888888,
                 "Laptop",
                 100);
-        PublishApprovedAuctionRequest req =
-            new PublishApprovedAuctionRequest(request, new User("MaroMoro@gmail.com", "l888888888", "Miro"));
+        PendingAuctionReviewRequest pendingRequest =
+            new PendingAuctionReviewRequest(
+                request,
+                new User("MaroMoro@gmail.com", "l888888888", "Miro"));
+        ProcessAuctionReviewRequest req =
+            new ProcessAuctionReviewRequest(pendingRequest, CreateAuctionStatus.SUCCESS);
 
         con.sendRequest(req);
         waitForResponse();
@@ -273,18 +289,6 @@ public class DataFlowTest {
 
     @AfterAll
     public static void clearResource() {
-        try {
-            FileOutputStream out1 =
-                new FileOutputStream(new File("data/AuctionList.ser"));
-            FileOutputStream out2 =
-                new FileOutputStream(new File("data/PendingAuction.ser"));
-            ClientHandler.getOnlineUser().clear();
-
-            FileOutputStream out3 =
-                new FileOutputStream(new File("data/User.ser"));
-
-        } catch (Exception e) {
-            LOGGER.error("Không thể dọn tài nguyên kiểm thử", e);
-        }
+        ClientHandler.getOnlineUser().clear();
     }
 }

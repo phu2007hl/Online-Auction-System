@@ -19,7 +19,6 @@ import com.auction.shared.request.auth.LoginRequest;
 import com.auction.shared.request.auth.RegisterRequest;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,12 +39,11 @@ public class RequestDispatcher {
     HANDLER_MAP.put(CreateAuctionRequest.class, new CreateAuctionRequestHandler());
     HANDLER_MAP.put(GetPendingAuctionListRequest.class, new GetPendingAuctionListHandler());
     HANDLER_MAP.put(GetApprovedAuctionListRequest.class, new GetApprovedAuctionListHandler());
-    HANDLER_MAP.put(LogOutRequest.class, new LogOutHandler());
-    HANDLER_MAP.put(SaveAuctionReviewResultRequest.class, new SaveAuctionReviewResultHandler());
     HANDLER_MAP.put(
-        PublishApprovedAuctionRequest.class,
-        new PublishApprovedAuctionHandler());
-    HANDLER_MAP.put(AuctionReviewResultRequest.class, new AuctionReviewResultHandler());
+        GetMyAuctionHistoryRequest.class,
+        new GetMyAuctionHistoryHandler());
+    HANDLER_MAP.put(LogOutRequest.class, new LogOutHandler());
+    HANDLER_MAP.put(ProcessAuctionReviewRequest.class, new ProcessAuctionReviewHandler());
     HANDLER_MAP.put(GetCheckedAuctionListRequest.class, new GetCheckedAuctionListHandler());
     HANDLER_MAP.put(BidRequest.class, new BidRequestHandler());
     HANDLER_MAP.put(JoinRoomRequest.class, new JoinRoomRequestHandler());

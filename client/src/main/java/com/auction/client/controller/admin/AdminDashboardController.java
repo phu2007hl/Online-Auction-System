@@ -4,11 +4,9 @@ import com.auction.client.controller.Controller;
 import com.auction.client.network.SocketClient;
 import com.auction.shared.enums.CreateAuctionStatus;
 import com.auction.shared.request.admin.GetPendingAuctionListRequest;
-import com.auction.shared.request.auction.AuctionReviewResultRequest;
 import com.auction.shared.request.auction.CreateAuctionRequest;
 import com.auction.shared.request.auction.PendingAuctionReviewRequest;
-import com.auction.shared.request.auction.PublishApprovedAuctionRequest;
-import com.auction.shared.request.auction.SaveAuctionReviewResultRequest;
+import com.auction.shared.request.auction.ProcessAuctionReviewRequest;
 import com.auction.shared.response.admin.GetPendingAuctionListResponse;
 
 import java.io.ByteArrayInputStream;
@@ -190,15 +188,10 @@ public class AdminDashboardController extends Controller implements Initializabl
   private void handleAccept(RequestRow row) {
     PendingAuctionReviewRequest pendingRequest = row.getRequest();
     pendingRequest.setStatus(CreateAuctionStatus.SUCCESS);
-    CreateAuctionRequest req = pendingRequest.getCreateAuctionRequest();
     try {
-      socket.sendRequest(new AuctionReviewResultRequest(pendingRequest.getUser(), true, CreateAuctionStatus.SUCCESS));
-      socket.sendRequest(new PublishApprovedAuctionRequest(req,pendingRequest.getUser()));
-      LOGGER.info("ADMIN: Đã gửi request chấp nhận auction đến client tương ứng và broadcast đến tất cả user");
-
-      SaveAuctionReviewResultRequest request = new SaveAuctionReviewResultRequest(pendingRequest);
-      socket.sendRequest(request);
-      LOGGER.info("Đã gửi request lưu auction SUCCESS vào database");
+      socket.sendRequest(
+          new ProcessAuctionReviewRequest(pendingRequest, CreateAuctionStatus.SUCCESS));
+      LOGGER.info("ADMIN: Đã gửi request chấp nhận auction");
     } catch (Exception e) {
       LOGGER.error("Không thể gửi kết quả duyệt auction", e);
     }
@@ -214,12 +207,9 @@ public class AdminDashboardController extends Controller implements Initializabl
     PendingAuctionReviewRequest pendingRequest = row.getRequest();
     pendingRequest.setStatus(CreateAuctionStatus.DECLINED);
     try {
-      socket.sendRequest(new AuctionReviewResultRequest(pendingRequest.getUser(), false, CreateAuctionStatus.DECLINED));
-      LOGGER.info("ADMIN: Đã gửi request từ chối auction đến client tương ứng");
-
-      SaveAuctionReviewResultRequest request = new SaveAuctionReviewResultRequest(pendingRequest);
-      socket.sendRequest(request);
-      LOGGER.info("Đã gửi request lưu auction DECLINED vào database");
+      socket.sendRequest(
+          new ProcessAuctionReviewRequest(pendingRequest, CreateAuctionStatus.DECLINED));
+      LOGGER.info("ADMIN: Đã gửi request từ chối auction");
     } catch (Exception e) {
       LOGGER.error("Không thể gửi kết quả từ chối auction", e);
     }

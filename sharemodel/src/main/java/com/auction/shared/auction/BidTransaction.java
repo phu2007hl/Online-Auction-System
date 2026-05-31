@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public class BidTransaction implements Serializable {
-  private static final long serialVersionUID = 1L;
 
   private String bidderUsername;
   private double bidAmount;
