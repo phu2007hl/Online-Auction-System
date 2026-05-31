@@ -33,21 +33,23 @@ public class RegisterAuthentication {
   */
   public boolean authenticateRegistration() {
     UserDatabase database = UserDatabase.getInstance();
-    userdata = database.getData();
+    synchronized (database) {
+      userdata = database.getData();
 
-    User newUser =
-        new User(
-            request.getEmail(),
-            request.getPassword(),
+      User newUser =
+          new User(
+              request.getEmail(),
+              request.getPassword(),
+              request.getUsername());
+      User result = userdata.putIfAbsent(request.getEmail(), newUser);
+
+      if (result == null) {
+        database.saveData(userdata);
+        LOGGER.info(
+            "User đăng ký thành công: {}",
             request.getUsername());
-    User result = userdata.putIfAbsent(request.getEmail(), newUser);
-
-    if (result == null) {
-      database.saveData(userdata);
-      LOGGER.info(
-          "User đăng ký thành công: {}",
-          request.getUsername());
-      return true;
+        return true;
+      }
     }
     LOGGER.warn(
         "Đăng ký thất bại - user đã tồn tại: {}",

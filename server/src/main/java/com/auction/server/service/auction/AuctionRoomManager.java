@@ -13,21 +13,22 @@ public class AuctionRoomManager {
     private static final ConcurrentHashMap<Integer, Set<ClientHandler>> auctionRooms =
             new ConcurrentHashMap<>();
 
-    public static synchronized boolean joinRoom(int auctionId, ClientHandler clientHandler){
+    public static boolean joinRoom(int auctionId, ClientHandler clientHandler){
         if(clientHandler == null){
             LOGGER.warn("Không thể join room vì clientHandler null [auctionId: {}]", auctionId);
             return false;
         }
-        auctionRooms.computeIfAbsent(auctionId, id -> ConcurrentHashMap.newKeySet())
-                .add(clientHandler);
+        Set<ClientHandler> auctionRoom =
+                auctionRooms.computeIfAbsent(auctionId, id -> ConcurrentHashMap.newKeySet());
+        auctionRoom.add(clientHandler);
         LOGGER.info(
                 "Client đã join auction room [auctionId: {}, roomSize: {}]",
                 auctionId,
-                auctionRooms.get(auctionId).size());
+                auctionRoom.size());
         return true;
     }
 
-    public static synchronized boolean leaveRoom(int auctionId, ClientHandler clientHandler) {
+    public static boolean leaveRoom(int auctionId, ClientHandler clientHandler) {
         Set<ClientHandler> auctionRoom = auctionRooms.get(auctionId);
         if (auctionRoom == null) {
             LOGGER.warn("Không thể leave room vì room không tồn tại [auctionId: {}]", auctionId);
@@ -35,7 +36,7 @@ public class AuctionRoomManager {
         }
         boolean removed = auctionRoom.remove(clientHandler);
         if (auctionRoom.isEmpty()) {
-            auctionRooms.remove(auctionId);
+            auctionRooms.remove(auctionId, auctionRoom);
             LOGGER.info("Đã xóa auction room rỗng [auctionId: {}]", auctionId);
         }
         LOGGER.info(

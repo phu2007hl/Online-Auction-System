@@ -13,8 +13,11 @@ import java.util.LinkedHashMap;
 public class GetCheckedAuctionListHandler implements RequestHandler {
     @Override
     public Response handle(Request request, ClientHandler clientHandler) {
-        LinkedHashMap<Integer, PendingAuctionReviewRequest> checkedAuctionList
-                = AdminResponseDatabase.getInstance().getData();
+        AdminResponseDatabase database = AdminResponseDatabase.getInstance();
+        LinkedHashMap<Integer, PendingAuctionReviewRequest> checkedAuctionList;
+        synchronized (database) {
+            checkedAuctionList = new LinkedHashMap<>(database.getData());
+        }
         return new GetCheckedAuctionListResponse(true, checkedAuctionList);
     }
 }
