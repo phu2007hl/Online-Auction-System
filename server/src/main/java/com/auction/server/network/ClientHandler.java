@@ -70,7 +70,9 @@ public class ClientHandler implements Runnable {
         RequestHandler handler = dispatcher.getHandler(request);
         Response response = handler.handle(request, this);
 
-        sendObject(response);
+        if (response != null) {
+          sendObject(response);
+        }
       }
     } catch (Exception e) {
       String userContext = (user != null) ? user.getUsername() : "unknown";

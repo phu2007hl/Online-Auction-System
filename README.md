@@ -21,8 +21,8 @@
 - Đã tách xử lý request phía server theo hướng `RequestDispatcher` và `RequestHandler`, giúp code dễ mở rộng hơn khi thêm nhiều request mới.
 - Đã bổ sung `currentUser` trong `LoginResponse` và `RegisterResponse` để client có thể lưu trạng thái người dùng sau khi đăng nhập hoặc đăng ký thành công.
 - Đã có các class nền cho hệ thống đấu giá như `Auction`, `BidTransaction`, `Entity`, `User`.
-- Đã xây dựng khung model cho `Item`, các lớp con của item và `ItemFactory`.
-- Đã có các enum phục vụ nghiệp vụ như `AuctionStatus`, `ItemCondition`, `LoginResponseStatus`.
+- Đã xây dựng luồng category trực tiếp bằng `String` cho phần tạo và hiển thị auction.
+- Đã có các enum phục vụ nghiệp vụ như `AuctionStatus`, `BidderStatus`, `LoginResponseStatus`.
 - Đã có một số màn hình JavaFX chính như `LoginView`, `RegisterView`, `MainPageView`, `CreateAuctionPage`.
 
 ### 2. Phần đang triển khai

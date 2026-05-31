@@ -1,8 +1,6 @@
 package com.auction.server.network;
 
 import com.auction.shared.request.Request;
-import com.auction.shared.response.Response;
-import java.io.ObjectInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +11,6 @@ public class AdminHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(AdminHandler.class);
 
   private final ClientHandler adminClientHandler;
-  private final ObjectInputStream in;
 
   /**
   * Tạo admin handler từ connection hiện có.
@@ -22,7 +19,6 @@ public class AdminHandler {
   */
   public AdminHandler(ClientHandler clienthandler) {
     this.adminClientHandler = clienthandler;
-    this.in = clienthandler.getInputStream();
   }
 
   /**
@@ -57,18 +53,4 @@ public class AdminHandler {
     }
   }
 
-  /**
-  * Đọc response từ admin.
-  *
-  * @return response từ admin
-  */
-  public Response getAdminResponse() {
-    try {
-      LOGGER.debug("Đang đọc response từ admin");
-      return (Response) in.readObject();
-    } catch (Exception e) {
-      LOGGER.error("Không thể đọc response từ admin", e);
-      return null;
-    }
-  }
 }

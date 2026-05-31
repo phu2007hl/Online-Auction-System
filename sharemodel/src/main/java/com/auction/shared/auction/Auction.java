@@ -4,7 +4,6 @@ import com.auction.shared.entity.Entity;
 import com.auction.shared.enums.AuctionStatus;
 import com.auction.shared.model.User;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -19,7 +18,6 @@ public class Auction extends Entity {
   private double currentPrice;
   private double minimumIncrement;
   private boolean antiSnippingEnabled;
-  private LocalDate startTime;
   private LocalDateTime endTime;
   private AuctionStatus status;
   private User winner;
@@ -82,9 +80,6 @@ public class Auction extends Entity {
   }
   public LocalDateTime getEndTime(){
     return endTime;
-  }
-  public LocalDate getStartTime(){
-    return startTime;
   }
   public User getWinner(){
     return winner;
