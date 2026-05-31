@@ -91,7 +91,7 @@ public class RegisterController extends Controller implements Initializable {
     String username = usernameField.getText().trim();
 
     if (email.isEmpty() || password.isEmpty() || username.isEmpty()) {
-      messageLabel.setText("Vui lòng nhập đầy đủ thông tin.");
+      showError("Vui lòng nhập đầy đủ thông tin.");
       return;
     }
 
@@ -101,14 +101,14 @@ public class RegisterController extends Controller implements Initializable {
       Request request = service.createAuthRequest();
 
       if (request == null) {
-        messageLabel.setText(service.getErrorMessage());
+        showError(service.getErrorMessage());
         return;
       }
 
       socket.sendRequest(request);
     } catch (Exception e) {
       LOGGER.error("Không thể gửi yêu cầu đăng ký", e);
-      messageLabel.setText("Không thể kết nối tới server.");
+      showError("Không thể kết nối tới server.");
     }
   }
 
@@ -136,7 +136,7 @@ public class RegisterController extends Controller implements Initializable {
       currentStage.show();
     } catch (IOException e) {
       LOGGER.error("Không thể mở trang đăng nhập", e);
-      messageLabel.setText("Không thể mở trang đăng nhập.");
+      showError("Không thể mở trang đăng nhập.");
     }
   }
 
@@ -164,7 +164,7 @@ public class RegisterController extends Controller implements Initializable {
       currentStage.show();
     } catch (IOException e) {
       LOGGER.error("Không thể mở trang chính", e);
-      messageLabel.setText("Không thể mở trang chính.");
+      showError("Không thể mở trang chính.");
     }
   }
 
@@ -175,10 +175,15 @@ public class RegisterController extends Controller implements Initializable {
       if (response.getResponse()) {
         switchToMain(response.getCurrentUser(), true);
       } else {
-        messageLabel.setText("Email đã tồn tại.");
+        showError("Email đã tồn tại.");
         switchToMainSuccess = false;
       }
     }
+  }
+
+  private void showError(String message) {
+    messageLabel.setStyle("-fx-text-fill: #dc2626; -fx-font-weight: bold;");
+    messageLabel.setText(message);
   }
 
   /**

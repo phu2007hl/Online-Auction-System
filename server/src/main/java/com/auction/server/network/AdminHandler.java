@@ -31,7 +31,7 @@ public class AdminHandler {
   * @param request request cần forward
   * @param clientHandler client connection goc
   */
-  public void forwardRequest(Request request, ClientHandler clientHandler) {
+  public boolean forwardRequest(Request request, ClientHandler clientHandler) {
     try {
       String userContext =
           (clientHandler.getUser() != null)
@@ -42,6 +42,7 @@ public class AdminHandler {
           "Đã chuyển request {} tới admin [user: {}]",
           request.getClass().getSimpleName(),
           userContext);
+      return true;
     } catch (Exception e) {
       String userContext =
           (clientHandler.getUser() != null)
@@ -52,6 +53,7 @@ public class AdminHandler {
           request.getClass().getSimpleName(),
           userContext,
           e);
+      return false;
     }
   }
 

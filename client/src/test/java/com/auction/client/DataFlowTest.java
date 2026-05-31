@@ -40,7 +40,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
 
@@ -74,9 +74,9 @@ public class DataFlowTest {
         controller5 = new RegisterController();
         controller6 = new AuctionDetailController();
         controller7 = new EditApprovedAuctionController();
-      AuctionListDatabase auctionListDatabase = new AuctionListDatabase(new File("C:\\Users\\LOQ\\Desktop\\Online-Auction-System\\client\\data-test\\AuctionList.ser"));
-      PendingAuctionDatabase pendingAuctionDatabase = new PendingAuctionDatabase(new File("C:\\Users\\LOQ\\Desktop\\Online-Auction-System\\client\\data-test\\PendingAuction.ser"));
-      UserDatabase userDatabase = new UserDatabase(new File("C:\\Users\\LOQ\\Desktop\\Online-Auction-System\\client\\data-test\\User.ser")); 
+      AuctionListDatabase auctionListDatabase = new AuctionListDatabase(new File("data/AuctionList.ser"));
+      PendingAuctionDatabase pendingAuctionDatabase = new PendingAuctionDatabase(new File("data/PendingAuction.ser"));
+      UserDatabase userDatabase = new UserDatabase(new File("data/User.ser")); 
       ConcurrentHashMap<Integer,Auction> auctionListTest = new ConcurrentHashMap<>();
       auctionListTest.put(12345678, new Auction(12345678, "Yuri", "None", new User("Nigger7@gmail.com", "Nigger", "Nigger"), 0, 0, null, null, null));
       auctionListDatabase.saveData(auctionListTest); 
@@ -184,7 +184,7 @@ public class DataFlowTest {
                 "Electronic",
                 1000,
                 "desc",
-                LocalDate.now().plusDays(4),
+                LocalDateTime.now().plusDays(4),
                 888888888,
                 "Laptop",
                 100);
@@ -211,7 +211,7 @@ public class DataFlowTest {
                 "Electronic",
                 1000,
                 "desc",
-                LocalDate.now().plusDays(4),
+                LocalDateTime.now().plusDays(4),
                 888888888,
                 "Laptop",
                 100);
@@ -275,13 +275,13 @@ public class DataFlowTest {
     public static void clearResource() {
         try {
             FileOutputStream out1 =
-                new FileOutputStream(new File("data-test/AuctionList.ser"));
+                new FileOutputStream(new File("data/AuctionList.ser"));
             FileOutputStream out2 =
-                new FileOutputStream(new File("data-test/PendingAuction.ser"));
+                new FileOutputStream(new File("data/PendingAuction.ser"));
             ClientHandler.getOnlineUser().clear();
 
             FileOutputStream out3 =
-                new FileOutputStream(new File("data-test/User.ser"));
+                new FileOutputStream(new File("data/User.ser"));
 
         } catch (Exception e) {
             LOGGER.error("Không thể dọn tài nguyên kiểm thử", e);

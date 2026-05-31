@@ -4,6 +4,7 @@ import com.auction.client.network.SocketClient;
 import com.auction.shared.auction.Auction;
 import com.auction.shared.enums.AuctionStatus;
 import com.auction.shared.model.User;
+import java.time.format.DateTimeFormatter;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -14,6 +15,9 @@ import javafx.scene.input.MouseEvent;
  * Controller của từng ô sản phẩm trên main page.
  */
 public class AuctionBoxController {
+  private static final DateTimeFormatter END_TIME_FORMATTER =
+      DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
   private SocketClient socket;
   private int auctionId;
   private User currentUser;
@@ -57,7 +61,11 @@ public class AuctionBoxController {
         : auction.getSeller().getUsername();
     sellerLabel.setText("Người bán: " + sellerName);
     categoryLabel.setText("Danh mục: " + auction.getCategory());
-    endDateLabel.setText("Kết thúc: " + auction.getEndTime());
+    if (auction.getEndTime() != null) {
+      endDateLabel.setText("Kết thúc: " + auction.getEndTime().format(END_TIME_FORMATTER));
+    } else {
+      endDateLabel.setText("Kết thúc: chưa xác định");
+    }
     priceLabel.setText("$" + String.format("%.2f", auction.getCurrentPrice()));
     renderStatus(auction.getStatus());
   }

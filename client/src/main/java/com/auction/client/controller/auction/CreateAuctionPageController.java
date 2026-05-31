@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,8 +19,11 @@ import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -51,7 +55,16 @@ public class CreateAuctionPageController {
   private DatePicker endDatePicker;
 
   @FXML
+  private Spinner<Integer> endHourSpinner;
+
+  @FXML
+  private Spinner<Integer> endMinuteSpinner;
+
+  @FXML
   private TextArea descriptionArea;
+
+  @FXML
+  private ToggleButton antiSnippingToggleButton;
 
   @FXML
   private Label imagePathLabel;
@@ -60,6 +73,34 @@ public class CreateAuctionPageController {
   private Label messageLabel;
   @FXML
   private TextField minimumIncrementField;
+
+  @FXML
+  private void initialize() {
+    endHourSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, 23));
+    endMinuteSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 59, 59));
+    endHourSpinner.setEditable(true);
+    endMinuteSpinner.setEditable(true);
+    updateAntiSnippingToggleStyle();
+    antiSnippingToggleButton
+        .selectedProperty()
+        .addListener((observable, oldValue, newValue) -> updateAntiSnippingToggleStyle());
+  }
+
+  private void updateAntiSnippingToggleStyle() {
+    if (antiSnippingToggleButton.isSelected()) {
+      antiSnippingToggleButton.setText("Bật");
+      antiSnippingToggleButton.setStyle(
+          "-fx-background-color: #16a34a; -fx-text-fill: white; "
+              + "-fx-font-weight: bold; -fx-background-radius: 999; "
+              + "-fx-padding: 6 18; -fx-cursor: hand;");
+    } else {
+      antiSnippingToggleButton.setText("Tắt");
+      antiSnippingToggleButton.setStyle(
+          "-fx-background-color: #e5e7eb; -fx-text-fill: #6b7280; "
+              + "-fx-font-weight: bold; -fx-background-radius: 999; "
+              + "-fx-padding: 6 18; -fx-cursor: hand;");
+    }
+  }
 
   /**
   * Gán socket client cho màn tạo auction.
@@ -138,18 +179,45 @@ public class CreateAuctionPageController {
         || description.isEmpty()
         || itemName.isEmpty()
         || minimumIncrement.isEmpty()) {
-      messageLabel.setText("Vui lòng nhập thông tin của sản phẩm.");
+      showError("Vui lòng nhập thông tin của sản phẩm.");
       return;
     }
     int id = IdGenerator.generateId();
-    double price = Double.parseDouble(startingPrice);
-    double increment = Double.parseDouble(minimumIncrement);
+    double price;
+    double increment;
+    try {
+      price = Double.parseDouble(startingPrice);
+      increment = Double.parseDouble(minimumIncrement);
+    } catch (NumberFormatException e) {
+      showError("Giá khởi điểm và bước giá tối thiểu phải là số hợp lệ.");
+      return;
+    }
+    if (price <= 0 || increment <= 0) {
+      showError("Giá khởi điểm và bước giá tối thiểu phải lớn hơn 0.");
+      return;
+    }
+    LocalDateTime endTime =
+        LocalDateTime.of(
+            endDate,
+            LocalTime.of(endHourSpinner.getValue(), endMinuteSpinner.getValue()));
+    if (!endTime.isAfter(LocalDateTime.now())) {
+      showError("Thời gian kết thúc phải sau thời gian hiện tại.");
+      return;
+    }
     CreateAuctionRequest request =
         new CreateAuctionRequest(
-            imageContent, category, price, description, endDate,id,itemName,increment); //Phần này phải thêm minimum increment 
+            imageContent,
+            category,
+            price,
+            description,
+            endTime,
+            id,
+            itemName,
+            increment,
+            antiSnippingToggleButton.isSelected()); //Phần này phải thêm minimum increment 
     socket.sendRequest(request);
     LOGGER.info("Đã gửi yêu cầu tạo auction cho sản phẩm {}", productNameField.getText());
-    messageLabel.setText("Đã gửi yêu cầu tạo đấu giá");
+    showSuccess("Đã gửi yêu cầu tạo đấu giá");
   }
 
   /**
@@ -180,5 +248,15 @@ public class CreateAuctionPageController {
     } catch (IOException e) {
       LOGGER.error("Không thể mở trang chính", e);
     }
+  }
+
+  private void showError(String message) {
+    messageLabel.setStyle("-fx-text-fill: #dc2626; -fx-font-weight: bold;");
+    messageLabel.setText(message);
+  }
+
+  private void showSuccess(String message) {
+    messageLabel.setStyle("-fx-text-fill: #16a34a; -fx-font-weight: bold;");
+    messageLabel.setText(message);
   }
 }

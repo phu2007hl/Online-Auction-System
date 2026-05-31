@@ -76,6 +76,18 @@ public class BidService {
             //Lưu các thông tin mới của Auction vào database;
             auction.setCurrentPrice(getBidPrice());
             auction.setWinner(getBidder());
+
+            if(auction.isAntiSnippingEnabled() && auction.getEndTime() != null){
+                LocalDateTime now = LocalDateTime.now();
+                LocalDateTime endTime = auction.getEndTime();
+
+                if (!auction.getStatus().equals(AuctionStatus.CLOSED)
+                        && endTime.minusSeconds(10).isBefore(now)
+                        && endTime.isAfter(now)) {
+                    auction.setEndTime(endTime.plusMinutes(1));
+                }
+            }
+
             BidTransaction bidTransaction =
                     new BidTransaction(getBidder().getUsername(), getBidPrice(), LocalDateTime.now());
             auction.getBidHistory().add(bidTransaction);
@@ -88,7 +100,7 @@ public class BidService {
                     auction.getCurrentPrice(),
                     auction.getBidHistory().size());
 
-    }
+        }
     }
     public void changeBidderStatus(){
             ConcurrentHashMap<Integer, AuctionBidderDetail> auctionBidderDetailHashMap = AuctionBidderDetailDatabase.
@@ -117,7 +129,6 @@ public class BidService {
                     getBidder().getEmail(),
                     auctionBidderDetail.getBidderStatusHashMap().size());
     }
-
     /**
      * Hàm thực sự xử lí logic đặt bid
      * Nếu đặt thành công thì sẽ thay đổi winner và currentprice bên trong object Auction, set trạng thái
@@ -139,6 +150,12 @@ public class BidService {
         if (auction.getStatus() != AuctionStatus.OPEN){
             return new BidProcessResult(BidResponseStatus.DECLINED, null);
         }
+        if (auction.getEndTime() != null && !auction.getEndTime().isAfter(LocalDateTime.now())) {
+            auction.setStatus(AuctionStatus.CLOSED);
+            ConcurrentHashMap<Integer, Auction> auctionList = AuctionListDatabase.getInstance().getData();
+            AuctionListDatabase.getInstance().saveData(auctionList);
+            return new BidProcessResult(BidResponseStatus.DECLINED, null);
+        }
         LOGGER.info(
                 "Đang xử lý bid [auctionId: {}, bidder: {}, bidPrice: {}, currentPrice: {}, minimumIncrement: {}]",
                 getAuctionId(),
@@ -151,7 +168,7 @@ public class BidService {
             changeBidderStatus();
             return new BidProcessResult(BidResponseStatus.ACCEPTED,
                     new BidUpdateResponse(getAuctionId(),getBidPrice(),getBidder().getEmail(),
-                            getBidder().getUsername(),auction.getBidHistory()));
+                            getBidder().getUsername(),auction.getBidHistory(), auction.getEndTime()));
         }
         LOGGER.info(
                 "Từ chối bid vì giá không đạt bước tối thiểu [auctionId: {}, bidder: {}, bidPrice: {}, requiredPrice: {}]",

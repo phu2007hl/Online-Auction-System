@@ -14,7 +14,7 @@ import com.auction.shared.request.auction.GetAuctionDetailRequest;
 import com.auction.shared.response.Response;
 import com.auction.shared.response.auction.GetAuctionDetailResponse;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,7 +34,8 @@ public class GetAuctionDetailRequestHandler implements RequestHandler {
 
         synchronized (LockManager.getLock(auction.getId())) {
             if (auction.getStatus() == AuctionStatus.OPEN
-                    && auction.getEndTime().isBefore(LocalDate.now())) {
+                    && auction.getEndTime() != null
+                    && auction.getEndTime().isBefore(LocalDateTime.now())) {
                 auctionStatus = AuctionStatus.CLOSED;
                 auction.setStatus(AuctionStatus.CLOSED);
                 AuctionListDatabase.getInstance().saveData(auctionList);
