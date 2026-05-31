@@ -34,7 +34,7 @@ public class SocketClient {
     ObjectInputStream createdIn = null;
 
     try {
-      createdSocket = new Socket("localhost", port);
+      createdSocket = new Socket("local host", port);
       LOGGER.info("Đã kết nối tới server ở cổng {}", port);
 
       createdOut = new ObjectOutputStream(createdSocket.getOutputStream());
